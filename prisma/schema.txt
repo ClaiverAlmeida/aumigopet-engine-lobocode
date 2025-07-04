@@ -1,0 +1,380 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator json {
+  provider = "prisma-json-types-generator"
+}
+
+generator erd {
+  provider = "prisma-erd-generator"
+  output   = "./ERD.svg"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  ADMIN_MASTER
+  ADMIN
+  RH
+  GUARD
+  CLIENT
+  EDITOR
+  WRITER
+  READER
+}
+
+enum ProfileType {
+  ADMIN_MASTER
+  GUARD
+  HR
+  CLIENT
+  SUPERVISOR
+  // ...
+}
+
+model Company {
+  id              String         @id @default(cuid()) 
+  companyName     String
+  companyCNPJ     String         @unique
+  companySite     String?        
+  companyAddress  String?
+  companyCountry  String? 
+  contactName     String?
+  contactEmail    String?
+  contactPhone    String?
+  users           User[]
+  guards          Guard[]
+  hrs             HR[]
+  clients         Client[]
+  supervisors     Supervisor[]
+  schedules       Schedule[]
+  rounds          Round[]
+  occurrences     Occurrence[]
+  warnings        Warning[]
+  notifications   Notification[]
+  reports         Report[]
+  feedbacks       Feedback[]
+  checklists      Checklist[]
+  // outros dados da empresa
+}
+
+model User {
+  id               String         @id @default(cuid())
+  name             String
+  email            String         @unique
+  password         String
+  role             Roles          @default(READER)
+  profileType      ProfileType
+  profileId        String?
+  /// [PermissionsList]
+  permissions      Json?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  Post             Post[]
+  guard            Guard?
+  hr               HR?
+  client           Client?
+  supervisor       Supervisor?
+  notifications    Notification[]
+  feedbacks        Feedback[]
+  messagesSent     Message[]      @relation("MessageSender")
+  messagesReceived Message[]      @relation("MessageReceiver")
+  chatParticipants Chat[]         @relation("ChatParticipants")
+  auditLogs        AuditLog[]     @relation("AuditLogUser")
+  auditLogUserLogs AuditLog[]     @relation("AuditLogUserLogs")
+  company          Company?       @relation(fields: [companyId], references: [id])
+  companyId        String?
+
+  ReportRecipient ReportRecipient[]
+}
+
+model Post {
+  id        String   @id @default(cuid())
+  title     String
+  content   String   @db.Text
+  published Boolean  @default(false)
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          String @id @default(cuid())
+  name        String
+  slug        String @unique
+  description String
+  price       Float
+}
+
+model Guard {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique
+  company       Company        @relation(fields: [companyId], references: [id])
+  companyId     String
+  profile       Json?
+  schedules     Schedule[]
+  rounds        Round[]
+  warnings      Warning[]
+  notifications Notification[] @relation("GuardNotifications")
+  feedbacks     Feedback[]     @relation("GuardFeedbacks")
+  hr            HR?            @relation(fields: [hrId], references: [id])
+  hrId          String?
+  supervisor    Supervisor?    @relation(fields: [supervisorId], references: [id])
+  supervisorId  String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  deletedAt     DateTime?
+  occurrences   Occurrence[]   @relation("GuardOccurrences")
+
+  @@index([companyId])
+}
+
+model HR {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique
+  company       Company        @relation(fields: [companyId], references: [id])
+  companyId     String
+  employees     Guard[]
+  reports       Report[]
+  notifications Notification[] @relation("HRNotifications")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Client {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique
+  company       Company        @relation(fields: [companyId], references: [id])
+  companyId     String
+  condominiums  Json?
+  notifications Notification[] @relation("ClientNotifications")
+  feedbacks     Feedback[]     @relation("ClientFeedbacks")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Supervisor {
+  id            String         @id @default(cuid())
+  user          User           @relation(fields: [userId], references: [id])
+  userId        String         @unique
+  company       Company        @relation(fields: [companyId], references: [id])
+  companyId     String
+  guards        Guard[]
+  warnings      Warning[]
+  notifications Notification[] @relation("SupervisorNotifications")
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Schedule {
+  id        String   @id @default(cuid())
+  guard     Guard    @relation(fields: [guardId], references: [id])
+  guardId   String
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  start     DateTime
+  end       DateTime
+  type      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Round {
+  id          String   @id @default(cuid())
+  guard       Guard    @relation(fields: [guardId], references: [id])
+  guardId     String
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   String
+  start       DateTime
+  end         DateTime
+  checkpoints Json?
+  media       Json?
+  route       Json?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Occurrence {
+  id          String   @id @default(cuid())
+  guard       Guard    @relation("GuardOccurrences", fields: [guardId], references: [id])
+  guardId     String
+  company     Company  @relation(fields: [companyId], references: [id])
+  companyId   String
+  category    String
+  description String
+  media       Json?
+  notified    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Warning {
+  id           String      @id @default(cuid())
+  guard        Guard       @relation(fields: [guardId], references: [id])
+  guardId      String
+  company      Company     @relation(fields: [companyId], references: [id])
+  companyId    String
+  supervisor   Supervisor? @relation(fields: [supervisorId], references: [id])
+  supervisorId String?
+  reason       String
+  details      String?
+  attachments  Json?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Notification {
+  id           String      @id @default(cuid())
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  company      Company     @relation(fields: [companyId], references: [id])
+  companyId    String
+  title        String
+  message      String
+  read         Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  guard        Guard?      @relation("GuardNotifications", fields: [guardId], references: [id])
+  guardId      String?
+  hr           HR?         @relation("HRNotifications", fields: [hrId], references: [id])
+  hrId         String?
+  client       Client?     @relation("ClientNotifications", fields: [clientId], references: [id])
+  clientId     String?
+  supervisor   Supervisor? @relation("SupervisorNotifications", fields: [supervisorId], references: [id])
+  supervisorId String?
+}
+
+model Chat {
+  id           String    @id @default(cuid())
+  participants User[]    @relation("ChatParticipants")
+  messages     Message[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  chat       Chat     @relation(fields: [chatId], references: [id])
+  chatId     String
+  sender     User     @relation("MessageSender", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User?    @relation("MessageReceiver", fields: [receiverId], references: [id])
+  receiverId String?
+  content    String
+  media      Json?
+  createdAt  DateTime @default(now())
+}
+
+model Fleet {
+  id        String    @id @default(cuid())
+  name      String
+  vehicles  Vehicle[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Vehicle {
+  id           String        @id @default(cuid())
+  fleet        Fleet         @relation(fields: [fleetId], references: [id])
+  fleetId      String
+  plate        String        @unique
+  model        String
+  fuelings     Fueling[]
+  maintenances Maintenance[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([fleetId])
+}
+
+model Fueling {
+  id        String   @id @default(cuid())
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId String
+  amount    Float
+  km        Int
+  createdAt DateTime @default(now())
+}
+
+model Maintenance {
+  id          String   @id @default(cuid())
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id])
+  vehicleId   String
+  type        String
+  description String
+  date        DateTime
+  createdAt   DateTime @default(now())
+}
+
+model Report {
+  id         String   @id @default(cuid())
+  hr         HR?      @relation(fields: [hrId], references: [id])
+  hrId       String?
+  company    Company  @relation(fields: [companyId], references: [id])
+  companyId  String
+  data       Json
+  type       String
+  scheduled  Boolean  @default(false)
+  recipients Json?
+  format     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  ReportRecipient ReportRecipient[]
+}
+
+model ReportRecipient {
+  id       String @id @default(cuid())
+  report   Report @relation(fields: [reportId], references: [id])
+  reportId String
+  user     User   @relation(fields: [userId], references: [id])
+  userId   String
+}
+
+model Feedback {
+  id        String   @id @default(cuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  content   String
+  createdAt DateTime @default(now())
+  guard     Guard?   @relation("GuardFeedbacks", fields: [guardId], references: [id])
+  guardId   String?
+  client    Client?  @relation("ClientFeedbacks", fields: [clientId], references: [id])
+  clientId  String?
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  user      User?    @relation("AuditLogUser", fields: [userId], references: [id])
+  userId    String?
+  action    String
+  details   Json?
+  createdAt DateTime @default(now())
+  userLogs  User[]   @relation("AuditLogUserLogs")
+}
+
+model Checklist {
+  id        String   @id @default(cuid())
+  company   Company  @relation(fields: [companyId], references: [id])
+  companyId String
+  name      String
+  items     Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

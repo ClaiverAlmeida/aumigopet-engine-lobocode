@@ -1,7 +1,7 @@
 import type {
   PermActions,
   PermissionResource,
-} from '../../src/casl/casl-ability.service';
+} from '../../src/shared/casl/casl-ability.service';
 
 declare global {
   namespace PrismaJson {
