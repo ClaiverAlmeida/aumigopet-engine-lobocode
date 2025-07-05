@@ -1,4 +1,25 @@
 @tokenAdmin = {{ adminLogin.response.body.access_token }}
+@tokenHR = {{ hrLogin.response.body.access_token }}
+
+
+
+### 
+# @name hrLogin
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+    "email": "hr@user.com",
+    "password": "123456"
+}
+
+###
+GET http://localhost:3000/users 
+Authorization: Bearer {{tokenHR}}
+
+###
+GET http://localhost:3000/users/cmco084n70001lt96th7lafk8
+Authorization: Bearer {{tokenHR}}
 
 ### 
 # @name adminLogin
@@ -9,13 +30,15 @@ Content-Type: application/json
     "email": "platformadmin@user.com",
     "password": "123456"
 }
-
 ###
-GET http://localhost:3000/users
+GET http://localhost:3000/users 
+Authorization: Bearer {{tokenAdmin}}
+###
+GET http://localhost:3000/users?companyId=cmco084kk0000lt96pxlqot9s
 Authorization: Bearer {{tokenAdmin}}
 
 ###
-GET http://localhost:3000/users/cm8z3gmns0002s9sywsjk9upq
+GET http://localhost:3000/users/cmco084n70001lt96th7lafk8
 Authorization: Bearer {{tokenAdmin}}
 
 ###
@@ -47,7 +70,7 @@ Authorization: Bearer {{tokenAdmin}}
     "name": "Admin",
     "email": "admin2@user.com",
     "password": "123456",
-    "companyId": "<company_id>",
+    "companyId": "cmco084kk0000lt96pxlqot9s",
     "role": "ADMIN"
 }
 
@@ -60,7 +83,7 @@ Authorization: Bearer {{tokenAdmin}}
     "name": "Guard",
     "email": "guard@user.com",
     "password": "123456",
-    "companyId": "<company_id>",
+    "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitIds": ["<unit_id1>", "<unit_id2>"],
     "role": "GUARD"
 }
@@ -74,7 +97,7 @@ Authorization: Bearer {{tokenAdmin}}
     "name": "HR",
     "email": "hr@user.com",
     "password": "123456",
-    "companyId": "<company_id>",
+    "companyId": "cmco084kk0000lt96pxlqot9s",
     "role": "HR"
 }
 
@@ -87,7 +110,7 @@ Authorization: Bearer {{tokenAdmin}}
     "name": "Resident",
     "email": "resident@user.com",
     "password": "123456",
-    "companyId": "<company_id>",
+    "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitId": "<unit_id>",
     "role": "RESIDENT"
 }

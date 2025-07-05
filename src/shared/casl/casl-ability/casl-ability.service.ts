@@ -6,7 +6,18 @@ import { JsonValue } from '@prisma/client/runtime/library';
 
 export type PermActions = 'manage' | 'create' | 'read' | 'update' | 'delete';
 
-export type PermissionResource = Subjects<{ User: User; Post: Post }> | 'all';
+export type PermissionResource =
+  | Subjects<{
+      User: User;
+      Post: Post;
+      Unit: any;
+      Round: any;
+      Shift: any;
+      EventLog: any;
+      PanicEvent: any;
+      Checkpoint: any;
+    }>
+  | 'all';
 
 export type AppAbility = PureAbility<
   [PermActions, PermissionResource],
@@ -23,27 +34,47 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
     can('manage', 'all');
   },
   ADMIN(user, { can }) {
-    can('manage', 'all');
+    // ADMIN pode gerenciar tudo, mas apenas no próprio tenant
+    can('manage', 'all', { companyId: user.companyId });
+
+    // Permissões específicas para maior clareza
+    can('create', 'User', { companyId: user.companyId });
+    can('read', 'User', { companyId: user.companyId });
+    can('update', 'User', { companyId: user.companyId });
+    can('delete', 'User', { companyId: user.companyId });
+
+    can('create', 'Post', { companyId: user.companyId });
+    can('read', 'Post', { companyId: user.companyId });
+    can('update', 'Post', { companyId: user.companyId });
+    can('delete', 'Post', { companyId: user.companyId });
   },
 
-  HR(user, { can }) { 
-    can('read', 'User', { id: user.id, companyId: user.companyId});
-    can('update', 'User', ['active', 'name', 'profilePicture']);
-    can('create', 'Post');
-    can('read', 'Post');
-    can('update', 'Post');
+  HR(user, { can }) {
+    // ADMIN pode gerenciar tudo, mas apenas no próprio tenant
+    can('read', 'all', { companyId: user.companyId });
+
+    // Permissões específicas para maior clareza
+    can('create', 'User', { companyId: user.companyId });
+    can('read', 'User', { companyId: user.companyId });
+    can('update', 'User', { companyId: user.companyId });
+    can('delete', 'User', { companyId: user.companyId });
+
+    can('create', 'Post', { companyId: user.companyId });
+    can('read', 'Post', { companyId: user.companyId });
+    can('update', 'Post', { companyId: user.companyId });
+    can('delete', 'Post', { companyId: user.companyId });
   },
   GUARD(user, { can }) {
     can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id }); 
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
   },
   RESIDENT(user, { can }) {
     can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id }); 
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
   },
   SUPERVISION(user, { can }) {
     can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id }); 
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
   },
   // TODO remover
   WRITER(user, { can }) {

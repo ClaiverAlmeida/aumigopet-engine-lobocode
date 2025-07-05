@@ -119,6 +119,7 @@ model User {
   panicEvents    PanicEvent[]
   // temporário irei remover
   Post           Post[]
+  @@index([companyId])
 }
 
 model Permission {
