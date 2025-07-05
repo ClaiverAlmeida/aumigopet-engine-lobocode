@@ -7,11 +7,22 @@ import { AuthModule } from './shared/auth/auth.module';
 import { PostsModule } from './modules/posts/posts.module';
 import { CaslModule } from './shared/casl/casl.module';
 import { ProductsModule } from './modules/products/products.module';
+import { CompaniesModule } from './modules/companies/companies.module';
+import { TenantModule } from './shared/tenant/tenant.module';
 
 //javascript es7
 
 @Module({
-  imports: [UsersModule, PrismaModule, AuthModule, PostsModule,ProductsModule, CaslModule],
+  imports: [
+    UsersModule,
+    PrismaModule,
+    AuthModule,
+    PostsModule,
+    ProductsModule,
+    CompaniesModule,
+    CaslModule,
+    TenantModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
