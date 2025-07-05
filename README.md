@@ -12,6 +12,14 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 > 📚 Documentação oficial NestJS:  
 > [https://docs.nestjs.com](https://docs.nestjs.com)
 
+## 📚 Documentação complementar
+
+- [Comandos úteis](./docs/README.commands.md)
+- [Monitoramento com Grafana e Prometheus](./docs/README-GRAFANA.md)
+- [Checklist de Produção](./docs/CHECKLIST-PRODUCAO.md)
+- [Módulo Users (arquitetura SOLID)](./src/modules/users/README.md)
+- [Sistema de Tenant](./src/shared/tenant/README.md)
+
 ---
 
 ## 🧰 Tecnologias Utilizadas
@@ -46,6 +54,3 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 ---
 
 ## 🗂️ Estrutura Inicial (Resumo)
-
-
-
