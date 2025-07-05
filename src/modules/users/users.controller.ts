@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,9 +20,12 @@ import { CreateAdminDto } from './dto/create-admin.dto';
 import { CreateGuardDto } from './dto/create-guard.dto';
 import { CreateHRDto } from './dto/create-hr.dto';
 import { CreateResidentDto } from './dto/create-resident.dto';
+import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
 
 // @RequiredRoles(Roles.ADMIN)
+
 @UseGuards(AuthGuard, RoleGuard)
+@UseInterceptors(TenantInterceptor)
 @RequiredRoles(Roles.HR)
 @Controller('users')
 export class UsersController {
