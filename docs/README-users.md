@@ -46,6 +46,7 @@ O sistema é **aberto para extensão, fechado para modificação**:
 ## 🔧 **Componentes**
 
 ### **1. UserRepository**
+
 ```typescript
 // Responsabilidade: Abstração de dados
 export class UserRepository {
@@ -58,6 +59,7 @@ export class UserRepository {
 ```
 
 ### **2. UserValidator**
+
 ```typescript
 // Responsabilidade: Validações de negócio
 export class UserValidator {
@@ -70,6 +72,7 @@ export class UserValidator {
 ```
 
 ### **3. UserQueryService**
+
 ```typescript
 // Responsabilidade: Construção de queries e permissões
 export class UserQueryService {
@@ -81,6 +84,7 @@ export class UserQueryService {
 ```
 
 ### **4. UserFactory**
+
 ```typescript
 // Responsabilidade: Criação de objetos User
 export class UserFactory {
@@ -93,6 +97,7 @@ export class UserFactory {
 ```
 
 ### **5. UsersService**
+
 ```typescript
 // Responsabilidade: Orquestração dos serviços
 export class UsersService {
@@ -108,21 +113,25 @@ export class UsersService {
 ## 🚀 **Vantagens da Nova Arquitetura**
 
 ### **✅ Eliminação de Código Duplicado**
+
 - **Includes padrão** centralizados no Repository
 - **Validações** reutilizáveis no Validator
 - **Queries** padronizadas no QueryService
 
 ### **✅ Facilidade de Manutenção**
+
 - **Mudanças isoladas** em cada componente
 - **Testes unitários** mais simples
 - **Debugging** mais fácil
 
 ### **✅ Extensibilidade**
+
 - **Novos tipos de usuário** sem modificar código existente
 - **Novas validações** sem afetar outros componentes
 - **Novos filtros** sem alterar lógica de negócio
 
 ### **✅ Separação de Responsabilidades**
+
 - **Repository**: Dados
 - **Validator**: Regras de negócio
 - **QueryService**: Permissões e filtros
@@ -186,4 +195,4 @@ src/modules/[entity]/
 2. **Criar interfaces** para os serviços (IUserRepository, etc.)
 3. **Implementar testes unitários** para cada componente
 4. **Adicionar logging** e métricas
-5. **Criar documentação** de API automática 
+5. **Criar documentação** de API automática

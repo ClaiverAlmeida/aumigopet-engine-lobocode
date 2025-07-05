@@ -9,11 +9,13 @@ import { CaslModule } from './shared/casl/casl.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { TenantModule } from './shared/tenant/tenant.module';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 
 //javascript es7
 
 @Module({
   imports: [
+    PrometheusModule.register(),
     UsersModule,
     PrismaModule,
     AuthModule,
