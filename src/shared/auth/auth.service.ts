@@ -5,6 +5,8 @@ import { PrismaService } from '../prisma/prisma.service';
 import bcrypt from 'bcrypt';
 import { CaslAbilityService } from 'src/shared/casl/casl-ability/casl-ability.service';
 import { packRules } from '@casl/ability/extra';
+import { ITokenPayload } from './interfaces/token-payload.interface';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -32,16 +34,15 @@ export class AuthService {
     }
 
     const ability = this.abilityService.createForUser(user);
-    const token = this.jwtService.sign({
+    const payload: ITokenPayload = {
       name: user.name,
       email: user.email,
       role: user.role,
       sub: user.id,
       permissions: packRules(ability.rules),
-    });
+    };
+    const token = this.jwtService.sign(payload);
 
-    const { password, ...userWithoutPassword } = user;
-
-    return { user: userWithoutPassword, access_token: token };
+    return { access_token: token };
   }
 }

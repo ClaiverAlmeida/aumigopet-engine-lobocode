@@ -3,7 +3,7 @@ import { NotFoundError, ValidationError } from 'src/shared/common/errors';
 import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 @Injectable()
-export class UnitService {
+export class UnitsService {
   constructor(private prisma: PrismaService) {}
 
   async getById(id: string) {
