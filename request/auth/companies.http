@@ -1,0 +1,80 @@
+@baseUrl = http://localhost:3000
+@token = {{ platformAdminLogin.response.body.access_token }}
+
+### Login PLATFORM_ADMIN (necessário para acessar companies)
+# @name platformAdminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "platformadmin@user.com",
+    "password": "123456"
+}
+
+### ========================================
+### COMPANIES - PLATFORM_ADMIN
+### ========================================
+
+### Listar todas as empresas
+GET {{baseUrl}}/companies
+Authorization: Bearer {{token}}
+
+### Buscar empresa específica
+GET {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
+Authorization: Bearer {{token}}
+
+### Criar nova empresa
+POST {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Nova Empresa Teste",
+    "cnpj": "12.345.678/0001-90",
+    "address": "Rua Teste, 123",
+    "phone": "(11) 99999-9999"
+}
+
+### Atualizar empresa
+PATCH {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Empresa Atualizada",
+    "phone": "(11) 88888-8888"
+}
+
+### Deletar empresa
+DELETE {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
+Authorization: Bearer {{token}}
+
+### ========================================
+### TESTES DE SEGURANÇA - COMPANIES
+### ========================================
+
+### ❌ TENTATIVA: ADMIN tentando acessar companies (deve falhar)
+# @name adminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@user.com",
+    "password": "123456"
+}
+
+GET {{baseUrl}}/companies
+Authorization: Bearer {{adminLogin.response.body.access_token}}
+
+### ❌ TENTATIVA: HR tentando acessar companies (deve falhar)
+# @name hrLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "hr@user.com",
+    "password": "123456"
+}
+
+GET {{baseUrl}}/companies
+Authorization: Bearer {{hrLogin.response.body.access_token}} 
