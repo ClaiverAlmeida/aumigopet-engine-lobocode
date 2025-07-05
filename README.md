@@ -7,18 +7,18 @@
 O **LoboCode Template - Backend** é um projeto base desenvolvido para padronizar e acelerar o desenvolvimento de APIs backend na LoboCode, utilizando o framework NestJS 11. A estrutura proposta garante organização, manutenibilidade, testes e escalabilidade desde o início do projeto.
 
 > 🎥 Referência: Assista ao vídeo explicativo para entender a estrutura por completo:  
-> [🔗 YouTube - Estrutura Base Nest.js](https://www.youtube.com/watch?v=_ZyX4Vcofek)
+> [🔗 YouTube - Estrutura Base Nest.js](hhttps://www.youtube.com/watch?v=PHIMN85trgk)
 
 > 📚 Documentação oficial NestJS:  
 > [https://docs.nestjs.com](https://docs.nestjs.com)
 
 ## 📚 Documentação complementar
 
-- [Comandos úteis](./docs/README.commands.md)
-- [Monitoramento com Grafana e Prometheus](./docs/README-GRAFANA.md)
-- [Checklist de Produção](./docs/CHECKLIST-PRODUCAO.md)
-- [Módulo Users (arquitetura SOLID)](./src/modules/users/README.md)
-- [Sistema de Tenant](./src/shared/tenant/README.md)
+- [Comandos úteis](./docs/README-comandos.md)
+- [Monitoramento com Grafana e Prometheus](./docs/README-grafana.md)
+- [Checklist de Produção](./docs/README-checklist-producao.md)
+- [Módulo Users (arquitetura SOLID)](./docs/README-users.md)
+- [Sistema de Tenant](./docs/README-tenant-multitenancy.md)
 
 ---
 
