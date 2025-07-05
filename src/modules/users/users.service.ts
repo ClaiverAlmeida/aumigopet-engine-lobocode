@@ -20,13 +20,28 @@ export class UsersService {
     private userFactory: UserFactory,
   ) {}
 
-  async getAll() {
+  async getAll(page = 1, limit = 20) {
     if (!this.userQueryService.canPerformAction('read')) {
       throw new ForbiddenError('You do not have permission to read users');
     }
 
     const whereClause = this.userQueryService.buildWhereClause();
-    return this.userRepository.findMany(whereClause);
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await Promise.all([
+      this.userRepository.findMany(whereClause, { skip, take: limit }),
+      this.userRepository.count(whereClause),
+    ]);
+
+    return {
+      data: users,
+      pagination: {
+        page,
+        limit,
+        total,
+        pages: Math.ceil(total / limit),
+      },
+    };
   }
 
   async getById(id: string) {

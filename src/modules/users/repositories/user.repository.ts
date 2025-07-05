@@ -34,9 +34,11 @@ export class UserRepository {
     };
   }
 
-  async findMany(where: Prisma.UserWhereInput, include?: Prisma.UserInclude) {
+  async findMany(where: Prisma.UserWhereInput, options?: { skip?: number; take?: number }, include?: Prisma.UserInclude) {
     return this.prisma.user.findMany({
       where,
+      skip: options?.skip,
+      take: options?.take,
       include: include || this.defaultInclude,
     });
   }
@@ -96,5 +98,9 @@ export class UserRepository {
     );
 
     return Promise.all(updates);
+  }
+
+  async count(where: Prisma.UserWhereInput) {
+    return this.prisma.user.count({ where });
   }
 } 

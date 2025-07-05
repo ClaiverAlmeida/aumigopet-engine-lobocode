@@ -24,7 +24,7 @@ export class TenantInterceptor implements NestInterceptor {
     next: CallHandler,
   ): Promise<Observable<any>> {
     try {
-      const request = context.switchToHttp().getRequest();
+    const request = context.switchToHttp().getRequest();
       const user = this.extractUserFromRequest(request);
 
       // Valida se usuário tem empresa (exceto PLATFORM_ADMIN)
@@ -123,7 +123,7 @@ export class TenantInterceptor implements NestInterceptor {
     }
 
     return { ...company, isGlobal: false };
-  }
+    }
 
   // Tratar erros de tenant de forma padronizada
   private handleTenantError(error: any): never {
