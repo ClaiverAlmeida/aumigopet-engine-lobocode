@@ -30,6 +30,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - REDIS_URL=redis://redis:6379
       - PORT=3000
+    volumes:
+      - app_logs:/app/logs
     depends_on:
       - db
       - redis
@@ -169,4 +171,6 @@ volumes:
   grafana_data:
     driver: local
   nginx_logs:
+    driver: local
+  app_logs:
     driver: local 
