@@ -3,16 +3,17 @@ import { sleep, check } from 'k6';
 
 // executar :  k6 run test-users.js  
 
+const access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiUGxhdGZvcm0gQWRtaW4iLCJlbWFpbCI6InBsYXRmb3JtYWRtaW5AdXNlci5jb20iLCJyb2xlIjoiUExBVEZPUk1fQURNSU4iLCJzdWIiOiJjbWNvODY3bTkwMDAwbHR4NmQ2MDJwM2lmIiwicGVybWlzc2lvbnMiOltbIm1hbmFnZSIsImFsbCJdXSwiaWF0IjoxNzUxNzM3Nzk0LCJleHAiOjE3NTE3NDQ5OTR9.YtyW7CojUjKZGXtTRJxN-mzCwBsV5ygedLz6v1v3eUU'
+
 export let options = {
-  vus: 20, // usuários virtuais simultâneos
-  duration: '60s', // duração do teste
+  vus: 200, // usuários virtuais simultâneos
+  duration: '10s', // duração do teste
 };
 
 export default function () {
   const res = http.get('http://localhost:3000/users?page=1&limit=20', {
     headers: {
-      Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiSFIiLCJlbWFpbCI6ImhyQHVzZXIuY29tIiwicm9sZSI6IkhSIiwic3ViIjoiY21jcHBsZW84MDAwYmx0YmlpajdleDhkaiIsInBlcm1pc3Npb25zIjpbWyJyZWFkIiwiYWxsIix7ImNvbXBhbnlJZCI6ImNtY28wODRrazAwMDBsdDk2cHhscW90OXMifV0sWyJjcmVhdGUiLCJVc2VyIix7ImNvbXBhbnlJZCI6ImNtY28wODRrazAwMDBsdDk2cHhscW90OXMifV0sWyJyZWFkIiwiVXNlciIseyJjb21wYW55SWQiOiJjbWNvMDg0a2swMDAwbHQ5NnB4bHFvdDlzIn1dLFsidXBkYXRlIiwiVXNlciIseyJjb21wYW55SWQiOiJjbWNvMDg0a2swMDAwbHQ5NnB4bHFvdDlzIn1dLFsiZGVsZXRlIiwiVXNlciIseyJjb21wYW55SWQiOiJjbWNvMDg0a2swMDAwbHQ5NnB4bHFvdDlzIn1dLFsiY3JlYXRlIiwiUG9zdCIseyJjb21wYW55SWQiOiJjbWNvMDg0a2swMDAwbHQ5NnB4bHFvdDlzIn1dLFsicmVhZCIsIlBvc3QiLHsiY29tcGFueUlkIjoiY21jbzA4NGtrMDAwMGx0OTZweGxxb3Q5cyJ9XSxbInVwZGF0ZSIsIlBvc3QiLHsiY29tcGFueUlkIjoiY21jbzA4NGtrMDAwMGx0OTZweGxxb3Q5cyJ9XSxbImRlbGV0ZSIsIlBvc3QiLHsiY29tcGFueUlkIjoiY21jbzA4NGtrMDAwMGx0OTZweGxxb3Q5cyJ9XV0sImlhdCI6MTc1MTcyODY3NCwiZXhwIjoxNzUxNzM1ODc0fQ.m5J0qzOkmb2K_ge4NuM3O5WKE9U5ONsPgQt6TronbqA'
-    }
+      Authorization: `Bearer ${access_token}`    }
   });
   check(res, { 'status was 200': (r) => r.status == 200 });
   sleep(1);
