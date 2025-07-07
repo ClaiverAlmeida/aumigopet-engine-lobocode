@@ -1,5 +1,6 @@
-// schema.dev.prisma - Schema para desenvolvimento
-// Inclui generators extras como ERD, ferramentas de debug, etc.
+// schema_opcao2.prisma
+// New schema aligned with the multi-tenant proposal and project features
+// For comparison with the current schema
 
 generator client {
   provider = "prisma-client-js"
@@ -8,7 +9,6 @@ generator client {
 generator json {
   provider = "prisma-json-types-generator"
 }
-
 
 
 datasource db {
@@ -192,4 +192,4 @@ model PanicEvent {
   status     String // open, attended, resolved
 }
 
-// Other tables for reports, dashboards, etc, can be added as needed 
+// Other tables for reports, dashboards, etc, can be added as needed
