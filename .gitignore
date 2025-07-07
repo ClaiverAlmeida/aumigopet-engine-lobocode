@@ -41,6 +41,8 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env.local
+env.production
+.env.production
 
 # temp directory
 .temp
@@ -56,3 +58,17 @@ pids
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 
 .history/
+
+# SSL Certificates
+nginx/ssl/
+*.pem
+*.key
+*.crt
+
+# Backups
+backups/
+*.sql
+*.sql.gz
+
+# Docker secrets
+secrets/
