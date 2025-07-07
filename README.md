@@ -14,6 +14,8 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 
 ## 📚 Documentação complementar
 
+- [Desenvolvimento](./docs/DESENVOLVIMENTO.md)
+- [Produção](./docs/PRODUCAO.md)
 - [Comandos úteis](./docs/README.commands.md)
 - [Monitoramento com Grafana e Prometheus](./docs/README-GRAFANA.md)
 - [Checklist de Produção](./docs/CHECKLIST-PRODUCAO.md)
