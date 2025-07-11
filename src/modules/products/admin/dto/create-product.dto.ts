@@ -1,31 +1,17 @@
-import {
-  IsNotEmpty,
-  IsNumber,
-  IsString,
-  Matches,
-  MaxLength,
-  Min,
-} from 'class-validator';
+import { IsString, IsNumber, MinLength, IsOptional } from 'class-validator';
+import { VALIDATION_MESSAGES } from '../../../../shared/common/messages';
 
 export class CreateProductDto {
-  @MaxLength(255)
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: VALIDATION_MESSAGES.REQUIRED.NAME })
+  @MinLength(2, { message: VALIDATION_MESSAGES.LENGTH.NAME_MIN })
   name: string;
 
-  @Matches(/^[a-z0-9-]+$/, {
-    message: 'slug can only contain lowercase letters, numbers and dashes',
-  })
-  @IsNotEmpty()
+  @IsString({ message: VALIDATION_MESSAGES.FORMAT.SLUG_INVALID })
   slug: string;
 
-  @MaxLength(500)
-  @IsString()
-  @IsNotEmpty()
+  @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   description: string;
 
-  @Min(1)
-  @IsNumber({ maxDecimalPlaces: 2 })
-  @IsNotEmpty()
+  @IsNumber({}, { message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   price: number;
 }

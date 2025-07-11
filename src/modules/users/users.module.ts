@@ -3,10 +3,23 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { UserRepository } from './repositories/user.repository';
 import { UserValidator } from './validators/user.validator';
-import { UserQueryService } from './services/user-query.service';
 import { UserFactory } from './factories/user.factory';
 import { CompaniesModule } from 'src/modules/companies/companies.module';
-import { UnitsModule } from '../units/units.module';
+import { PostsModule } from '../posts/posts.module'; 
+
+//  Novos services específicos
+
+import {
+  UserPermissionService,
+  SystemAdminService,
+  AdminService,
+  HRService,
+  SupervisorService,
+  GuardService,
+  PostSupervisorService,
+  PostResidentService,
+  UserQueryService,
+} from './services';
 
 @Module({
   controllers: [UsersController],
@@ -15,8 +28,18 @@ import { UnitsModule } from '../units/units.module';
     UserRepository,
     UserValidator,
     UserQueryService,
+    UserPermissionService,
     UserFactory,
+
+    //  Novos services específicos
+    SystemAdminService,
+    AdminService,
+    HRService,
+    SupervisorService,
+    GuardService,
+    PostSupervisorService,
+    PostResidentService,
   ],
-  imports: [CompaniesModule, UnitsModule],
+  imports: [CompaniesModule, PostsModule],
 })
 export class UsersModule {}
