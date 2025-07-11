@@ -37,12 +37,12 @@ model Product {
 }
 
 enum Roles {
-  PLATFORM_ADMIN
+  SYSTEM_ADMIN
   ADMIN
   HR
   GUARD
   RESIDENT
-  SUPERVISION
+  SUPERVISOR
 
   // temporário, irei remover
   EDITOR

@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
     "email": "hr@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 ###
@@ -27,8 +27,8 @@ POST http://localhost:3000/auth/login
 Content-Type: application/json
 
 {
-    "email": "platformadmin@user.com",
-    "password": "123456"
+    "email": "systemadmin@user.com",
+    "password": "SystemAdmin123@Senha"
 }
 ###
 GET http://localhost:3000/users 
@@ -50,15 +50,15 @@ GET http://localhost:3000/products
 Authorization: Bearer {{tokenAdmin}}
 
 ### Create Platform Admin
-POST http://localhost:3000/users/platform-admin
+POST http://localhost:3000/users/system-admin
 Content-Type: application/json
 Authorization: Bearer {{tokenAdmin}}
 
 {
     "name": "Platform Admin",
-    "email": "platformadmin@user.com",
-    "password": "123456",
-    "role": "PLATFORM_ADMIN"
+    "email": "systemadmin@user.com",
+    "password": "SystemAdmin123@Senha",
+    "role": "SYSTEM_ADMIN"
 }
 
 ### Create Admin
@@ -69,7 +69,7 @@ Authorization: Bearer {{tokenAdmin}}
 {
     "name": "Admin",
     "email": "admin2@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "role": "ADMIN"
 }
@@ -82,7 +82,7 @@ Authorization: Bearer {{tokenAdmin}}
 {
     "name": "Guard",
     "email": "guard@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitIds": ["<unit_id1>", "<unit_id2>"],
     "role": "GUARD"
@@ -96,7 +96,7 @@ Authorization: Bearer {{tokenAdmin}}
 {
     "name": "HR",
     "email": "hr@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "role": "HR"
 }
@@ -109,7 +109,7 @@ Authorization: Bearer {{tokenAdmin}}
 {
     "name": "Resident",
     "email": "resident@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitId": "<unit_id>",
     "role": "RESIDENT"

@@ -27,7 +27,7 @@ export class TenantInterceptor implements NestInterceptor {
     const request = context.switchToHttp().getRequest();
       const user = this.extractUserFromRequest(request);
 
-      // Valida se usuário tem empresa (exceto PLATFORM_ADMIN)
+      // Valida se usuário tem empresa (exceto SYSTEM_ADMIN)
       this.validateUserHasCompany(user);
       
       // Configura tenant baseado no contexto (body ou query)
@@ -54,7 +54,7 @@ export class TenantInterceptor implements NestInterceptor {
   private validateUserHasCompany(user: any): void {
     const ability = this.abilityService.ability;
     
-    // Verifica se usuário pode acessar dados globais (PLATFORM_ADMIN)
+    // Verifica se usuário pode acessar dados globais (SYSTEM_ADMIN)
     if (ability.can('manage', 'all')) {
       return;
     }
@@ -70,11 +70,11 @@ export class TenantInterceptor implements NestInterceptor {
     const body = request.body;
     const query = request.query;
 
-    // Verifica se PLATFORM_ADMIN especificou companyId (body ou query)
+    // Verifica se SYSTEM_ADMIN especificou companyId (body ou query)
     const specifiedCompanyId = body?.companyId || query?.companyId;
 
     if (specifiedCompanyId) {
-      // Valida se apenas PLATFORM_ADMIN pode especificar companyId
+      // Valida se apenas SYSTEM_ADMIN pode especificar companyId
       if (!ability.can('manage', 'all')) {
         throw new ForbiddenException(
           'Only platform administrators can specify companyId in requests'
@@ -95,7 +95,7 @@ export class TenantInterceptor implements NestInterceptor {
   private async findAndValidateCompany(companyIdOrUser: any) {
     const ability = this.abilityService.ability;
     
-    // Se for PLATFORM_ADMIN sem especificar companyId, retorna tenant global
+    // Se for SYSTEM_ADMIN sem especificar companyId, retorna tenant global
     if (ability.can('manage', 'all') && typeof companyIdOrUser !== 'string') {
       return { id: 'global', name: 'Global Tenant', isGlobal: true };
     }

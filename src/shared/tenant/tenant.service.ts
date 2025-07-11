@@ -24,7 +24,7 @@ export class TenantService {
     return this.temporaryTenant || this.currentTenant;
   }
 
-  // Para PLATFORM_ADMIN especificar tenant temporário
+  // Para SYSTEM_ADMIN especificar tenant temporário
   setTemporaryTenant(companyId: string, companyName: string) {
     this.temporaryTenant = {
       id: companyId,

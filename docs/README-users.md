@@ -1,8 +1,25 @@
-# Users Module - Arquitetura SOLID
+# Users Module - Sistema de Roles Hierárquico
 
 ## 🏗️ **Arquitetura Aplicada**
 
-Este módulo implementa os princípios **SOLID** com foco em **Single Responsibility (S)** e **Open/Closed (O)**:
+Este módulo implementa um **sistema de roles hierárquico** para gestão de usuários em condomínios/empresas de segurança, seguindo os princípios **SOLID** com foco em **Single Responsibility (S)** e **Open/Closed (O)**:
+
+### 🎯 **Escopo do Sistema de Usuários**
+
+O sistema gerencia **7 tipos de usuários** com diferentes níveis de acesso:
+
+1. **SYSTEM_ADMIN** - Administrador da plataforma (acesso global)
+2. **ADMIN** - Administrador da empresa/condomínio
+3. **SUPERVISOR** - Supervisor de segurança da empresa
+4. **HR** - Recursos Humanos da empresa
+5. **GUARD** - Guarda de segurança (não associado a postos)
+6. **POST_SUPERVISOR** - Supervisor de um posto específico (1 posto)
+7. **POST_RESIDENT** - Morador/residente de um posto específico (1 posto)
+
+### 🔗 **Associação com Postos**
+
+- **GUARD, SUPERVISOR, HR, ADMIN**: Não são associados a postos específicos
+- **POST_SUPERVISOR, POST_RESIDENT**: Associados a **exatamente 1 posto** cada
 
 ### **📁 Estrutura de Arquivos**
 
@@ -65,9 +82,11 @@ export class UserRepository {
 export class UserValidator {
   async validateEmailUnique(email: string, excludeUserId?: string)
   async validateCompanyExists(companyId: string)
-  async validateUnitBelongsToCompany(unitId: string, companyId: string)
+  async validatePostBelongsToCompany(postId: string, companyId: string)
   async validateUserExists(id: string)
   async validateUserCanBeDeleted(id: string)
+  async validateCPF(cpf: string, excludeUserId?: string)
+  async validatePhone(phone: string, excludeUserId?: string)
 }
 ```
 
@@ -90,9 +109,11 @@ export class UserQueryService {
 export class UserFactory {
   createPlatformAdmin(dto: CreatePlatformAdminDto): Prisma.UserCreateInput
   createAdmin(dto: CreateAdminDto): Prisma.UserCreateInput
+  createSupervisor(dto: CreateSupervisorDto): Prisma.UserCreateInput
   createGuard(dto: CreateGuardDto): Prisma.UserCreateInput
   createHR(dto: CreateHRDto): Prisma.UserCreateInput
-  createResident(dto: CreateResidentDto): Prisma.UserCreateInput
+  createPostSupervisor(dto: CreatePostSupervisorDto): Prisma.UserCreateInput
+  createPostResident(dto: CreatePostResidentDto): Prisma.UserCreateInput
 }
 ```
 

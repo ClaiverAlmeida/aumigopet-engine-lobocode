@@ -16,14 +16,14 @@ import { AuthGuard } from 'src/shared/auth/guards/auth.guard';
 import { RequiredRoles } from 'src/shared/auth/required-roles.decorator';
 import { Roles } from '@prisma/client';
 import { RoleGuard } from 'src/shared/auth/guards/role.guard';
-import { CreatePlatformAdminDto } from './dto/create-platform-admin.dto';
+import { CreateSystemAdminDto } from './dto/create-system-admin.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
 import { CreateGuardDto } from './dto/create-guard.dto';
 import { CreateHRDto } from './dto/create-hr.dto';
-import { CreateResidentDto } from './dto/create-resident.dto';
+import { CreatePostResidentDto } from './dto/create-post-resident.dto';
 import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
-
-// @RequiredRoles(Roles.ADMIN)
+import { CreatePostSupervisorDto } from './dto/create-post-supervisor.dto';
+import { CreateSupervisorDto } from './dto/create-supervisor.dto';
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(TenantInterceptor)
@@ -33,50 +33,65 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  getAll(
+  buscarTodos(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '20',
   ) {
-    return this.usersService.getAll(Number(page), Number(limit));
+    return this.usersService.buscarTodos(Number(page), Number(limit));
   }
 
   @Get(':id')
-  getById(@Param('id') id: string) {
-    return this.usersService.getById(id);
+  buscarPorId(@Param('id') id: string) {
+    return this.usersService.buscarPorId(id);
   }
 
-  @Post('platform-admin')
-  createPlatformAdmin(@Body() dto: CreatePlatformAdminDto) {
-    return this.usersService.createPlatformAdmin(dto);
+  @Post('system-admin')
+  criarNovoSystemAdmin(@Body() dto: CreateSystemAdminDto) {
+    return this.usersService.criarNovoSystemAdmin(dto);
   }
 
   @Post('admin')
-  createAdmin(@Body() dto: CreateAdminDto) {
-    return this.usersService.createAdmin(dto);
-  }
-
-  @Post('guard')
-  createGuard(@Body() dto: CreateGuardDto) {
-    return this.usersService.createGuard(dto);
+  criarNovoAdmin(@Body() dto: CreateAdminDto) {
+    return this.usersService.criarNovoAdmin(dto);
   }
 
   @Post('hr')
-  createHR(@Body() dto: CreateHRDto) {
-    return this.usersService.createHR(dto);
+  criarNovoHR(@Body() dto: CreateHRDto) {
+    return this.usersService.criarNovoHR(dto);
   }
 
-  @Post('resident')
-  createResident(@Body() dto: CreateResidentDto) {
-    return this.usersService.createResident(dto);
+  @Post('supervisor')
+  criarNovoSupervisor(@Body() dto: CreateSupervisorDto) {
+    return this.usersService.criarNovoSupervisor(dto);
+  }
+
+  @Post('guard')
+  criarNovoGuard(@Body() dto: CreateGuardDto) {
+    return this.usersService.criarNovoGuard(dto);
+  }
+
+  @Post('post-supervisor')
+  criarNovoPostSupervisor(@Body() dto: CreatePostSupervisorDto) {
+    return this.usersService.criarNovoPostSupervisor(dto);
+  }
+
+  @Post('post-resident')
+  criarNovoPostResident(@Body() dto: CreatePostResidentDto) {
+    return this.usersService.criarNovoPostResident(dto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+  atualizar(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.atualizar(id, updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  desativar(@Param('id') id: string) {
+    return this.usersService.desativar(id);
+  }
+
+  @Post(':id/restore')
+  reativar(@Param('id') id: string) {
+    return this.usersService.reativar(id);
   }
 }

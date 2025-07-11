@@ -1,5 +1,5 @@
 // prisma/seed.ts
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Roles, UserStatus } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -22,24 +22,32 @@ async function seedCompany() {
     },
   });
 
-  console.log('✅ Empresa Infraseg criado via seed');
+  console.log(' Empresa Infraseg criado via seed');
 }
 async function seedUser() {
-  const email = 'platformadmin@user.com';
-  const exists = await prisma.user.findUnique({ where: { email } });
+  const userData = {
+    name: 'Claiver Almeida de Araújo',
+    login: 'System Admin Claiver',
+    password: 'SystemAdmin123@Senha',
+    email: 'systemadmin@user.com',
+    role: Roles.SYSTEM_ADMIN,
+    profilePicture: null,
+    status: UserStatus.ACTIVE,
+    cpf: '021.564.766-16',
+    phone: '(11) 97073-6987',
+    address: 'Rua Jabuticabeira, 393',
+  };
+
+  const exists = await prisma.user.findUnique({
+    where: { email: userData.email },
+  });
   if (exists) return;
 
-  const hashed = await bcrypt.hash('123456', 10);
-  const role = 'PLATFORM_ADMIN';
+  userData.password = await bcrypt.hash(userData.password, 10);
 
   await prisma.user.create({
-    data: {
-      name: 'Platform Admin',
-      email,
-      password: hashed,
-      role, // Adicione o valor apropriado para profileType conforme definido no seu schema
-    },
+    data: userData,
   });
 
-  console.log('✅ Usuário administrador criado via seed');
+  console.log(' Usuário administrador criado via seed');
 }

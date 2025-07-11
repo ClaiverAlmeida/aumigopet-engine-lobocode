@@ -2,75 +2,105 @@ import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
 import { Roles } from '@prisma/client';
 import { Prisma } from '@prisma/client';
-import { CreatePlatformAdminDto } from '../dto/create-platform-admin.dto';
+import { CreateSystemAdminDto } from '../dto/create-system-admin.dto';
 import { CreateAdminDto } from '../dto/create-admin.dto';
 import { CreateGuardDto } from '../dto/create-guard.dto';
 import { CreateHRDto } from '../dto/create-hr.dto';
-import { CreateResidentDto } from '../dto/create-resident.dto';
+import { CreatePostResidentDto } from '../dto/create-post-resident.dto';
+import { CreatePostSupervisorDto } from '../dto/create-post-supervisor.dto';
+import { CreateSupervisorDto } from '../dto/create-supervisor.dto';
 
 @Injectable()
 export class UserFactory {
-  private hashPassword(password: string): string {
+  private criptografarPassword(password: string): string {
     return bcrypt.hashSync(password, 10);
   }
 
-  createPlatformAdmin(dto: CreatePlatformAdminDto): Prisma.UserCreateInput {
+  criarSystemAdmin(dto: CreateSystemAdminDto): Prisma.UserCreateInput {
     return {
       name: dto.name,
+      login: dto.login,
       email: dto.email,
-      password: this.hashPassword(dto.password),
-      role: Roles.PLATFORM_ADMIN,
+      password: this.criptografarPassword(dto.password),
+      role: Roles.ADMIN,
     };
   }
 
-  createAdmin(dto: CreateAdminDto): Prisma.UserCreateInput {
+  criarAdmin(dto: CreateAdminDto): Prisma.UserCreateInput {
     return {
       name: dto.name,
+      login: dto.login,
       email: dto.email,
-      password: this.hashPassword(dto.password),
+      password: this.criptografarPassword(dto.password),
       role: Roles.ADMIN,
       company: {
-        connect: { id: dto.companyId }
+        connect: { id: dto.companyId },
       },
     };
   }
 
-  createGuard(dto: CreateGuardDto): Prisma.UserCreateInput {
+  criarSupervisor(dto: CreateSupervisorDto): Prisma.UserCreateInput {
     return {
       name: dto.name,
+      login: dto.login,
       email: dto.email,
-      password: this.hashPassword(dto.password),
+      password: this.criptografarPassword(dto.password),
+      role: Roles.SUPERVISOR,
+      company: {
+        connect: { id: dto.companyId },
+      },
+    };
+  }
+
+  criarGuard(dto: CreateGuardDto): Prisma.UserCreateInput {
+    return {
+      name: dto.name,
+      login: dto.login,
+      email: dto.email,
+      password: this.criptografarPassword(dto.password),
       role: Roles.GUARD,
       company: {
-        connect: { id: dto.companyId }
+        connect: { id: dto.companyId },
       },
     };
   }
 
-  createHR(dto: CreateHRDto): Prisma.UserCreateInput {
+  criarHR(dto: CreateHRDto): Prisma.UserCreateInput {
     return {
       name: dto.name,
+      login: dto.login,
       email: dto.email,
-      password: this.hashPassword(dto.password),
+      password: this.criptografarPassword(dto.password),
       role: Roles.HR,
       company: {
-        connect: { id: dto.companyId }
+        connect: { id: dto.companyId },
       },
     };
   }
 
-  createResident(dto: CreateResidentDto): Prisma.UserCreateInput {
+  criarPostSupervisor(dto: CreatePostSupervisorDto): Prisma.UserCreateInput {
     return {
       name: dto.name,
+      login: dto.login,
       email: dto.email,
-      password: this.hashPassword(dto.password),
-      role: Roles.RESIDENT,
+      password: this.criptografarPassword(dto.password),
+      role: Roles.POST_SUPERVISOR,
       company: {
-        connect: { id: dto.companyId }
+        connect: { id: dto.companyId },
       },
-      unit: dto.unitId ? {
-        connect: { id: dto.unitId }
-      } : undefined,
     };
   }
-} 
+
+  criarPostResident(dto: CreatePostResidentDto): Prisma.UserCreateInput {
+    return {
+      name: dto.name,
+      login: dto.login,
+      email: dto.email,
+      password: this.criptografarPassword(dto.password),
+      role: Roles.POST_RESIDENT,
+      company: {
+        connect: { id: dto.companyId },
+      },
+    };
+  }
+}

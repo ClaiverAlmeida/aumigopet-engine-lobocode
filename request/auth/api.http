@@ -36,7 +36,7 @@ Authorization: Bearer {{tokenAdmin}}
 {
     "name": "Felix",
     "email": "admin@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 ### Create Reader

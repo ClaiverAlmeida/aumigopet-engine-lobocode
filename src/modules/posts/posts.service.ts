@@ -1,89 +1,33 @@
-import { Injectable } from '@nestjs/common';
-import { CreatePostDto } from './dto/create-post.dto';
-import { UpdatePostDto } from './dto/update-post.dto';
-import { PrismaService } from '../../shared/prisma/prisma.service';
-import { CaslAbilityService } from '../../shared/casl/casl-ability/casl-ability.service';
-import { accessibleBy } from '@casl/prisma';
+import { Injectable } from '@nestjs/common'; 
+import { NotFoundError, ValidationError } from 'src/shared/common/errors';
+import { PrismaService } from 'src/shared/prisma/prisma.service';
 
 @Injectable()
 export class PostsService {
-  constructor(
-    private prismaService: PrismaService,
-    private abilityService: CaslAbilityService,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  create(createPostDto: CreatePostDto & { authorId: string }) {
-    const ability = this.abilityService.ability;
-
-    if (!ability.can('create', 'Post')) {
-      throw new Error('Unauthorized');
-    }
-
-    return this.prismaService.post.create({
-      data: createPostDto,
-    });
+  async getById(id: string) {
+    return this.prisma.post.findUnique({ where: { id } });
   }
 
-  async findAll() {
-    const ability = this.abilityService.ability;
-
-    return this.prismaService.post.findMany({
-      where: {
-        AND: [accessibleBy(ability, 'read').Post],
-      },
-    });
-  }
-
-  findOne(id: string) {
-    const ability = this.abilityService.ability;
-
-    if (!ability.can('read', 'Post')) {
-      throw new Error('Unauthorized'); //403
-    }
-
-    return this.prismaService.post.findUnique({
-      where: {
-        id,
-        AND: [accessibleBy(ability, 'read').Post],
-      },
-    });
-  }
-
-  async update(id: string, updatePostDto: UpdatePostDto) {
-    const ability = this.abilityService.ability;
-
-    const post = await this.prismaService.post.findUnique({
-      where: {
-        id,
-        AND: [accessibleBy(ability, 'update').Post],
-      },
-    });
-
+  async validateExists(id: string) {
+    const post = await this.getById(id);
     if (!post) {
-      throw new Error('Post not found');
+      throw new NotFoundError('Post', id, 'id');
     }
-
-    return this.prismaService.post.update({
-      where: { id },
-      data: updatePostDto,
-    });
+    return post;
   }
 
-  async remove(id: string) {
-    const ability = this.abilityService.ability;
-    const post = await this.prismaService.post.findUnique({
-      where: {
-        id,
-        AND: [accessibleBy(ability, 'remove').Post],
-      },
-    });
-
+  async validateBelongsToCompany(postId: string, companyId: string) {
+    const post = await this.getById(postId);
     if (!post) {
-      throw new Error('Post not found');
+      throw new NotFoundError('Post', postId, 'id');
     }
-
-    return this.prismaService.post.delete({
-      where: { id },
-    });
+    if (post.companyId !== companyId) {
+      throw new ValidationError('Post does not belong to the specified company');
+    }
+    return post;
   }
-}
+
+  // Adicione outros métodos conforme necessário
+} 

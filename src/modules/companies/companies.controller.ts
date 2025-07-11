@@ -18,7 +18,7 @@ import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(TenantInterceptor)
-@RequiredRoles(Roles.PLATFORM_ADMIN)
+@RequiredRoles(Roles.SYSTEM_ADMIN)
 @Controller('companies')
 export class CompaniesController {
   constructor(private readonly companiesService: CompaniesService) {}

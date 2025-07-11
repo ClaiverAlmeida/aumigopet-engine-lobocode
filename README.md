@@ -4,7 +4,15 @@
 
 ## 📌 Sobre o Projeto
 
-O **LoboCode Template - Backend** é um projeto base desenvolvido para padronizar e acelerar o desenvolvimento de APIs backend na LoboCode, utilizando o framework NestJS 11. A estrutura proposta garante organização, manutenibilidade, testes e escalabilidade desde o início do projeto.
+O **Infraseg Engine** é um sistema backend robusto para gestão de segurança patrimonial, desenvolvido com NestJS 11. O sistema oferece controle de acesso multi-tenant com gestão de usuários baseada em roles, focando em segurança, escalabilidade e manutenibilidade.
+
+### 🎯 **Escopo do Sistema**
+
+- **Multi-tenant**: Suporte a múltiplas empresas/condomínios
+- **Gestão de Usuários**: Sistema de roles hierárquico
+- **Controle de Acesso**: Autorização granular por tipo de usuário
+- **Gestão de Postos**: Controle de pontos de acesso/segurança
+- **Auditoria**: Rastreamento completo de ações dos usuários
 
 > 🎥 Referência: Assista ao vídeo explicativo para entender a estrutura por completo:  
 > [🔗 YouTube - Estrutura Base Nest.js](https://www.youtube.com/watch?v=PHIMN85trgk)
@@ -14,13 +22,22 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 
 ## 📚 Documentação complementar
 
+### 🏗️ **Arquitetura e Padrões**
+- [Padrões de Codificação](./docs/CODING_STANDARDS.md) - Convenções gerais de código
+- [Convenções de Nomenclatura](./docs/NAMING_CONVENTIONS.md) - Padrões de nomenclatura específicos
+- [Padrão CRUD Genérico](./docs/padroes/crud-generic-pattern.md) - Padronização de métodos CRUD
+- [Módulo Users (arquitetura SOLID)](./docs/README-users.md) - Arquitetura do módulo de usuários
+- [Sistema de Tenant](./docs/README-tenant-multitenancy.md) - Multi-tenancy
+
+### 🚀 **Desenvolvimento e Deploy**
+- [Escopo do Sistema](./docs/ESCOPO-SISTEMA.md)
 - [Desenvolvimento](./docs/DESENVOLVIMENTO.md)
 - [Produção](./docs/PRODUCAO.md)
 - [Comandos úteis](./docs/README.commands.md)
+
+### 📊 **Monitoramento e Infraestrutura**
 - [Monitoramento com Grafana e Prometheus](./docs/README-GRAFANA.md)
 - [Checklist de Produção](./docs/README-checklist-producao.md)
-- [Módulo Users (arquitetura SOLID)](./src/modules/users/README.md)
-- [Sistema de Tenant](./src/shared/tenant/README.md)
 
 ---
 
@@ -45,7 +62,7 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 
 ## 🎯 Objetivo
 
-> Fornecer uma estrutura backend robusta, escalável e reutilizável para todos os projetos da LoboCode com NestJS.
+> Fornecer uma plataforma completa para gestão de segurança patrimonial com controle de acesso multi-tenant e sistema de roles hierárquico.
 
 ### Principais Benefícios:
 
@@ -65,11 +82,9 @@ O **LoboCode Template - Backend** é um projeto base desenvolvido para padroniza
 ```
 src/
 ├── modules/           # Módulos da aplicação
-│   ├── users/        # Gestão de usuários
-│   ├── companies/    # Gestão de empresas
-│   ├── units/        # Gestão de unidades
-│   ├── products/     # Gestão de produtos
-│   └── posts/        # Gestão de posts
+│   ├── users/        # Gestão de usuários (multi-role)
+│   ├── companies/    # Gestão de empresas/condomínios
+│   └── posts/        # Gestão de postos de segurança
 ├── shared/           # Recursos compartilhados
 │   ├── auth/         # Autenticação e autorização
 │   ├── prisma/       # Configuração do banco de dados
