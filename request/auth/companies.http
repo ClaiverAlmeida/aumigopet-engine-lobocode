@@ -1,18 +1,18 @@
 @baseUrl = http://localhost:3000
 @token = {{ platformAdminLogin.response.body.access_token }}
 
-### Login PLATFORM_ADMIN (necessário para acessar companies)
+### Login SYSTEM_ADMIN (necessário para acessar companies)
 # @name platformAdminLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "platformadmin@user.com",
-    "password": "123456"
+    "email": "systemadmin@user.com",
+    "password": "SystemAdmin123@Senha"
 }
 
 ### ========================================
-### COMPANIES - PLATFORM_ADMIN
+### COMPANIES - SYSTEM_ADMIN
 ### ========================================
 
 ### Listar todas as empresas
@@ -60,7 +60,7 @@ Content-Type: application/json
 
 {
     "email": "admin@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 GET {{baseUrl}}/companies
@@ -73,7 +73,7 @@ Content-Type: application/json
 
 {
     "email": "hr@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 GET {{baseUrl}}/companies

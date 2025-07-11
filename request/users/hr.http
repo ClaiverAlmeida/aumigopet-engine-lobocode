@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
     "email": "hr@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 ### ========================================
@@ -78,7 +78,7 @@ Authorization: Bearer {{token}}
 {
     "name": "Novo HR",
     "email": "novo.hr@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s"
 }
 

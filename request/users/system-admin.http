@@ -1,0 +1,153 @@
+@baseUrl = http://localhost:3000
+@companyId = cmco084kk0000lt96pxlqot9s
+
+
+@token = {{ platformAdminLogin.response.body.access_token }}
+
+### Login SYSTEM_ADMIN
+# @name platformAdminLogin
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "systemadmin@user.com",
+    "password": "SystemAdmin123@Senha"
+}
+
+### ========================================
+### USERS - SYSTEM_ADMIN (Tenant Global)
+### ========================================
+
+### Listar TODOS os usuários (tenant global)
+GET {{baseUrl}}/users 
+Authorization: Bearer {{token}}
+
+### Buscar usuário específico (qualquer empresa)
+GET {{baseUrl}}/users/cmco084n70001lt96th7lafk8
+Authorization: Bearer {{token}}
+
+### Atualizar usuário (qualquer empresa)
+PATCH {{baseUrl}}/users/cmcttd8eg0001lttqg2s3zp1b
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+    "name": "[Platform Admin] Claiver Almeida",
+    "active": true
+}
+
+### Deletar usuário (qualquer empresa)
+DELETE {{baseUrl}}/users/cmcpq4bj4000altyjpjjfccvl
+Authorization: Bearer {{token}}
+
+### ========================================
+### USERS - SYSTEM_ADMIN (Tenant Específico)
+### ========================================
+
+### Listar usuários de empresa específica (via query)
+GET {{baseUrl}}/users?companyId={{companyId}}
+Authorization: Bearer {{token}}
+
+### Buscar usuário de empresa específica
+GET {{baseUrl}}/users/cmco41oh1000altzzr6h8mr5m?companyId={{companyId}}
+Authorization: Bearer {{token}}
+
+### ========================================
+### CREATE USERS - SYSTEM_ADMIN
+### ========================================
+
+### Criar novo SYSTEM_ADMIN
+POST {{baseUrl}}/users/system-admin
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Novo Platform Admin",
+    "email": "novo.systemadmin@user.com",
+    "password": "SystemAdmin123@Senha"
+}
+
+### Criar ADMIN em empresa específica
+POST {{baseUrl}}/users/admin
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Admin Empresa A",
+    "email": "admin.empresaA@user.com",
+    "password": "SystemAdmin123@Senha",
+    "companyId": "{{companyId}}"
+}
+
+### Criar HR em empresa específica
+POST {{baseUrl}}/users/hr
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "HR Empresa A",
+    "email": "hr.empresaA@user.com",
+    "password": "SystemAdmin123@Senha",
+    "companyId": "{{companyId}}"
+}
+
+### Criar GUARD em empresa específica
+POST {{baseUrl}}/users/guard
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Guard Empresa A",
+    "email": "guard.empresaA@user.com",
+    "password": "SystemAdmin123@Senha",
+    "companyId": "{{companyId}}",
+    "unitIds": ["unit_id_1", "unit_id_2"]
+}
+
+### Criar RESIDENT em empresa específica
+POST {{baseUrl}}/users/resident
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Resident Empresa A",
+    "email": "resident.empresaA@user.com",
+    "password": "SystemAdmin123@Senha",
+    "companyId": "{{companyId}}",
+    "unitId": "unit_id_1"
+}
+
+### ========================================
+### POSTS - SYSTEM_ADMIN
+### ========================================
+
+### Listar TODOS os posts (tenant global)
+GET {{baseUrl}}/posts
+Authorization: Bearer {{token}}
+
+### Listar posts de empresa específica
+GET {{baseUrl}}/posts?companyId={{companyId}}
+Authorization: Bearer {{token}}
+
+### Criar post em empresa específica
+POST {{baseUrl}}/posts
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "title": "Post da Empresa A",
+    "content": "Conteúdo do post",
+    "companyId": "{{companyId}}"
+}
+
+### ========================================
+### OUTROS RECURSOS - SYSTEM_ADMIN
+### ========================================
+
+### Listar produtos (se existir)
+GET {{baseUrl}}/products
+Authorization: Bearer {{token}}
+
+### Listar empresas (se existir)
+GET {{baseUrl}}/companies
+Authorization: Bearer {{token}} 

@@ -8,7 +8,7 @@ Content-Type: application/json
 
 {
     "email": "admin@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
 ### ========================================
@@ -49,7 +49,7 @@ Authorization: Bearer {{token}}
 {
     "name": "HR da Empresa",
     "email": "hr.empresa@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s"
 }
 
@@ -61,7 +61,7 @@ Authorization: Bearer {{token}}
 {
     "name": "Guard da Empresa",
     "email": "guard.empresa@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitIds": ["unit_id_1", "unit_id_2"]
 }
@@ -74,7 +74,7 @@ Authorization: Bearer {{token}}
 {
     "name": "Resident da Empresa",
     "email": "resident.empresa@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s",
     "unitId": "unit_id_1"
 }
@@ -113,22 +113,22 @@ Authorization: Bearer {{token}}
 {
     "name": "HR Outra Empresa",
     "email": "hr.outra@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "outra_empresa_id"
 }
 
-### ❌ TENTATIVA: Criar PLATFORM_ADMIN (deve falhar - só PLATFORM_ADMIN pode)
-POST {{baseUrl}}/users/platform-admin
+### ❌ TENTATIVA: Criar SYSTEM_ADMIN (deve falhar - só SYSTEM_ADMIN pode)
+POST {{baseUrl}}/users/system-admin
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
     "name": "Tentativa Platform Admin",
     "email": "tentativa@user.com",
-    "password": "123456"
+    "password": "SystemAdmin123@Senha"
 }
 
-### ❌ TENTATIVA: Criar ADMIN (deve falhar - só PLATFORM_ADMIN pode)
+### ❌ TENTATIVA: Criar ADMIN (deve falhar - só SYSTEM_ADMIN pode)
 POST {{baseUrl}}/users/admin
 Content-Type: application/json
 Authorization: Bearer {{token}}
@@ -136,6 +136,6 @@ Authorization: Bearer {{token}}
 {
     "name": "Tentativa Admin",
     "email": "tentativa.admin@user.com",
-    "password": "123456",
+    "password": "SystemAdmin123@Senha",
     "companyId": "cmco084kk0000lt96pxlqot9s"
 } 
