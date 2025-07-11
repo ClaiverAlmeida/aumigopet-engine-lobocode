@@ -48,6 +48,9 @@ async function bootstrap() {
         transformOptions: {
           enableImplicitConversion: true,
         },
+        whitelist: true, // Remove propriedades não decoradas
+        forbidNonWhitelisted: true, // Rejeita requisições com propriedades não permitidas
+        disableErrorMessages: false, // Mantém mensagens de erro
       }),
     );
     app.useGlobalInterceptors(new MetricsInterceptor());
