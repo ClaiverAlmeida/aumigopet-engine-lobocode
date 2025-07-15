@@ -29,6 +29,12 @@ O **Infraseg Engine** é um sistema backend robusto para gestão de segurança p
 - [Módulo Users (arquitetura SOLID)](./docs/README-users.md) - Arquitetura do módulo de usuários
 - [Sistema de Tenant](./docs/README-tenant-multitenancy.md) - Multi-tenancy
 
+### 🔐 **Autenticação e Segurança**
+- [Refatoração do Módulo Auth](./docs/AUTH-REFATORACAO.md) - Arquitetura SOLID aplicada
+- [Sistema de Filtros de Erro](./docs/ESTRATEGIA-ERROS-SIMPLES.md) - Tratamento padronizado
+- [Padronização de Mensagens](./docs/PADRONIZACAO-MENSAGENS-AUTH.md) - Mensagens centralizadas
+- [AuthGuard Customizado](./docs/AUTH-GUARD-CUSTOMIZADO.md) - Exceções específicas
+
 ### 🚀 **Desenvolvimento e Deploy**
 - [Escopo do Sistema](./docs/ESCOPO-SISTEMA.md)
 - [Desenvolvimento](./docs/DESENVOLVIMENTO.md)
@@ -48,6 +54,30 @@ O **Infraseg Engine** é um sistema backend robusto para gestão de segurança p
 - **Prisma ORM** para acesso a banco de dados relacional
 - **Zod** para validação de dados
 - **JWT** para autenticação
+- **Sistema de Filtros Customizados** para tratamento de erros
+- **Mensagens Centralizadas** para consistência
+- **Exceções Específicas** para diferentes tipos de erro
+
+## 🎯 **Melhorias Recentes**
+
+### ✅ **Sistema de Autenticação Refatorado**
+- **Arquitetura SOLID**: Separação de responsabilidades
+- **LoginService**: Lógica específica de login
+- **AuthValidator**: Validações centralizadas
+- **Exceções Customizadas**: Tipos específicos de erro
+- **Mensagens Padronizadas**: Consistência nas respostas
+
+### ✅ **Sistema de Filtros de Erro**
+- **Detecção Automática**: Erros de token identificados automaticamente
+- **BaseExceptionFilter**: Funcionalidades comuns centralizadas
+- **Filtros Específicos**: Para cada tipo de erro
+- **Respostas Padronizadas**: Formato consistente para o frontend
+
+### ✅ **Mensagens Centralizadas**
+- **MessagesService**: Serviço global para mensagens
+- **AUTH_MESSAGES**: Constantes para autenticação
+- **Interpolação**: Suporte a variáveis dinâmicas
+- **Multilíngue**: Preparado para internacionalização
 - **Swagger** para documentação automática
 - **Docker** para conteinerização
 - **Arquitetura modular baseada em princípios SOLID**
