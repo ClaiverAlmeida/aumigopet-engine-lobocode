@@ -1,9 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
+import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { PrismaService } from '../../../shared/prisma/prisma.service';
-import { ProductSlugAlreadyExistsError } from '../errors';
-import { NotFoundError } from '../../../shared/common/errors';
 
 @Injectable()
 export class AdminProductsService {
@@ -17,7 +15,7 @@ export class AdminProductsService {
     });
 
     if (product) {
-      throw new ProductSlugAlreadyExistsError(createProductDto.slug);
+      throw new ConflictException('Produto com este slug já existe');
     }
 
     return this.prismaService.product.create({
@@ -29,68 +27,24 @@ export class AdminProductsService {
     return this.prismaService.product.findMany();
   }
 
-  async findOne(id: string) {
-    const product = await this.prismaService.product.findFirst({
+  findOne(id: string) {
+    return this.prismaService.product.findUnique({
       where: {
         id,
       },
     });
-
-    if (!product) {
-      throw new NotFoundError('Product', id);
-    }
-
-    return product;
   }
 
-  // async update(id: string, updateProductDto: UpdateProductDto) {
-  //   let product = null;
-  //   // let product = null;
-
-  //   if (updateProductDto.slug) {
-  //     product = await this.prismaService.product.findFirst({
-  //       where: {
-  //         slug: updateProductDto.slug,
-  //       },
-  //     });
-  //   }
-
-  //   if (product && product.id !== id) {
-  //     throw new ProductSlugAlreadyExistsError(updateProductDto.slug);
-  //   }
-
-  //   product =
-  //     product && product.id === id
-  //       ? product
-  //       : await this.prismaService.product.findFirst({
-  //           where: {
-  //             id,
-  //           },
-  //         });
-
-  //   if (!product) {
-  //     throw new NotFoundError('Product', id);
-  //   }
-
-  //   return this.prismaService.product.update({
-  //     where: {
-  //       id,
-  //     },
-  //     data: updateProductDto,
-  //   });
-  // }
-
-  async remove(id: string) {
-    const product = await this.prismaService.product.findFirst({
+  update(id: string, updateProductDto: UpdateProductDto) {
+    return this.prismaService.product.update({
       where: {
         id,
       },
+      data: updateProductDto,
     });
+  }
 
-    if (!product) {
-      throw new NotFoundError('Product', id);
-    }
-
+  remove(id: string) {
     return this.prismaService.product.delete({
       where: {
         id,

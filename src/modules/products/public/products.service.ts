@@ -1,13 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
-import { NotFoundError } from '../../../shared/common/errors';
 
 @Injectable()
 export class ProductsService {
   constructor(private prismaService: PrismaService) {}
 
   findAll(dto: { name?: string; page?: number; limit?: number }) {
-    
     const { name, page = 1, limit = 15 } = dto;
     return this.prismaService.product.findMany({
       ...(name && {
@@ -30,7 +28,7 @@ export class ProductsService {
     });
 
     if (!product) {
-      throw new NotFoundError('Product', slug, 'slug');
+      throw new NotFoundException('Produto não encontrado');
     }
 
     return product;
