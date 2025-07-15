@@ -12,15 +12,15 @@ Content-Type: application/json
 {
     #   "login": "System Admin Claiver", 
     #   "login": "admin.empresA",
-      "login": "hr.empresa",
-    #   "login": "supervisor.empresa",
+    #   "login": "hr.empresa",
+      "login": "supervisor.exmpresa",
     #   "login": "guard.empresa",
     #   "login": "postsupervisor.empresa",
     #   "login": "postresident.empresa",
     # "login": "hr.empresa@user.com",
 
     "password": "SystemAdmin123@Senha"
-    # "password": "SystemAdmin123@Senha"
+    # "password": "SystemAdmin@Senha"
 }
 
 ### ========================================
@@ -34,8 +34,8 @@ Authorization: Bearer {{token}}
 
 {
     "name": "Novo Platform Admin",
-    "login": "novo.platformadmsin",
-    "email": "novo.platform@user.com",
+    "login": "novo.platformxadmsixSn",
+    "email": "novo.platfxorSxm@user.com",
     "password": "SystemAdmin123@Senha",
     "role": "SYSTEM_ADMIN"
 }
