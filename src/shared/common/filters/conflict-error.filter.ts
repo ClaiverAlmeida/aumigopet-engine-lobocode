@@ -1,16 +1,21 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { ConflictError } from '../errors';
-import { Response } from 'express';
+import { BaseExceptionFilter } from './base-exception.filter';
+import { MessagesService } from '../messages/messages.service';
 
 @Catch(ConflictError)
-export class ConflictErrorFilter implements ExceptionFilter {
-  catch(exception: ConflictError, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+export class ConflictErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
+  constructor(messagesService: MessagesService) {
+    super(messagesService);
+  }
 
-    response.status(409).json({
-      statusCode: 409,
-      message: exception.message,
-    });
+  catch(exception: ConflictError, host: ArgumentsHost) {
+    this.sendErrorResponse(
+      exception,
+      host,
+      HttpStatus.CONFLICT,
+      'CONFLICT',
+      this.messagesService.getErrorMessage('RESOURCE', 'ALREADY_EXISTS'),
+    );
   }
 } 

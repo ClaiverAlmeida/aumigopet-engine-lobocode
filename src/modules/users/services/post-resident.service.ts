@@ -26,10 +26,10 @@ export class PostResidentService extends BaseUserService {
     );
   }
 
-  //  Funcionalidades específicas de residentes de posto
+    //  Funcionalidades específicas de residentes de posto
   async criarNovoPostResident(dto: CreatePostResidentDto) {
-    // Validação de criação com CASL usando role configurado no construtor
-    await this.validarPermissaoDeCreate();
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.POST_RESIDENT);
 
     // Valida se email é único
     await this.validarSeEmailEhUnico(dto.email);

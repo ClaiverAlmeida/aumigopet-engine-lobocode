@@ -5,7 +5,7 @@ import { UserRepository } from './repositories/user.repository';
 import { UserValidator } from './validators/user.validator';
 import { UserFactory } from './factories/user.factory';
 import { CompaniesModule } from 'src/modules/companies/companies.module';
-import { PostsModule } from '../posts/posts.module'; 
+import { PostsModule } from '../posts/posts.module';
 
 //  Novos services específicos
 

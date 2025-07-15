@@ -3,9 +3,9 @@ import { AdminProductsService } from './admin/admin-products.service';
 import { AdminProductsController } from './admin/admin-products.controller';
 import { PrismaService } from '../../shared/prisma/prisma.service';
 import { ProductsController } from './public/products.controller';
-import { ProductsService } from './public/products.service';
+import { ProductsService } from './public/products.service'; 
 
-@Module({
+@Module({ 
   controllers: [AdminProductsController, ProductsController],
   providers: [AdminProductsService, ProductsService],
 })

@@ -1,39 +1,38 @@
 import { Injectable } from '@nestjs/common';
-import { CaslAbilityService } from '../../../shared/casl/casl-ability/casl-ability.service';
-import { TenantService } from '../../../shared/tenant/tenant.service';
-import { Roles } from '@prisma/client';
-import { ForbiddenError } from 'src/shared/common/errors';
-import { ERROR_MESSAGES } from 'src/shared/common/messages';
+import { CaslService } from '../../../shared/casl/casl.service';
+import { PermissionContextService } from '../../../shared/casl/services/permission-context.service';
+import { PermissionAuditService } from '../../../shared/casl/services/permission-audit.service';
+import { Roles, User } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 
 @Injectable()
 export class UserPermissionService {
   constructor(
-    private abilityService: CaslAbilityService,
-    private tenantService: TenantService,
+    private caslService: CaslService,
+    private contextService: PermissionContextService,
+    private auditService: PermissionAuditService,
   ) {}
 
   // ============================================================================
-  // 🔐 MÉTODOS PÚBLICOS - VALIDAÇÃO DE PERMISSÕES BÁSICAS
+  // 🔐 MÉTODOS PÚBLICOS - VALIDAÇÃO BÁSICA (Mantidos para compatibilidade)
   // ============================================================================
 
   /**
    * Verifica se o usuário pode realizar uma ação específica
    */
   validarAction(action: CrudAction): boolean {
-    const ability = this.abilityService.ability;
+    return this.caslService.validarAction(action, 'User');
+  }
 
-    if (!ability.can(action, 'User')) {
-      throw new ForbiddenError(
-        ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,
-      );
-    }
-
-    return true;
+  /**
+   * Valida permissões para atualização de campos específicos
+   */
+  validarPermissoesDeCampo(updateData: any): boolean {
+    return this.caslService.validarPermissaoDeCampo('User', updateData);
   }
 
   // ============================================================================
-  // 🎯 MÉTODOS PÚBLICOS - VALIDAÇÃO DE ROLE POR AÇÃO
+  // 🎯 MÉTODOS PÚBLICOS - VALIDAÇÃO DE ROLE HIERÁRQUICO (RESTAURADO)
   // ============================================================================
 
   /**
@@ -65,86 +64,125 @@ export class UserPermissionService {
   }
 
   // ============================================================================
-  // 📝 MÉTODOS PÚBLICOS - VALIDAÇÃO DE CAMPOS
+  // 🎯 MÉTODOS PÚBLICOS - VALIDAÇÃO COM AUDITORIA (Recomendado)
   // ============================================================================
 
   /**
-   * Valida permissões para atualização de campos específicos
+   * Valida ação com auditoria completa
    */
-  validarPermissoesDeCampo(updateData: any): boolean {
-    const ability = this.abilityService.ability;
-
-    // Verifica se tem permissão geral para update
-    const canUpdateGeneral = ability.can('update', 'User');
-    if (!canUpdateGeneral) {
-      throw new ForbiddenError(
-        ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,
-      );
-    }
-
-    const updateRules = ability.rulesFor('update', 'User');
-
-    // VALIDAÇÃO GRANULAR: Verificar cada campo individualmente
-    const fieldsToUpdate = Object.keys(updateData);
-
-    // Se não há campos para atualizar, retorna true
-    if (fieldsToUpdate.length === 0) {
-      return true;
-    }
-
-    // Analisa as regras CASL para entender permissões por campo
-    const allowedFields = this.extrairCamposPermitidosDasRules(updateRules);
-
-    // Verifica cada campo específico
-    for (const field of fieldsToUpdate) {
-      let canUpdateField = false;
-
-      // Se temos campos específicos definidos nas regras, verifica se o campo está permitido
-      if (allowedFields.length > 0) {
-        canUpdateField =
-          allowedFields.includes(field) || allowedFields.includes('*');
-      } else {
-        // Se não há campos específicos, usa permissão geral
-        canUpdateField = canUpdateGeneral;
-      }
-
-      if (!canUpdateField) {
-        throw new ForbiddenError(
-          ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,
-        );
-      }
-    }
-    return true;
+  validarComAuditoria(
+    user: User,
+    action: CrudAction,
+    context?: {
+      resourceId?: string;
+      ipAddress?: string;
+      userAgent?: string;
+      additionalContext?: Record<string, any>;
+    },
+  ): boolean {
+    return this.auditService.validarComAuditoria(
+      user,
+      action,
+      'User',
+      context,
+    );
   }
 
+
+
   // ============================================================================
-  // 🔧 MÉTODOS PRIVADOS - LÓGICA CENTRALIZADA
+  // 🔧 MÉTODOS PÚBLICOS - VALIDAÇÃO CONTEXTUAL (Novo)
   // ============================================================================
 
   /**
-   * Extrai campos permitidos das regras CASL
+   * Valida permissão considerando contexto do usuário
    */
-  private extrairCamposPermitidosDasRules(rules: any[]): string[] {
-    const allowedFields: string[] = [];
-
-    for (const rule of rules) {
-      // Se a regra tem campos específicos definidos
-      if (rule.fields) {
-        if (Array.isArray(rule.fields)) {
-          allowedFields.push(...rule.fields);
-        } else if (typeof rule.fields === 'string') {
-          allowedFields.push(rule.fields);
-        }
-      }
-
-      // Se a regra é 'manage all', permite todos os campos
-      if (rule.action === 'manage' && rule.subject === 'all') {
-        allowedFields.push('*');
-      }
-    }
-
-    return Array.from(new Set(allowedFields)); // Remove duplicatas
+  validarContextual(
+    user: User,
+    action: CrudAction,
+    context?: {
+      postId?: string;
+      companyId?: string;
+      isOnShift?: boolean;
+      timeOfDay?: 'day' | 'night';
+    },
+  ): boolean {
+    const permissionContext = this.contextService.criarContexto(user, context);
+    
+    return this.contextService.validarPermissaoContextual(
+      permissionContext,
+      {
+        action,
+        subject: 'User',
+        conditions: {
+          companyId: context?.companyId,
+          postId: context?.postId,
+        },
+        timeRestrictions: context?.timeOfDay === 'night' ? {
+          startHour: 18,
+          endHour: 6,
+        } : undefined,
+      },
+    );
   }
+
+  /**
+   * Valida permissão para operações de RH (horário comercial)
+   */
+  validarOperacaoRH(
+    user: User,
+    action: CrudAction,
+    context?: any,
+  ): boolean {
+    const permissionContext = this.contextService.criarContexto(user, context);
+    
+    return this.contextService.validarPermissaoContextual(
+      permissionContext,
+      {
+        action,
+        subject: 'User',
+        timeRestrictions: {
+          startHour: 8,
+          endHour: 18,
+        },
+        conditions: {
+          role: { in: ['HR', 'ADMIN'] },
+        },
+      },
+    );
+  }
+
+  // ============================================================================
+  // 📊 MÉTODOS PÚBLICOS - MÉTRICAS E AUDITORIA (Novo)
+  // ============================================================================
+
+  /**
+   * Obtém métricas de permissões de usuário
+   */
+  obterMetricas(periodo?: { inicio: Date; fim: Date }) {
+    return this.auditService.obterMetricas(periodo);
+  }
+
+  /**
+   * Obtém logs de auditoria de usuário
+   */
+  obterLogs(filtros?: any, limit = 100) {
+    return this.auditService.obterLogs(
+      { ...filtros, subject: 'User' },
+      limit,
+    );
+  }
+
+  /**
+   * Exporta logs de usuário para análise
+   */
+  exportarLogs(formato: 'json' | 'csv' = 'json') {
+    return this.auditService.exportarLogs(formato);
+  }
+
+  // ============================================================================
+  // 🔧 MÉTODOS PRIVADOS - LÓGICA ESPECÍFICA DO USUÁRIO
+  // ============================================================================
 
   /**
    * Valida se o usuário pode realizar ação específica com determinado role
@@ -154,30 +192,6 @@ export class UserPermissionService {
     action: CrudAction,
     targetRole: Roles,
   ): boolean {
-    const ability = this.abilityService.ability;
-
-    // Se o usuário tem permissão 'manage all' (SYSTEM_ADMIN), pode realizar qualquer ação
-    // independente do tenant (global ou específico)
-    if (ability.can('manage', 'all')) {
-      return true;
-    }
-
-    try {
-      const rules = ability.rulesFor(action, 'User');
-
-      for (const rule of rules as any[]) {
-        if (rule.conditions?.role?.in) {
-          if (rule.conditions.role.in.includes(targetRole)) {
-            return true;
-          }
-        }
-      }
-
-      return false;
-    } catch (error) {
-      throw new ForbiddenError(
-        ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,
-      );
-    }
+    return this.caslService.validarPermissaoDeRole(action, 'User', targetRole);
   }
 }

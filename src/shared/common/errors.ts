@@ -1,3 +1,5 @@
+import { AUTH_MESSAGES } from "../auth/constants";
+
 export class NotFoundError extends Error {
   constructor(entity: string, key: string, attribute: string = 'id') {
     super(`${entity} with ${attribute} ${key} not found`);
@@ -30,6 +32,31 @@ export class ConflictError extends Error {
 
 export class InvalidCredentialsError extends Error {
   constructor() {
-    super('Invalid credentials');
+    super(AUTH_MESSAGES.ERROR.INVALID_CREDENTIALS);
+  }
+}
+
+// Exceções específicas para autenticação com tokens
+export class TokenExpiredError extends Error {
+  constructor(message: string = AUTH_MESSAGES.ERROR.TOKEN_EXPIRED) {
+    super(message);
+  }
+}
+
+export class TokenInvalidError extends Error {
+  constructor(message: string = AUTH_MESSAGES.ERROR.TOKEN_INVALID) {
+    super(message);
+  }
+}
+
+export class TokenRequiredError extends Error {
+  constructor(message: string = AUTH_MESSAGES.VALIDATION.TOKEN_REQUIRED) {
+    super(message);
+  }
+}
+
+export class RefreshTokenInvalidError extends Error {
+  constructor(message: string = AUTH_MESSAGES.ERROR.REFRESH_TOKEN_INVALID) {
+    super(message);
   }
 }

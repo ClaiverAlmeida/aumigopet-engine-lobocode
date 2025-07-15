@@ -1,25 +1,41 @@
-import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ValidationPipe } from '@nestjs/common';
-import { APP_PIPE, APP_INTERCEPTOR } from '@nestjs/core';
+import { Module, NestModule, MiddlewareConsumer, ValidationPipe } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
+import { PrometheusModule } from '@willsoto/nestjs-prometheus';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { AuthModule } from './shared/auth/auth.module';
-import { CaslModule } from './shared/casl/casl.module';
 import { ProductsModule } from './modules/products/products.module';
 import { CompaniesModule } from './modules/companies/companies.module';
+import { CaslModule } from './shared/casl/casl.module';
 import { TenantModule } from './shared/tenant/tenant.module';
-import { PrometheusModule } from '@willsoto/nestjs-prometheus';
 import { LoggerModule } from './shared/common/logger/logger.module';
 import { MessagesModule } from './shared/common/messages/messages.module';
-import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
 import { SoftDeleteInterceptor } from './shared/interceptors/soft-delete.interceptor';
+import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
+import { 
+  HttpExceptionFilter,
+  ForbiddenErrorFilter,
+  NotFoundErrorFilter,
+  ConflictErrorFilter,
+  UnauthorizedErrorFilter,
+  ValidationErrorFilter,
+  InvalidCredentialsErrorFilter,
+  AuthErrorFilter
+} from './shared/common/filters';
 
 //javascript es7
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+    }),
     LoggerModule,
     MessagesModule,
     PrometheusModule.register(),
@@ -36,11 +52,52 @@ import { SoftDeleteInterceptor } from './shared/interceptors/soft-delete.interce
     AppService,
     {
       provide: APP_PIPE,
-      useClass: ValidationPipe,
+      useFactory: () => new ValidationPipe({
+        whitelist: true,
+        forbidNonWhitelisted: true,
+        transform: true,
+        transformOptions: {
+          enableImplicitConversion: true,
+        },
+      }),
     },
     {
       provide: APP_INTERCEPTOR,
       useClass: SoftDeleteInterceptor,
+    },
+    // Filtros específicos para erros customizados
+    {
+      provide: APP_FILTER,
+      useClass: ForbiddenErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: NotFoundErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ConflictErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: UnauthorizedErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: ValidationErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: InvalidCredentialsErrorFilter,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AuthErrorFilter,
+    },
+    // Filtro para exceções HTTP padrão do NestJS
+    {
+      provide: APP_FILTER,
+      useClass: HttpExceptionFilter,
     },
   ],
 })

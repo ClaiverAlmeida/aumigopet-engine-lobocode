@@ -28,8 +28,8 @@ export class HRService extends BaseUserService {
 
   //  Funcionalidades específicas de RH
   async criarNovoHR(dto: CreateHRDto) {
-    // Validação de criação com CASL usando role configurado no construtor
-    await this.validarPermissaoDeCreate();
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.HR);
 
     // Validações comuns
     await this.validarSeEmailEhUnico(dto.email);

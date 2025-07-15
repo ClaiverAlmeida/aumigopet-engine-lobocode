@@ -67,6 +67,8 @@ export const ERROR_MESSAGES = {
     UNAUTHORIZED: 'Usuário não autenticado',
     INVALID_CREDENTIALS: 'Credenciais inválidas',
     TOKEN_EXPIRED: 'Token expirado',
+    TOKEN_INVALID: 'Token inválido',
+    TOKEN_REQUIRED: 'Token é obrigatório',
     INSUFFICIENT_PERMISSIONS: 'Permissões insuficientes',
     USER_NOT_FOUND: 'Usuário não encontrado',
   },
