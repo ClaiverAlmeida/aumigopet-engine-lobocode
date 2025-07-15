@@ -28,8 +28,8 @@ export class AdminService extends BaseUserService {
 
   //  Funcionalidades específicas de administradores
   async criarNovoAdmin(dto: CreateAdminDto) {
-    // Validação de criação com CASL usando role configurado no construtor
-    await this.validarPermissaoDeCreate();
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.ADMIN);
 
     // Validações comuns
     await this.validarSeEmailEhUnico(dto.email);

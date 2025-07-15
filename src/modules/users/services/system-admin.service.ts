@@ -27,13 +27,12 @@ export class SystemAdminService extends BaseUserService {
   }
 
   //  Funcionalidades específicas de administradores da plataforma
-  async criarNovoSystemAdmin(dto: CreateSystemAdminDto) {
-    // Valida permissão para criação
-    await this.validarPermissaoDeCreate();
-
+    async criarNovoSystemAdmin(dto: CreateSystemAdminDto) {
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.SYSTEM_ADMIN);
+ 
     // Valida se email é único
-    await this.validarSeEmailEhUnico(dto.email);
-
+    await this.validarSeEmailEhUnico(dto.email); 
     // Criação do usuário
     const userData = this.userFactory.criarSystemAdmin(dto);
     const user = await this.userRepository.criar(userData);

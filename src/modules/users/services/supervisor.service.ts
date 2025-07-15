@@ -28,11 +28,11 @@ export class SupervisorService extends BaseUserService {
     );
   }
 
-  //  Funcionalidades específicas de supervisores
+    //  Funcionalidades específicas de supervisores
   async criarNovoSupervisor(dto: CreateSupervisorDto) {
-    // Validação de criação com CASL usando role configurado no construtor
-    await this.validarPermissaoDeCreate();
-  
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.SUPERVISOR);
+
     // Valida se email é único
     await this.validarSeEmailEhUnico(dto.email);
 

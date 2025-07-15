@@ -28,9 +28,9 @@ export class GuardService extends BaseUserService {
 
   //  Funcionalidades específicas de guardas
   async criarNovoGuard(dto: CreateGuardDto) {
-    // Validação de criação com CASL usando role configurado no construtor
-    await this.validarPermissaoDeCreate();
-    
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.GUARD);
+
     // Valida se email é único
     await this.validarSeEmailEhUnico(dto.email);
 

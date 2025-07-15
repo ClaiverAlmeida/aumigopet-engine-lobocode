@@ -1,20 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateUserDto } from '../dto/update-user.dto';
-import {
-  ForbiddenError,
-  NotFoundError,
-} from '../../../shared/common/errors';
 import { UserRepository } from '../repositories/user.repository';
 import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service';
 import { UserPermissionService } from './user-permission.service';
-import {
-  ERROR_MESSAGES,
-  SUCCESS_MESSAGES,
-} from '../../../shared/common/messages';
+import { UpdateUserDto } from '../dto/update-user.dto';
 import { Roles } from '@prisma/client';
+import { CrudAction } from '../../../shared/common/types';
+import { NotFoundError, ForbiddenError } from '../../../shared/common/errors';
+import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../../../shared/common/messages';
 import { Prisma } from '@prisma/client';
-import { CrudAction } from '../../../shared/common/types'; 
 
 @Injectable()
 export class BaseUserService {
@@ -27,86 +21,81 @@ export class BaseUserService {
   ) {}
 
   // ============================================================================
-  // 📋 MÉTODOS PÚBLICOS - OPERAÇÕES CRUD
+  // 📋 MÉTODOS PÚBLICOS - CRUD BÁSICO
   // ============================================================================
 
   /**
    * Lista todos os usuários com paginação
    */
-  async buscarTodos(page = 1, limit = 20) {
-    // Valida permissão para leitura
-    this.validarPermissaoDeRead();
-
-    const whereClause = this.construirWhereClauseComPermissao('read');
+  async buscarTodos(page = 1, limit  = 20) {
+    const whereClause = this.userQueryService.construirWhereClauseParaRead();
     const skip = (page - 1) * limit;
-
     const [users, total] = await Promise.all([
       this.userRepository.buscarMuitos(whereClause, { skip, take: limit }),
       this.userRepository.contar(whereClause),
     ]);
 
+    const { totalPages, hasNextPage, hasPreviousPage } =
+      this.calcularInformacoesDePaginacao(page, limit, total);
+
     return {
       data: users,
-      pagination: this.calcularInformacoesDePaginacao(page, limit, total),
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+      },
     };
   }
 
   /**
    * Busca usuário por ID
    */
-  async buscarPorId(id: string) {
-    // Valida permissão para leitura
-    this.validarPermissaoDeRead();
-
-    const whereClause = this.construirWhereClauseComPermissao('read', { id });
+  async buscarPorId(id: string) { 
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({ id });
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
-    return this.validarResultadoDaBusca(user, 'User', 'id', id);
+    this.validarResultadoDaBusca(user, 'User', 'id', id);
+
+    return { data: user };
   }
 
   /**
    * Busca usuário por email
    */
   async buscarUserPorEmail(email: string) {
-    // Valida permissão para leitura
-    this.validarPermissaoDeRead();
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({ email });
+    const user = await this.userRepository.buscarPrimeiro(whereClause);
 
-    const user = await this.userRepository.buscarUnico({ email });
-    return this.validarResultadoDaBusca(user, 'User', 'email', email);
+    this.validarResultadoDaBusca(user, 'User', 'email', email);
+
+    return { data: user };
   }
 
   /**
    * Busca usuários por empresa
    */
   async buscarUsersPorCompany(companyId: string) {
-    // Valida permissão para leitura
-    this.validarPermissaoDeRead();
-
-    const whereClause = this.construirWhereClauseComPermissao('read', {
-      companyId,
-    });
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({ companyId });
     const users = await this.userRepository.buscarMuitos(whereClause);
-    return this.validarResultadoDaBusca(users, 'Users', 'companyId', companyId);
+
+    return { data: users };
   }
 
   /**
-   * Atualiza dados do usuário
+   * Atualiza usuário
    */
   async atualizar(id: string, updateUserDto: UpdateUserDto) {
-    //  Validação de atualização com CASL
-    this.validarPermissaoDeUpdate();
-
-    // Valida permissão para atualização
-    const whereClause = this.construirWhereClauseComPermissao('update', { id });
+    const whereClause = this.userQueryService.construirWhereClauseParaUpdate(id);
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     this.validarResultadoDaBusca(user, 'User', 'id', id);
 
     // Prepara dados para atualização
     const updateData = this.prepararDadosParaUpdate(updateUserDto);
-
-    // Valida permissão para campos específicos
-    this.userPermissionService.validarPermissoesDeCampo(updateData);
 
     return this.userRepository.atualizar({ id }, updateData);
   }
@@ -115,10 +104,7 @@ export class BaseUserService {
    * Soft delete - marca usuário como deletado
    */
   async desativar(id: string) {
-    // Valida permissão para exclusão
-    this.validarPermissaoDeDelete();
-
-    const whereClause = this.construirWhereClauseComPermissao('delete', { id });
+    const whereClause = this.userQueryService.construirWhereClauseParaDelete(id);
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     if (!user) {
@@ -140,14 +126,11 @@ export class BaseUserService {
   }
 
   /**
-   * Restaura usuário deletado (soft delete)
+   * Restaura usuário deletado (soft delete)  
    */
   async reativar(id: string) {
-    // Valida permissão para atualização
-    this.validarPermissaoDeUpdate();
-
     // Busca usuário deletado
-    const whereClause = this.construirWhereClauseComPermissao('update', { id });
+    const whereClause = this.userQueryService.construirWhereClauseParaUpdate(id);
     const user = await this.userRepository.buscarPrimeiro({
       ...whereClause,
       deletedAt: { not: null }, // Só restaura se estiver deletado
@@ -169,7 +152,59 @@ export class BaseUserService {
   }
 
   // ============================================================================
-  //  MÉTODOS PROTEGIDOS - VALIDAÇÕES COMUNS
+  // 🔐 MÉTODOS PÚBLICOS - VALIDAÇÕES AVANÇADAS (Opcional)
+  // ============================================================================
+
+  /**
+   * Validação contextual para operações críticas
+   * Útil para operações que precisam de contexto específico
+   */
+  async validarOperacaoCritica(user: any, action: CrudAction, context?: any) {
+    return this.userPermissionService.validarContextual(
+      user,
+      action,
+      context,
+    );
+  }
+
+  /**
+   * Validação para operações de RH com restrições de horário
+   */
+  async validarOperacaoRH(user: any, action: CrudAction, context?: any) {
+    return this.userPermissionService.validarOperacaoRH(
+      user,
+      action,
+      context,
+    );
+  }
+
+  // ============================================================================
+  // 📊 MÉTODOS PÚBLICOS - MÉTRICAS E AUDITORIA (Novo)
+  // ============================================================================
+
+  /**
+   * Obtém métricas de permissões de usuário
+   */
+  obterMetricas(periodo?: { inicio: Date; fim: Date }) {
+    return this.userPermissionService.obterMetricas(periodo);
+  }
+
+  /**
+   * Obtém logs de auditoria de usuário
+   */
+  obterLogs(filtros?: any, limit = 100) {
+    return this.userPermissionService.obterLogs(filtros, limit);
+  }
+
+  /**
+   * Exporta logs de usuário para análise
+   */
+  exportarLogs(formato: 'json' | 'csv' = 'json') {
+    return this.userPermissionService.exportarLogs(formato);
+  }
+
+  // ============================================================================
+  // 🔧 MÉTODOS PROTEGIDOS - UTILITÁRIOS
   // ============================================================================
 
   /**
@@ -208,118 +243,29 @@ export class BaseUserService {
   }
 
   // ============================================================================
-  // 🔐 MÉTODOS PROTEGIDOS - VALIDAÇÕES DE PERMISSÃO
-  // ============================================================================
-
-  /**
-   * Valida permissão para leitura de usuários
-   * Centraliza validações de permissão e role para leitura
-   */
-  protected validarPermissaoDeRead(targetRole?: Roles) {
-    this.validarPermissaoParaAction('read', targetRole);
-  }
-  /**
-   * Valida permissão para criação de usuário
-   * Centraliza validações de permissão e role para criação
-   */
-  protected validarPermissaoDeCreate(targetRole?: Roles) {
-    this.validarPermissaoParaAction('create', targetRole);
-  }
-
-  /**
-   * Valida permissão para atualização de usuário
-   * Centraliza validações de permissão e role para atualização
-   */
-  protected validarPermissaoDeUpdate(targetRole?: Roles) {
-    this.validarPermissaoParaAction('update', targetRole);
-  }
-  /**
-   * Valida permissão para atualização de usuário
-   * Centraliza validações de permissão e role para atualização
-   */
-  protected async validarPermissaoDeDelete() {
-    await this.validarPermissaoParaAction('delete');
-  }
-
-  /**
-   * Valida permissão de usuário para qualquer ação
-   * Centraliza validações de permissão e role para qualquer ação
-   */
-  private validarPermissaoParaAction(action: CrudAction, targetRole?: Roles) {
-    this.userPermissionService.validarAction(action);
-
-    // Usa o role configurado no construtor ou o passado como parâmetro
-    const roleToValidate = targetRole || this.targetRole;
-    if (roleToValidate) {
-      this.validarPermissaoParaRole(action, roleToValidate);
-    }
-  }
-
-  // ============================================================================
   // 🔧 MÉTODOS PRIVADOS - UTILITÁRIOS CENTRALIZADOS
   // ============================================================================
 
   /**
-   * Centraliza validação de permissão + construção de where clause
-   * Reduz código duplicado em todos os métodos CRUD
-   */
-  private construirWhereClauseComPermissao(
-    action: CrudAction,
-    extra?: Prisma.UserWhereInput,
-  ) {
-    this.userPermissionService.validarAction(action);
-
-    switch (action) {
-      case 'read':
-        return this.userQueryService.construirWhereClauseParaRead(extra);
-      case 'create':
-        return this.userQueryService.construirWhereClauseParaCreate();
-      case 'update':
-        return this.userQueryService.construirWhereClauseParaUpdate(
-          extra?.id as string,
-        );
-      case 'delete':
-        return this.userQueryService.construirWhereClauseParaDelete(
-          extra?.id as string,
-        );
-    }
-  }
-
-  /**
-   * Centraliza validação de role para qualquer ação
-   * Padroniza a verificação de permissões hierárquicas
-   */
-  private validarPermissaoParaRole(action: CrudAction, targetRole: Roles) {
-    if (
-      !this.userPermissionService.validarAcaoDeUserComRole(action, targetRole)
-    ) {
-      throw new ForbiddenError(
-        ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,
-      );
-    }
-  }
-
-  // ============================================================================
-  // 🔧 MÉTODOS UTILITÁRIOS - SIMPLIFICAM OPERAÇÕES COMUNS
-  // ============================================================================
-
-  /**
-   * Prepara dados para atualização
+   * Prepara dados para atualização removendo campos vazios
    */
   private prepararDadosParaUpdate(
     updateUserDto: UpdateUserDto,
   ): Record<string, any> {
     const updateData: Record<string, any> = {};
-    if (updateUserDto.name) updateData.name = updateUserDto.name;
-    if (updateUserDto.profilePicture)
-      updateData.profilePicture = updateUserDto.profilePicture;
-    if (updateUserDto.status !== undefined)
-      updateData.status = updateUserDto.status;
+
+    // Só inclui campos que foram fornecidos
+    Object.entries(updateUserDto).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        updateData[key] = value;
+      }
+    });
+
     return updateData;
   }
 
   /**
-   * Valida se resultado de busca não está vazio
+   * Valida resultado da busca e lança erro se não encontrado
    */
   protected validarResultadoDaBusca(
     result: any,
@@ -327,25 +273,24 @@ export class BaseUserService {
     identifier: string,
     value: string,
   ): any {
-    if (!result || (Array.isArray(result) && result.length === 0)) {
+    if (!result) {
       throw new NotFoundError(entity, value, identifier);
     }
     return result;
   }
 
   /**
-   * Calcula paginação
+   * Calcula informações de paginação
    */
   private calcularInformacoesDePaginacao(
     page: number,
     limit: number,
     total: number,
   ) {
-    return {
-      page,
-      limit,
-      total,
-      pages: Math.ceil(total / limit),
-    };
+    const totalPages = Math.ceil(total / limit);
+    const hasNextPage = page < totalPages;
+    const hasPreviousPage = page > 1;
+
+    return { totalPages, hasNextPage, hasPreviousPage };
   }
 }
