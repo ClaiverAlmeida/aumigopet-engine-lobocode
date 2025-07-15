@@ -1,16 +1,21 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { ForbiddenError } from '../errors';
-import { Response } from 'express';
+import { BaseExceptionFilter } from './base-exception.filter';
+import { MessagesService } from '../messages/messages.service';
 
 @Catch(ForbiddenError)
-export class ForbiddenErrorFilter implements ExceptionFilter {
-  catch(exception: ForbiddenError, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+export class ForbiddenErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
+  constructor(messagesService: MessagesService) {
+    super(messagesService);
+  }
 
-    response.status(403).json({
-      statusCode: 403,
-      message: exception.message,
-    });
+  catch(exception: ForbiddenError, host: ArgumentsHost) {
+    this.sendErrorResponse(
+      exception,
+      host,
+      HttpStatus.FORBIDDEN,
+      'FORBIDDEN',
+      this.messagesService.getErrorMessage('AUTHORIZATION', 'FORBIDDEN'),
+    );
   }
 } 

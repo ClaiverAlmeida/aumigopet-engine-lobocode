@@ -1,16 +1,21 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common';
 import { UnauthorizedError } from '../errors';
-import { Response } from 'express';
+import { BaseExceptionFilter } from './base-exception.filter';
+import { MessagesService } from '../messages/messages.service';
 
 @Catch(UnauthorizedError)
-export class UnauthorizedErrorFilter implements ExceptionFilter {
-  catch(exception: UnauthorizedError, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+export class UnauthorizedErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
+  constructor(messagesService: MessagesService) {
+    super(messagesService);
+  }
 
-    response.status(401).json({
-      statusCode: 401,
-      message: exception.message,
-    });
+  catch(exception: UnauthorizedError, host: ArgumentsHost) {
+    this.sendErrorResponse(
+      exception,
+      host,
+      HttpStatus.UNAUTHORIZED,
+      'UNAUTHORIZED',
+      this.messagesService.getErrorMessage('AUTH', 'UNAUTHORIZED'),
+    );
   }
 } 

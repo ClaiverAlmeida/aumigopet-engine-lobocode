@@ -1,16 +1,21 @@
-import { ArgumentsHost, Catch, ExceptionFilter } from '@nestjs/common'; 
-import { Response } from 'express';
+import { ArgumentsHost, Catch, ExceptionFilter, HttpStatus } from '@nestjs/common'; 
 import { InvalidCredentialsError } from '../errors';
+import { BaseExceptionFilter } from './base-exception.filter';
+import { MessagesService } from '../messages/messages.service';
 
 @Catch(InvalidCredentialsError)
-export class InvalidCredentialsErrorFilter implements ExceptionFilter {
-  catch(exception: InvalidCredentialsError, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
+export class InvalidCredentialsErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
+  constructor(messagesService: MessagesService) {
+    super(messagesService);
+  }
 
-    response.status(401).json({
-      statusCode: 401,
-      message: 'Invalid credentials',
-    });
+  catch(exception: InvalidCredentialsError, host: ArgumentsHost) {
+    this.sendErrorResponse(
+      exception,
+      host,
+      HttpStatus.UNAUTHORIZED,
+      'INVALID_CREDENTIALS',
+      this.messagesService.getErrorMessage('AUTH', 'INVALID_CREDENTIALS'),
+    );
   }
 }

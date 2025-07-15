@@ -23,7 +23,7 @@ export class MessagesService {
   /**
    * Obtém uma mensagem de erro
    */
-  getErrorMessage(category: keyof typeof ERROR_MESSAGES, key: string, context?: MessageContext): string {
+getErrorMessage(category: keyof typeof ERROR_MESSAGES, key: string, context?: MessageContext): string {
     const message = ERROR_MESSAGES[category]?.[key];
     return this.interpolateMessage(message, context);
   }
