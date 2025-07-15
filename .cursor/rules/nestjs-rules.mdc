@@ -1,0 +1,781 @@
+
+---
+description: "Regras específicas para desenvolvimento NestJS no projeto Infraseg"
+globs: 
+  - "src/**/*.ts"
+  - "src/**/*.module.ts"
+  - "src/**/*.service.ts"
+  - "src/**/*.controller.ts"
+  - "src/**/*.guard.ts"
+  - "src/**/*.filter.ts"
+  - "src/**/*.interceptor.ts"
+  - "src/**/*.decorator.ts"
+alwaysApply: true
+---
+
+# 🧱 Regras de Desenvolvimento NestJS - Projeto Infraseg
+
+> **📘 Complemento**: Este documento trabalha em conjunto com o `docs/NAMING_CONVENTIONS.md` que contém os padrões específicos de nomenclatura do projeto.
+
+## 📋 Arquitetura do Projeto
+
+### 🏗️ Estrutura de Módulos
+- Sempre usar **módulos separados** para cada funcionalidade
+- Seguir estrutura: `src/modules/[nome]/` para módulos de negócio
+- Usar `src/shared/` para funcionalidades compartilhadas
+- **Um módulo por domínio principal**
+- **Um controller por rota principal**
+
+### 📁 Organização de Pastas por Módulo
+```
+src/modules/[nome]/
+├── dto/                 # Data Transfer Objects
+├── entities/            # Entidades do banco
+├── services/           # Lógica de negócio
+│   ├── base/           # Serviços base (herança)
+│   ├── [tipo]/         # Serviços específicos por tipo
+│   └── [nome]-query.service.ts # Construção de queries
+├── repositories/       # Acesso a dados
+├── validators/         # Validações centralizadas
+├── factories/          # Criação de objetos
+├── controllers/        # Endpoints REST
+├── guards/            # Proteção de rotas
+├── filters/           # Tratamento de erros
+├── models/            # Tipos de dados
+└── [nome].module.ts   # Módulo principal
+```
+
+## 🎯 Princípios Fundamentais
+
+### 📝 Diretrizes Gerais TypeScript
+- **Sempre declarar tipos** para variáveis e funções (parâmetros e retorno)
+- **Evitar `any`** - criar tipos necessários
+- **Usar JSDoc** para documentar classes e métodos públicos
+- **Não deixar linhas em branco** dentro de funções
+- **Um export por arquivo**
+- **Seguir princípios SOLID**
+
+### 🔤 Convenções de Nomenclatura
+- **PascalCase** para classes (`UserService`, `AuthController`)
+- **camelCase** para variáveis, funções e métodos (`userName`, `buscarUserPorId`)
+- **kebab-case** para arquivos e diretórios (`user-service.ts`, `auth-module/`)
+- **UPPERCASE** para variáveis de ambiente (`DATABASE_URL`, `JWT_SECRET`)
+
+#### 🎯 Regras Específicas do Projeto
+- **Entidades SEMPRE em inglês**: `User`, `Company`, `Post`, `Role`, `Shift`, `Round`, `EventLog`, `PanicEvent`
+- **Métodos SEMPRE em português literal**: `buscarUserPorId()`, `validarSeUserExiste()`, `criarNovoAdmin()`
+- **Propriedades SEMPRE em inglês**: `id`, `name`, `email`, `companyId`, `postId`, `role`, `active`, `deletedAt`
+- **Endpoints SEMPRE em português**: `obterTodosOsUsers()`, `criarNovoAdmin()`, `updateDadosDoUser()`
+
+#### 🔍 Padrões de Nomenclatura por Categoria
+
+**Busca e Consulta:**
+- `buscar[Entity]Por[Criteria]` → `buscarUserPorId()`, `buscarUserPorEmail()`
+- `buscarTodos[Entity]` → `buscarTodosOsUsers()`
+- `buscar[Entity]sAtivos` → `buscarUsersAtivos()`
+
+**Validação:**
+- `validarSe[Entity]Existe` → `validarSeUserExiste()`
+- `validarSe[Field]EhUnico` → `validarSeEmailEhUnico()`
+- `validarPermissaoPara[Action]` → `validarPermissaoParaRead()`
+- `validarSePode[Action]` → `validarSePodeExecutarAction()`
+
+**Criação:**
+- `criarNovo[Entity]` → `criarNovoUser()`, `criarNovoAdmin()`
+
+**Atualização:**
+- `update[Entity]` → `updateUser()`, `updateCompany()`
+- `update[Entity][Field]` → `updateUserStatus()`
+
+**Construção de Queries:**
+- `construir[What]Para[Action]` → `construirWhereClauseParaRead()`
+
+**Preparação de Dados:**
+- `preparar[What]Para[Action]` → `prepararDadosParaUpdate()`
+
+- **Começar funções com verbos** (`buscarUser`, `validarEmail`, `criarNovo`)
+- **Usar verbos para variáveis boolean** (`isLoading`, `hasError`, `canDelete`)
+- **Usar palavras completas** ao invés de abreviações
+- **Evitar números mágicos** - definir constantes
+
+### 📊 Exemplos de Nomenclatura
+```typescript
+// ✅ Correto - Seguindo padrões do projeto
+export class UserService {
+  private readonly isActiveUser: boolean;
+  
+  async buscarUserPorId(id: string): Promise<User> {
+    // implementação
+  }
+  
+  async validarSeUserExiste(id: string): Promise<boolean> {
+    // implementação
+  }
+  
+  async criarNovoAdmin(dto: CreateAdminDto): Promise<User> {
+    // implementação
+  }
+  
+  async validarSeEmailEhUnico(email: string, excludeUserId?: string): Promise<boolean> {
+    // implementação
+  }
+}
+
+// ❌ Evitar - Não segue padrões do projeto
+export class UserService {
+  private readonly active: any;
+  
+  async findUserById(id: string): Promise<any> {
+    // implementação
+  }
+  
+  async createUser(data: any): Promise<any> {
+    // implementação
+  }
+}
+```
+
+## 🔧 Convenções de Código
+
+### 🎯 Funções e Métodos
+- **Escrever funções curtas** com propósito único (menos de 20 instruções)
+- **Nomear funções com verbo** e complemento
+- **Se retorna boolean**, usar `isX`, `hasX`, `canX`
+- **Se não retorna nada**, usar `executeX`, `saveX`, `processX`
+- **Evitar nesting** usando early returns
+- **Usar higher-order functions** (map, filter, reduce)
+- **Usar arrow functions** para funções simples (menos de 3 instruções)
+- **Usar parâmetros padrão** ao invés de verificar null/undefined
+- **Usar RO-RO pattern** para múltiplos parâmetros
+
+### 📋 Exemplo de Boas Práticas em Funções
+```typescript
+// ✅ Correto - Função curta com propósito único
+async validarPermissaoDoUser(userId: string, permission: string): Promise<boolean> {
+  if (!userId || !permission) return false;
+  
+  const user = await this.userRepository.buscarPorId(userId);
+  if (!user) return false;
+  
+  return user.hasPermission(permission);
+}
+
+// ✅ Correto - RO-RO pattern
+async criarNovoUser(params: {
+  userData: CreateUserDto;
+  companyId: string;
+  createdBy: string;
+}): Promise<{ user: User; success: boolean }> {
+  // implementação
+}
+
+// ❌ Evitar - Função muito longa e com múltiplas responsabilidades
+async processarDadosDoUser(userId: string, action: string, data: any): Promise<any> {
+  // 50+ linhas de código misturando validação, processamento e persistência
+}
+```
+
+### 🏗️ Classes e Estruturas
+- **Seguir princípios SOLID**
+- **Preferir composição** sobre herança
+- **Escrever classes pequenas** (menos de 200 instruções)
+- **Menos de 10 métodos públicos** por classe
+- **Menos de 10 propriedades** por classe
+- **Declarar interfaces** para definir contratos
+- **Usar readonly** para dados que não mudam
+- **Preferir imutabilidade** para dados
+
+### 📋 Exemplo de Classe Bem Estruturada
+```typescript
+/**
+ * Serviço responsável pela gestão de usuários
+ */
+@Injectable()
+export class UserService {
+  private readonly maxRetries = 3;
+  private readonly defaultPageSize = 20;
+  
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly userValidator: UserValidator,
+    private readonly userFactory: UserFactory,
+  ) {}
+  
+  /**
+   * Cria um novo usuário
+   * @param userData - Dados do usuário
+   * @returns Promise com o usuário criado
+   */
+  async criarNovoUser(userData: CreateUserDto): Promise<User> {
+    if (!this.userValidator.validarDadosDoUser(userData)) {
+      throw new ValidationError('Dados de usuário inválidos');
+    }
+    
+    const user = this.userFactory.criarNovo(userData);
+    return this.userRepository.salvar(user);
+  }
+}
+```
+
+## 🏗️ Padrões Arquiteturais Específicos
+
+### 🎯 Padrão CRUD Genérico
+Todos os módulos devem seguir padrões consistentes para operações CRUD:
+
+```typescript
+// Métodos CRUD obrigatórios
+async buscarTodos(page = 1, limit = 20) { /* Lista com paginação */ }
+async buscarPorId(id: string) { /* Busca específica */ }
+async criar(dto: CreateDto) { /* Criação */ }
+async atualizar(id: string, dto: UpdateDto) { /* Atualização */ }
+async desativar(id: string) { /* Soft delete */ }
+async reativar(id: string) { /* Restaurar */ }
+async deletar(id: string) { /* Hard delete */ }
+
+// Métodos específicos por necessidade
+async buscarPorEmail(email: string) { /* Campo específico */ }
+async buscarPorCompany(companyId: string) { /* Relacionamento */ }
+```
+
+### 🏗️ Arquitetura Modular (Padrão do Projeto)
+Cada módulo deve ser estruturado seguindo o padrão estabelecido:
+
+```typescript
+// Repository - Acesso a dados
+@Injectable()
+export class UserRepository {
+  async buscarMuitos(where: Prisma.UserWhereInput, options?: { skip?: number; take?: number }) { }
+  async buscarPrimeiro(where: Prisma.UserWhereInput) { }
+  async criarNovo(data: Prisma.UserCreateInput) { }
+}
+
+// Validator - Validações centralizadas
+@Injectable()
+export class UserValidator {
+  async validarSeEmailEhUnico(email: string, excludeUserId?: string) { }
+  async validarSeUserExiste(id: string) { }
+  async validarSeCompanyExiste(companyId: string) { }
+}
+
+// Factory - Criação de objetos
+@Injectable()
+export class UserFactory {
+  criarNovoAdmin(dto: CreateAdminDto): Prisma.UserCreateInput { }
+  criarNovoGuard(dto: CreateGuardDto): Prisma.UserCreateInput { }
+}
+
+// Service - Orquestração
+@Injectable()
+export class UserService {
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly userValidator: UserValidator,
+    private readonly userFactory: UserFactory,
+  ) {}
+}
+```
+
+### 📊 Sistema de Roles Hierárquico
+O projeto possui 7 tipos de usuários com hierarquia específica:
+
+```typescript
+enum Roles {
+  SYSTEM_ADMIN,    // Máximo acesso
+  ADMIN,           // Acesso à empresa
+  SUPERVISOR,      // Supervisão de guardas
+  HR,              // Recursos humanos
+  GUARD,           // Guardas de segurança
+  POST_SUPERVISOR, // Supervisor de posto
+  POST_RESIDENT    // Morador/residente
+}
+
+// Associação com postos
+// POST_SUPERVISOR e POST_RESIDENT: associados a exatamente 1 posto
+// Outros roles: não associados a postos
+```
+
+### 🏢 Multi-Tenancy
+Sistema multi-tenant com isolamento por empresa:
+
+```typescript
+// Sempre filtrar por companyId quando aplicável
+const whereClause = {
+  companyId: this.tenantService.getCurrentTenant().id,
+  ...otherFilters
+};
+
+// Validar pertencimento ao tenant
+await this.validarSeCompanyExiste(companyId);
+```
+
+## 🛡️ Segurança e Validação
+
+### 🔐 Autenticação e Autorização
+- Usar `@UseGuards(AuthGuard)` para proteger rotas
+- Implementar `@RequiredRoles()` para controle de acesso
+- Sempre validar permissões por tipo de usuário
+- Usar sistema CASL para permissões granulares
+
+### ✅ Validação de Dados
+- Usar **class-validator** em DTOs
+- Implementar validações customizadas quando necessário
+- Sempre validar dados de entrada
+- **Evitar validações em funções** - usar classes com validação interna
+
+### 🔒 Validações Customizadas Específicas
+```typescript
+// Validações específicas do projeto
+@IsStrongPassword()     // Senha forte obrigatória
+@IsUniqueEmail()       // Email único por empresa
+@IsUniqueCPF()         // CPF único por empresa
+@IsCPF()               // CPF válido
+@IsPhoneNumberBR()     // Telefone brasileiro válido
+```
+
+## 🚦 Tratamento de Exceções
+
+### 🔄 Sistema de Filtros Hierárquico
+```typescript
+// Filtros específicos por tipo de erro
+@Catch(TokenExpiredError)
+export class TokenExpiredErrorFilter { }
+
+@Catch(ValidationError)
+export class ValidationErrorFilter { }
+
+@Catch(NotFoundError)
+export class NotFoundErrorFilter { }
+
+// Filtro base para funcionalidades comuns
+export abstract class BaseExceptionFilter {
+  protected sendErrorResponse(
+    exception: any,
+    host: ArgumentsHost,
+    status: HttpStatus,
+    errorCode: string,
+    message: string,
+  ) {
+    // Resposta padronizada
+  }
+}
+```
+
+### 🔍 Detecção Automática de Erros
+```typescript
+// Sistema detecta automaticamente erros de token
+protected detectTokenError(exception: any): { isTokenError: boolean; errorCode: string } {
+  if (exception instanceof UnauthorizedException) {
+    const message = exception.message;
+    
+    if (message === AUTH_MESSAGES.ERROR.TOKEN_EXPIRED) {
+      return { isTokenError: true, errorCode: 'TOKEN_EXPIRED' };
+    }
+    
+    if (message === AUTH_MESSAGES.ERROR.TOKEN_INVALID) {
+      return { isTokenError: true, errorCode: 'TOKEN_INVALID' };
+    }
+  }
+  
+  return { isTokenError: false, errorCode: 'UNKNOWN_ERROR' };
+}
+```
+
+### 📋 Exemplo de Tratamento de Exceções
+```typescript
+@Injectable()
+export class UserService {
+  async criarNovoUser(userData: CreateUserDto): Promise<User> {
+    try {
+      // Early return para validações
+      if (!userData.email) {
+        throw new ValidationError('Email é obrigatório');
+      }
+      
+      const user = await this.userRepository.criarNovo(userData);
+      return user;
+    } catch (error) {
+      if (error instanceof ValidationError) {
+        // Adicionar contexto específico
+        throw new UserCreationError(`Falha ao criar usuário: ${error.message}`);
+      }
+      
+      // Deixar outros erros para o handler global
+      throw error;
+    }
+  }
+}
+```
+
+## 📦 Estrutura de DTOs e Modelos
+
+### 📥 Input DTOs
+```typescript
+export class CreateUserDto {
+  @IsString()
+  @IsNotEmpty()
+  readonly name: string;
+
+  @IsEmail()
+  @IsUniqueEmail()
+  readonly email: string;
+
+  @IsEnum(Roles)
+  readonly role: Roles;
+
+  @IsStrongPassword()
+  readonly password: string;
+}
+```
+
+### 📤 Output DTOs
+```typescript
+export class UserResponseDto {
+  readonly id: string;
+  readonly name: string;
+  readonly email: string;
+  readonly role: Roles;
+  readonly createdAt: Date;
+}
+```
+
+### 🔗 Tipos de Dados
+- **Não abusar de tipos primitivos**
+- **Encapsular dados em tipos compostos**
+- **Usar readonly** para dados imutáveis
+- **Usar as const** para literais que não mudam
+
+## 📨 Sistema de Mensagens Centralizadas
+
+### 🎯 Uso das Constantes
+```typescript
+// Sempre usar constantes centralizadas
+import { VALIDATION_MESSAGES, ERROR_MESSAGES, SUCCESS_MESSAGES } from '../shared/common/messages';
+
+// Em validações
+@IsString({ message: VALIDATION_MESSAGES.REQUIRED.NAME })
+name: string;
+
+// Em exceções
+throw new NotFoundError(ERROR_MESSAGES.RESOURCE.NOT_FOUND);
+
+// Em respostas
+return { message: SUCCESS_MESSAGES.CRUD.CREATED };
+```
+
+### 💬 Interpolação de Variáveis
+```typescript
+// Usando o MessagesService
+const message = this.messagesService.createCustomMessage(
+  'Usuário {name} criado na empresa {companyName}',
+  { name: 'João Silva', companyName: 'Empresa ABC' }
+);
+```
+
+## 🎮 Controllers e Endpoints
+
+### 🌐 Padrões de Endpoints
+- **Endpoints SEMPRE em português**: `obterTodosOsUsers()`, `criarNovoAdmin()`, `updateDadosDoUser()`
+- **Seguir padrões REST** com verbos HTTP corretos
+- **Usar DTOs** para validação de entrada
+- **Documentar com Swagger** todos os endpoints
+
+### 📋 Exemplo de Controller
+```typescript
+@Controller('users')
+@ApiTags('Usuários')
+export class UsersController {
+  constructor(private readonly userService: UserService) {}
+
+  @Get()
+  @ApiOperation({ summary: 'Obter todos os usuários' })
+  async obterTodosOsUsers(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20'
+  ): Promise<UserResponseDto[]> {
+    return this.userService.buscarTodosOsUsers(+page, +limit);
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Obter usuário por ID' })
+  async obterUserPorId(@Param('id') id: string): Promise<UserResponseDto> {
+    return this.userService.buscarUserPorId(id);
+  }
+
+  @Post('admin')
+  @ApiOperation({ summary: 'Criar novo admin' })
+  async criarNovoAdmin(@Body() dto: CreateAdminDto): Promise<UserResponseDto> {
+    return this.userService.criarNovoAdmin(dto);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Atualizar dados do usuário' })
+  async updateDadosDoUser(
+    @Param('id') id: string,
+    @Body() dto: UpdateUserDto
+  ): Promise<UserResponseDto> {
+    return this.userService.updateUser(id, dto);
+  }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Remover usuário do sistema' })
+  async removerUserDoSistema(@Param('id') id: string): Promise<void> {
+    return this.userService.removerUser(id);
+  }
+}
+```
+
+## 📊 Banco de Dados
+
+### 🗃️ Prisma ORM
+- Usar **Prisma** para acesso ao banco
+- Implementar **soft delete** quando necessário
+- Adicionar **auditoria** (createdAt, updatedAt, createdBy)
+- **Entidades com Prisma** para persistência de dados
+
+### 🔗 Relacionamentos
+```typescript
+// Sempre definir relacionamentos no schema
+model User {
+  id        String   @id @default(cuid())
+  companyId String
+  company   Company  @relation(fields: [companyId], references: [id])
+  posts     Post[]   // Relacionamento com postos
+  
+  // Campos de auditoria obrigatórios
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+}
+```
+
+## 🧪 Testes
+
+### ✅ Princípios de Testes
+- **Usar Jest** como framework padrão
+- **Seguir convenção Arrange-Act-Assert**
+- **Nomear variáveis de teste claramente** (inputX, mockX, actualX, expectedX)
+- **Escrever testes unitários** para cada função pública
+- **Usar test doubles** para simular dependências
+- **Escrever testes de aceitação** para cada módulo
+
+### 📋 Estrutura de Testes
+```typescript
+describe('UserService', () => {
+  let userService: UserService;
+  let mockUserRepository: jest.Mocked<UserRepository>;
+  
+  beforeEach(() => {
+    // Arrange
+    mockUserRepository = {
+      buscarPorId: jest.fn(),
+      criarNovo: jest.fn(),
+    } as any;
+    
+    userService = new UserService(mockUserRepository);
+  });
+  
+  describe('criarNovoUser', () => {
+    it('should create user successfully', async () => {
+      // Arrange
+      const inputUserData = { name: 'Test User', email: 'test@example.com' };
+      const expectedUser = { id: '1', ...inputUserData };
+      mockUserRepository.criarNovo.mockResolvedValue(expectedUser);
+      
+      // Act
+      const actualUser = await userService.criarNovoUser(inputUserData);
+      
+      // Assert
+      expect(actualUser).toEqual(expectedUser);
+      expect(mockUserRepository.criarNovo).toHaveBeenCalledWith(inputUserData);
+    });
+  });
+});
+```
+
+### 🔍 Tipos de Testes
+- **Testes unitários** para cada service e controller
+- **Testes de integração** para endpoints completos
+- **Testes end-to-end** para cada módulo de API
+- **Smoke tests** em controllers (`admin/test` method)
+
+## 📝 Documentação
+
+### 📚 Swagger
+- Documentar **todos os endpoints**
+- Usar **@ApiTags()** para agrupamento
+- Implementar **@ApiResponse()** para responses
+
+### 📖 JSDoc
+```typescript
+/**
+ * Serviço responsável pela gestão de usuários
+ */
+@Injectable()
+export class UserService {
+  /**
+   * Cria um novo usuário no sistema
+   * @param userData - Dados do usuário a ser criado
+   * @param companyId - ID da empresa
+   * @returns Promise com o usuário criado
+   * @throws ValidationError quando dados são inválidos
+   */
+  async criarNovoUser(userData: CreateUserDto, companyId: string): Promise<User> {
+    // implementação
+  }
+}
+```
+
+## 🚀 Performance
+
+### ⚡ Otimizações
+- Usar **paginação** em listas
+- Implementar **cache** quando apropriado
+- Otimizar **queries** do banco
+- **Evitar N+1 queries**
+
+### 📈 Monitoramento
+- Usar **Winston** para logging
+- Implementar **métricas** com Prometheus
+- Monitorar **performance** de endpoints
+
+## 🔧 Configuração
+
+### 🌍 Variáveis de Ambiente
+- Usar **@nestjs/config** para configuração
+- Validar **variáveis obrigatórias**
+- Separar configurações por **ambiente**
+- **UPPERCASE** para todas as variáveis
+
+### 🐳 Docker
+- Usar **multi-stage builds**
+- Otimizar **imagens** para produção
+- Implementar **health checks**
+
+## ❌ Anti-Patterns (Evitar)
+
+### 🚫 Nomenclatura Incorreta
+```typescript
+// ❌ Métodos em inglês
+async findUserById(id: string) { }
+async createUser(dto: CreateUserDto) { }
+async updateUser(id: string, dto: UpdateUserDto) { }
+
+// ❌ Entidades em português
+class Usuario { }
+class Empresa { }
+class Posto { }
+
+// ❌ Propriedades em português  
+interface User {
+  identificador: string;
+  nome: string;
+  email: string;
+}
+
+// ❌ Endpoints em inglês
+@Get() findAllUsers() { }
+@Post() createUser() { }
+@Put(':id') updateUser() { }
+```
+
+### 🚫 Padrões Inconsistentes
+```typescript
+// ❌ Mistura de padrões
+async getUser(id: string) { }           // Deveria ser buscarUserPorId
+async validateUser(id: string) { }      // Deveria ser validarSeUserExiste
+async saveUser(dto: CreateUserDto) { }  // Deveria ser criarNovoUser
+```
+
+### 🚫 Arquitetura Incorreta
+```typescript
+// ❌ Lógica de negócio no controller
+@Controller('users')
+export class UsersController {
+  @Post()
+  async criarUser(@Body() dto: CreateUserDto) {
+    // ❌ Validação no controller
+    if (!dto.email) {
+      throw new BadRequestException('Email é obrigatório');
+    }
+    
+    // ❌ Acesso direto ao banco
+    const user = await this.prisma.user.create({ data: dto });
+    return user;
+  }
+}
+
+// ❌ Validação misturada com lógica de negócio
+@Injectable()
+export class UserService {
+  async criarUser(dto: CreateUserDto) {
+    // ❌ Validação, criação e persistência no mesmo lugar
+    if (!dto.email) throw new Error('Email obrigatório');
+    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    return this.prisma.user.create({ data: { ...dto, password: hashedPassword } });
+  }
+}
+```
+
+## 📋 Checklist de Desenvolvimento
+
+### ✅ Antes de Commitar
+- [ ] Código segue **convenções** estabelecidas
+- [ ] **Nomenclatura** segue padrões do projeto (métodos em português, entidades em inglês)
+- [ ] **Tipos TypeScript** declarados corretamente
+- [ ] **Funções curtas** com propósito único (máximo 20 instruções)
+- [ ] **JSDoc** em classes e métodos públicos
+- [ ] **Validações** implementadas usando validators centralizados
+- [ ] **Tratamento de erros** usando sistema de filtros
+- [ ] **Mensagens** usando constantes centralizadas
+- [ ] **Testes** implementados e passando
+- [ ] **Documentação** atualizada
+- [ ] **Segurança** validada
+- [ ] **Performance** verificada
+- [ ] **Padrão CRUD** seguido
+- [ ] **Estrutura modular** respeitada
+
+### 🚦 Code Review
+- Verificar **arquitetura** seguida (Repository, Validator, Factory, Service)
+- Validar **nomenclatura** correta (português para métodos, inglês para entidades)
+- Confirmar **tipos TypeScript** adequados
+- Verificar **funções** com responsabilidade única
+- Validar **segurança** implementada
+- Confirmar **performance** adequada
+- Checar **tratamento de erros** usando filtros específicos
+- Validar **testes** adequados
+- Verificar **padrões específicos** do projeto
+- Confirmar **mensagens centralizadas**
+- Validar **multi-tenancy** se aplicável
+- Checar **validações customizadas**
+
+### 🧪 Qualidade de Código
+- **Funções**: Máximo 20 instruções
+- **Classes**: Máximo 200 instruções, 10 métodos públicos
+- **Cobertura de testes**: Mínimo 80%
+- **Sem uso de `any`**: Tipos explícitos
+- **Documentação**: JSDoc em APIs públicas
+- **Nomenclatura**: Seguir padrões estabelecidos no NAMING_CONVENTIONS.md
+- **Arquitetura**: Seguir padrão modular estabelecido
+- **Mensagens**: Usar constantes centralizadas
+- **Validações**: Usar validators customizados
+- **Erros**: Usar sistema de filtros específicos
+
+---
+
+## 📞 Importante
+
+**Sempre consultar estas regras** antes de implementar novas funcionalidades. Em caso de dúvida, seguir os **padrões já estabelecidos** no projeto.
+
+**📋 Referências obrigatórias**:
+- `docs/NAMING_CONVENTIONS.md` - Padrões específicos de nomenclatura
+- `docs/CODING_STANDARDS.md` - Padrões gerais de codificação
+- `docs/padroes/crud-generic-pattern.md` - Padrão CRUD genérico
+- `src/shared/common/messages/README.md` - Sistema de mensagens
+- `src/shared/common/filters/README.md` - Sistema de filtros
+- `src/shared/auth/README.md` - Sistema de autenticação
+- `src/shared/casl/README.md` - Sistema de autorização
+- `src/modules/users/services/README.md` - Arquitetura modular
+
+**Foco atual**: Implementar funcionalidades core (Rondas, Ocorrências, Turnos) seguindo estas diretrizes e os padrões de nomenclatura estabelecidos.
