@@ -4,7 +4,7 @@ services:
   #   build: 
   #     context: .
   #     dockerfile: Dockerfile
-  #   container_name: ifraseg-backend
+  #   container_name: infraseg-backend
   #   ports:
   #     - '3000:3000'
   #   environment:
@@ -30,7 +30,7 @@ services:
   # Database PostgreSQL
   db:
     image: postgres:16.8-alpine3.20
-    container_name: ifraseg-db
+    container_name: infraseg-db
     environment:
       POSTGRES_PASSWORD: root
       POSTGRES_DB: mydb
@@ -58,7 +58,7 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: ifraseg-redis
+    container_name: infraseg-redis
     ports:
       - '6379:6379'
     volumes:
@@ -76,7 +76,7 @@ services:
   # Prometheus Monitoring
   prometheus:
     image: prom/prometheus:latest
-    container_name: ifraseg-prometheus
+    container_name: infraseg-prometheus
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
@@ -102,7 +102,7 @@ services:
   # Grafana Dashboard
   grafana:
     image: grafana/grafana:latest
-    container_name: ifraseg-grafana
+    container_name: infraseg-grafana
     ports:
       - '3001:3000'
     environment:

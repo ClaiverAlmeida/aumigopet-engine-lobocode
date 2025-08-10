@@ -1,6 +1,6 @@
 ### =============================================================================
 ### ARQUIVO HTTP - MÓDULO DE AUTENTICAÇÃO
-### Sistema: IFRASEG Engine
+### Sistema: INFRASEG Engine
 ### Versão: 1.0
 ### =============================================================================
 
@@ -58,7 +58,8 @@ POST {{baseUrl}}/auth/refresh
 Content-Type: {{contentType}}
 
 {
-  "refreshToken": "{{refreshToken}}"
+  # "refreshToken": "{{refreshToken}}"
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJjbWN5MmEwZHEwMDAxbHRqbmVoaWYyODY5IiwiaWF0IjoxNzUyNjI4MTA1LCJleHAiOjE3NTI2MzE3MDV9.aTAsMm6-f8zp7-0t0em20LzJWsGdJwfQ1m5vdgOiPN4"
 }
 
 ### 2.2 Logout - Invalidar token específico
@@ -88,7 +89,7 @@ POST {{baseUrl}}/auth/forgot-password
 Content-Type: {{contentType}}
 
 {
-  "email": "admin@ifraseg.com"
+  "email": "admin@infraseg.com"
 }
 
 ### 3.2 Validate Reset Token - Validar token de reset
@@ -167,7 +168,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "guard@ifraseg.com",
+  "login": "guard@infraseg.com",
   "password": "Guard123!"
 }
 
@@ -196,7 +197,7 @@ POST {{baseUrl}}/auth/forgot-password
 Content-Type: {{contentType}}
 
 {
-  "email": "teste@ifraseg.com"
+  "email": "teste@infraseg.com"
 }
 
 ###
@@ -228,7 +229,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "teste@ifraseg.com",
+  "login": "teste@infraseg.com",
   "password": "senha_errada"
 }
 
@@ -250,22 +251,22 @@ Authorization: Bearer token_invalido_123
 # Usuários de teste para diferentes roles:
 # 
 # SYSTEM_ADMIN:
-# - Email: admin@ifraseg.com
+# - Email: admin@infraseg.com
 # - Login: admin
 # - Password: Admin123!
 #
 # GUARD:
-# - Email: guard@ifraseg.com
+# - Email: guard@infraseg.com
 # - Login: guard
 # - Password: Guard123!
 #
 # SUPERVISOR:
-# - Email: supervisor@ifraseg.com
+# - Email: supervisor@infraseg.com
 # - Login: supervisor
 # - Password: Supervisor123!
 #
 # HR:
-# - Email: hr@ifraseg.com
+# - Email: hr@infraseg.com
 # - Login: hr
 # - Password: Hr123!
 

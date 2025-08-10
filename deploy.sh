@@ -44,7 +44,7 @@ build_images() {
     
     # Build do Backend
     log "Build do Backend NestJS..."
-    docker build -t ifraseg-backend:latest .
+    docker build -t infraseg-backend:latest .
     
     # Frontend será buildado em outro projeto
     log "ℹ️ Frontend será buildado em projeto separado"
@@ -57,8 +57,8 @@ deploy() {
     log "Iniciando deploy em produção..."
     
     # Verificar se as imagens existem
-    if ! docker image inspect ifraseg-backend:latest >/dev/null 2>&1; then
-        warning "Imagem ifraseg-backend:latest não encontrada. Executando build..."
+    if ! docker image inspect infraseg-backend:latest >/dev/null 2>&1; then
+        warning "Imagem infraseg-backend:latest não encontrada. Executando build..."
         build_images
     fi
     

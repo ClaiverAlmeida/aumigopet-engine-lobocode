@@ -14,8 +14,8 @@
   "details": {
     "stack": [
       "UnauthorizedException: Token inválido",
-      "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/ifraseg-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
-      "    at AuthGuard.canActivate (/home/claiver/projetos/ifraseg-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
+      "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
+      "    at AuthGuard.canActivate (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
     ]
   }
 }

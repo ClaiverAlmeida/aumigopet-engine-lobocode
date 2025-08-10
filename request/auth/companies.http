@@ -7,16 +7,23 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "systemadmin@user.com",
-    "password": "SystemAdmin123@Senha"
+     "login": "System Admin Claiver", 
+    #   "login": "admin.empresA",
+    #   "login": "hr.empresa",
+    "password": "SystemAdmin@Senha"
 }
+
 
 ### ========================================
 ### COMPANIES - SYSTEM_ADMIN
 ### ========================================
 
-### Listar todas as empresas
+### Listar todas as empresas (com paginação)
 GET {{baseUrl}}/companies
+Authorization: Bearer {{token}}
+
+### Listar todas as empresas
+GET {{baseUrl}}/companies/all
 Authorization: Bearer {{token}}
 
 ### Buscar empresa específica
@@ -28,25 +35,39 @@ POST {{baseUrl}}/companies
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
-{
-    "name": "Nova Empresa Teste",
-    "cnpj": "12.345.678/0001-90",
-    "address": "Rua Teste, 123",
-    "phone": "(11) 99999-9999"
+{ 
+    "name": "Empresa Exemplo", 
+    "cnpj": "81.811.213/0001-03",
+    "website": "https://www.empresa.com",
+    "address": "Rua Exemplo, 123, São Paulo - SP",
+    "country": "Brasil",
+    "contactName": "Contato Exemplo",
+    "contactEmail": "contato@empresa.com",
+    "contactPhone": "(11) 99999-9299"
 }
 
 ### Atualizar empresa
-PATCH {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
+PATCH {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "Empresa Atualizada",
-    "phone": "(11) 88888-8888"
+    "name": "Empresa Exemplo", 
+    "cnpj": "81.811.213/0001-03",
+    "website": "https://www.empresa.com",
+    "address": "Rua Exemplo, 123, São Paulo - SP",
+    "country": "Brasil",
+    "contactName": "Contato Exemplo",
+    "contactEmail": "contato@empresa.com",
+    "contactPhone": "(11) 99999-9299"
 }
 
 ### Deletar empresa
-DELETE {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
+DELETE {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf
+Authorization: Bearer {{token}}
+
+### Restaurar empresa deletada
+POST {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf/restore
 Authorization: Bearer {{token}}
 
 ### ========================================

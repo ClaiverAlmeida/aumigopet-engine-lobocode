@@ -1,0 +1,273 @@
+// // schema.dev.prisma - Schema para desenvolvimento
+// // Inclui generators extras como ERD, ferramentas de debug, etc.
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+// // temporário, irei remover
+// model BlogPost {
+//   id        String   @id @default(cuid())
+//   title     String
+//   content   String   @db.Text
+//   published Boolean  @default(false)
+//   authorId  String
+//   author    User     @relation(fields: [authorId], references: [id])
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model Product {
+//   id          String @id @default(cuid())
+//   name        String
+//   slug        String @unique
+//   description String
+//   price       Float
+// }
+
+// enum Roles {
+//   SYSTEM_ADMIN
+//   ADMIN
+//   HR
+//   SUPERVISOR
+//   GUARD
+//   POST_SUPERVISOR
+//   POST_RESIDENT
+
+//   // temporário, irei remover
+//   EDITOR
+//   WRITER
+//   READER
+// }
+
+// enum UserStatus {
+//   ACTIVE // Ativo - funcionário em atividade normal
+//   INACTIVE // Inativo - funcionário desligado
+//   PENDING // Pendente - aguardando aprovação/documentação
+//   ON_LEAVE // Em férias - funcionário em período de férias
+//   SICK_LEAVE // Licença médica - funcionário em licença por saúde
+//   SUSPENDED // Suspenso - funcionário temporariamente suspenso
+//   TERMINATED // Demitido - funcionário demitido/desligado
+// }
+
+// enum PermissionType {
+//   DOORMAN // Porteiro
+//   SUPPORT // Apoio  
+//   PATROL // Rota
+// }
+
+// model Company {
+//   id           String    @id @default(cuid())
+//   name         String
+//   cnpj         String    @unique
+//   website      String?
+//   address      String?
+//   country      String?
+//   contactName  String?
+//   contactEmail String?
+//   contactPhone String?
+//   posts        Post[]
+//   users        User[]
+//   createdAt    DateTime  @default(now())
+//   updatedAt    DateTime  @updatedAt
+//   deletedAt    DateTime?
+// }
+
+// model Post {
+//   id          String       @id @default(cuid())
+//   name        String
+//   address     String?
+//   company     Company      @relation(fields: [companyId], references: [id])
+//   companyId   String
+//   userPosts   UserPost[] // Relacionamento com usuários (supervisor/resident)
+//   rounds      Round[]
+//   checkpoints Checkpoint[]
+//   shifts      Shift[]
+//   eventLogs   EventLog[]
+//   panicEvents PanicEvent[]
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+//   deletedAt   DateTime?
+// }
+
+// model User {
+//   id             String     @id @default(cuid())
+//   name           String
+//   email          String     @unique
+//   login          String     @unique
+//   password       String
+//   role           Roles
+//   company        Company?   @relation(fields: [companyId], references: [id])
+//   companyId      String?
+//   profilePicture String?
+//   status         UserStatus @default(ACTIVE)
+
+//   // Campos de auditoria
+//   createdAt DateTime  @default(now())
+//   updatedAt DateTime  @updatedAt
+//   deletedAt DateTime?
+
+//   // Campos de validação
+//   cpf     String? @unique
+//   phone   String?
+//   address String?
+
+//   // Relacionamentos de permissões (apenas para Guards)
+//   permissions Permission[]
+
+//   // Relacionamentos operacionais
+//   rounds      Round[]      @relation("UserRounds")
+//   shifts      Shift[]
+//   eventLogs   EventLog[]
+//   panicEvents PanicEvent[]
+//   userPosts   UserPost[] // Relacionamento com posts (supervisor/resident)
+
+//   // temporário irei remover
+//   BlogPost BlogPost[]
+
+//   // Índices para otimização
+//   @@index([companyId])
+//   @@index([email])
+//   @@index([cpf])
+//   @@index([status])
+//   @@index([deletedAt])
+//   @@index([role])
+//   @@index([createdAt])
+// }
+
+// // Tabela de relacionamento para usuários com roles específicos em posts
+// model UserPost {
+//   id        String   @id @default(cuid())
+//   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId    String
+//   post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+//   postId    String
+//   role      Roles // POST_SUPERVISOR ou POST_RESIDENT
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   // Garantir que um usuário só pode ter um papel específico por post
+//   @@unique([userId, postId, role])
+//   @@index([userId])
+//   @@index([postId])
+//   @@index([role])
+// }
+
+// model Permission {
+//   id             String         @id @default(cuid())
+//   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   userId         String
+//   permissionType PermissionType
+//   granted        Boolean        @default(true)
+//   createdAt      DateTime       @default(now())
+//   updatedAt      DateTime       @updatedAt
+
+//   @@unique([userId, permissionType])
+//   @@index([userId])
+//   @@index([permissionType])
+// }
+
+// model Round {
+//   id          String       @id @default(cuid())
+//   post        Post         @relation(fields: [postId], references: [id])
+//   postId      String
+//   guard       User         @relation("UserRounds", fields: [guardId], references: [id])
+//   guardId     String
+//   start       DateTime
+//   end         DateTime?
+//   status      String // started, finished, failed
+//   roundPoints RoundPoint[]
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+
+//   @@index([postId])
+//   @@index([guardId])
+//   @@index([status])
+//   @@index([start])
+// }
+
+// model Checkpoint {
+//   id          String       @id @default(cuid())
+//   post        Post         @relation(fields: [postId], references: [id])
+//   postId      String
+//   name        String
+//   location    String?
+//   roundPoints RoundPoint[]
+//   createdAt   DateTime     @default(now())
+//   updatedAt   DateTime     @updatedAt
+
+//   @@index([postId])
+// }
+
+// model RoundPoint {
+//   id           String     @id @default(cuid())
+//   round        Round      @relation(fields: [roundId], references: [id])
+//   roundId      String
+//   checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
+//   checkpointId String
+//   checkedAt    DateTime
+//   status       String // ok, failed, etc
+//   createdAt    DateTime   @default(now())
+
+//   @@index([roundId])
+//   @@index([checkpointId])
+//   @@index([checkedAt])
+// }
+
+// model Shift {
+//   id        String   @id @default(cuid())
+//   guard     User     @relation(fields: [guardId], references: [id])
+//   guardId   String
+//   post      Post     @relation(fields: [postId], references: [id])
+//   postId    String
+//   type      String // entry, exit, check-in
+//   dateTime  DateTime @default(now())
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+
+//   @@index([guardId])
+//   @@index([postId])
+//   @@index([type])
+//   @@index([dateTime])
+// }
+
+// model EventLog {
+//   id        String   @id @default(cuid())
+//   post      Post     @relation(fields: [postId], references: [id])
+//   postId    String
+//   guard     User?    @relation(fields: [guardId], references: [id])
+//   guardId   String?
+//   type      String // e.g. "PANIC", "NOTE", "PHOTO", etc
+//   details   String?
+//   media     String?
+//   createdAt DateTime @default(now())
+
+//   @@index([postId])
+//   @@index([guardId])
+//   @@index([type])
+//   @@index([createdAt])
+// }
+
+// model PanicEvent {
+//   id         String   @id @default(cuid())
+//   resident   User     @relation(fields: [residentId], references: [id])
+//   residentId String
+//   post       Post     @relation(fields: [postId], references: [id])
+//   postId     String
+//   dateTime   DateTime @default(now())
+//   status     String // open, attended, resolved
+//   createdAt  DateTime @default(now())
+//   updatedAt  DateTime @updatedAt
+
+//   @@index([residentId])
+//   @@index([postId])
+//   @@index([status])
+//   @@index([dateTime])
+// }
+
+// // Other tables for reports, dashboards, etc, can be added as needed 

@@ -9,7 +9,10 @@ import { BaseExceptionFilter } from './base-exception.filter';
 import { MessagesService } from '../messages/messages.service';
 
 @Catch(HttpException)
-export class HttpExceptionFilter extends BaseExceptionFilter implements ExceptionFilter {
+export class HttpExceptionFilter
+  extends BaseExceptionFilter
+  implements ExceptionFilter
+{
   constructor(messagesService: MessagesService) {
     super(messagesService);
   }
@@ -18,7 +21,7 @@ export class HttpExceptionFilter extends BaseExceptionFilter implements Exceptio
     const status = exception.getStatus();
     const message = exception.message;
 
-    // Detectar erros de token automaticamente 
+    // Detectar erros de token automaticamente
     const tokenError = this.detectTokenError(exception);
     if (tokenError.isTokenError) {
       this.sendErrorResponse(
@@ -38,19 +41,32 @@ export class HttpExceptionFilter extends BaseExceptionFilter implements Exceptio
     switch (status) {
       case HttpStatus.BAD_REQUEST:
         errorCode = 'BAD_REQUEST';
-        clientMessage = this.messagesService.getErrorMessage('VALIDATION', 'INVALID_DATA');
+        const validationDetails = this.extractValidationErrors(exception);
+        clientMessage =
+          validationDetails ||
+          this.messagesService.getErrorMessage('VALIDATION', 'INVALID_DATA');
+        exception.message = clientMessage ?? exception.message;
         break;
       case HttpStatus.NOT_FOUND:
         errorCode = 'NOT_FOUND';
-        clientMessage = this.messagesService.getErrorMessage('RESOURCE', 'NOT_FOUND');
+        clientMessage = this.messagesService.getErrorMessage(
+          'RESOURCE',
+          'NOT_FOUND',
+        );
         break;
       case HttpStatus.FORBIDDEN:
         errorCode = 'FORBIDDEN';
-        clientMessage = this.messagesService.getErrorMessage('AUTHORIZATION', 'FORBIDDEN');
+        clientMessage = this.messagesService.getErrorMessage(
+          'AUTHORIZATION',
+          'FORBIDDEN',
+        );
         break;
       case HttpStatus.CONFLICT:
         errorCode = 'CONFLICT';
-        clientMessage = this.messagesService.getErrorMessage('RESOURCE', 'ALREADY_EXISTS');
+        clientMessage = this.messagesService.getErrorMessage(
+          'RESOURCE',
+          'ALREADY_EXISTS',
+        );
         break;
       case HttpStatus.TOO_MANY_REQUESTS:
         errorCode = 'RATE_LIMIT_EXCEEDED';
@@ -58,19 +74,45 @@ export class HttpExceptionFilter extends BaseExceptionFilter implements Exceptio
         break;
       case HttpStatus.INTERNAL_SERVER_ERROR:
         errorCode = 'INTERNAL_SERVER_ERROR';
-        clientMessage = this.messagesService.getErrorMessage('SYSTEM', 'INTERNAL_ERROR');
+        clientMessage = this.messagesService.getErrorMessage(
+          'SYSTEM',
+          'INTERNAL_ERROR',
+        );
         break;
       default:
         errorCode = 'UNKNOWN_ERROR';
         clientMessage = this.messagesService.getHttpErrorMessage(500);
     }
 
-    this.sendErrorResponse(
-      exception,
-      host,
-      status,
-      errorCode,
-      clientMessage,
-    );
+    this.sendErrorResponse(exception, host, status, errorCode, clientMessage);
+  }
+
+  /**
+   * Extrai detalhes dos erros de validação do ValidationPipe
+   */
+  private extractValidationErrors(exception: HttpException): string | null {
+    try {
+      const response = exception.getResponse();
+
+      // Se a resposta é um objeto com propriedade 'message' que é um array
+      if (typeof response === 'object' && response !== null) {
+        const responseObj = response as any;
+
+        if (Array.isArray(responseObj.message)) {
+          // Extrair as mensagens de validação específicas
+          const validationMessage = responseObj.message.join(', ');
+
+          return validationMessage;
+        }
+
+        if (typeof responseObj.message === 'string') {
+          return responseObj.message;
+        }
+      }
+
+      return null;
+    } catch (error) {
+      return null;
+    }
   }
 }

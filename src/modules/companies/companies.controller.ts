@@ -8,8 +8,13 @@ import {
   Delete,
   UseGuards,
   UseInterceptors,
+  HttpStatus,
+  HttpCode,
+  Query,
 } from '@nestjs/common';
 import { CompaniesService } from './companies.service';
+import { CreateCompanyDto } from './dto/create-company.dto';
+import { UpdateCompanyDto } from './dto/update-company.dto';
 import { AuthGuard } from 'src/shared/auth/guards/auth.guard';
 import { RequiredRoles } from 'src/shared/auth/required-roles.decorator';
 import { Roles } from '@prisma/client';
@@ -21,30 +26,49 @@ import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
 @RequiredRoles(Roles.SYSTEM_ADMIN)
 @Controller('companies')
 export class CompaniesController {
+  private readonly entityName = 'company';
+
   constructor(private readonly companiesService: CompaniesService) {}
 
   @Get()
-  findAll() {
-    return this.companiesService.findAll();
+  buscarComPaginacao(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return this.companiesService.buscarComPaginacao(page, limit);
+  }
+
+  @Get('all')
+  buscarTodos() {
+    return this.companiesService.buscarTodos(this.entityName);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.companiesService.getById(id);
+  buscarPorId(@Param('id') id: string) {
+    return this.companiesService.buscarPorId(id);
   }
 
   @Post()
-  create(@Body() createCompanyDto: any) {
-    return this.companiesService.create(createCompanyDto);
+  @HttpCode(HttpStatus.CREATED)
+  criar(@Body() createCompanyDto: CreateCompanyDto) {
+    return this.companiesService.criar(createCompanyDto);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCompanyDto: any) {
-    return this.companiesService.update(id, updateCompanyDto);
+  atualizar(
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ) {
+    return this.companiesService.atualizar(id, updateCompanyDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.companiesService.remove(id);
+  desativar(@Param('id') id: string) {
+    return this.companiesService.desativar(id);
   }
-} 
+
+  @Post(':id/restore')
+  reativar(@Param('id') id: string) {
+    return this.companiesService.reativar(id);
+  }
+}

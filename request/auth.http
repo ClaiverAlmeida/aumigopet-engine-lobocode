@@ -1,6 +1,6 @@
 ### =============================================================================
 ### ARQUIVO HTTP - TESTE DE AUTENTICAÇÃO COM RESPONSES PADRONIZADOS
-### Sistema: IFRASEG Engine
+### Sistema: INFRASEG Engine
 ### =============================================================================
 
 # Configuração de variáveis
@@ -20,7 +20,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "admin@ifraseg.com",
+  "login": "admin@infraseg.com",
   "password": "Admin123!"
 }
 
@@ -109,7 +109,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "teste@ifraseg.com",
+  "login": "teste@infraseg.com",
   "password": "senha_errada"
 }
 
@@ -128,8 +128,8 @@ Content-Type: {{contentType}}
 #   "details": {
 #     "stack": [
 #       "UnauthorizedException: Token inválido",
-#       "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/ifraseg-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
-#       "    at AuthGuard.canActivate (/home/claiver/projetos/ifraseg-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
+#       "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
+#       "    at AuthGuard.canActivate (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
 #     ]
 #   }
 # }
@@ -149,7 +149,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "admin@ifraseg.com",
+  "login": "admin@infraseg.com",
   "password": "Admin123!"
 }
 

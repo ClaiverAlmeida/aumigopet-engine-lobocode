@@ -1,8 +1,8 @@
-# 📋 Padrões de Codificação - iFraseg Engine
+# 📋 Padrões de Codificação - INFRASEG Engine
 
 ## 🎯 Visão Geral
 
-Este documento estabelece os padrões de nomenclatura e convenções de código para o projeto iFraseg Engine, garantindo consistência, legibilidade e manutenibilidade.
+Este documento estabelece os padrões de nomenclatura e convenções de código para o projeto INFRASEG Engine, garantindo consistência, legibilidade e manutenibilidade.
 
 ## 🇧🇷🇺🇸 Convenções de Idioma
 
@@ -289,4 +289,4 @@ validateUserExists() // Deveria ser validarSeUserExiste()
 
 **Última atualização**: Dezembro 2024  
 **Versão**: 1.0  
-**Responsável**: Equipe de Desenvolvimento iFraseg 
+**Responsável**: Equipe de Desenvolvimento INFRASEG 

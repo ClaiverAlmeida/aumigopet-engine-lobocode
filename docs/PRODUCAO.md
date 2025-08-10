@@ -1,4 +1,4 @@
-# 🚀 Guia de Produção - iFraseg
+# 🚀 Guia de Produção - INFRASEG
 
 Este documento contém todas as informações necessárias para fazer o deploy da aplicação em produção.
 
@@ -12,7 +12,7 @@ Este documento contém todas as informações necessárias para fazer o deploy d
 ## 🏗️ Estrutura de Arquivos
 
 ```
-ifraseg-engine/
+infraseg-engine/
 ├── docker-compose.prod.yml    # Configuração de produção
 ├── env.production             # Variáveis de ambiente
 ├── deploy.sh                  # Script de deploy
@@ -31,7 +31,7 @@ Edite o arquivo `env.production`:
 
 ```bash
 # Database
-DB_NAME=ifraseg_prod
+DB_NAME=infraseg_prod
 DB_PASSWORD=sua_senha_super_segura
 JWT_SECRET=seu_jwt_secret_super_seguro
 
@@ -188,7 +188,7 @@ O sistema faz backup automático diário às 2h da manhã:
 ls -la backups/
 
 # Restaurar backup
-gunzip -c backups/backup_20241201_020000.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U postgres ifraseg_prod
+gunzip -c backups/backup_20241201_020000.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U postgres infraseg_prod
 ```
 
 ### Atualizações

@@ -1,4 +1,9 @@
-import { ArgumentsHost, HttpStatus, Logger, UnauthorizedException } from '@nestjs/common';
+import {
+  ArgumentsHost,
+  HttpStatus,
+  Logger,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { MessagesService } from '../messages/messages.service';
 import { AUTH_MESSAGES } from 'src/shared/auth/constants';
@@ -11,28 +16,31 @@ export abstract class BaseExceptionFilter {
   /**
    * Detecta automaticamente erros de token baseado na mensagem
    */
-  protected detectTokenError(exception: any): { isTokenError: boolean; errorCode: string } {
+  protected detectTokenError(exception: any): {
+    isTokenError: boolean;
+    errorCode: string;
+  } {
     if (exception instanceof UnauthorizedException) {
       const message = exception.message;
-      
+
       // Mapear mensagens específicas para códigos de erro
       if (message === AUTH_MESSAGES.ERROR.TOKEN_INVALID) {
         return { isTokenError: true, errorCode: 'TOKEN_INVALID' };
       }
-      
+
       if (message === AUTH_MESSAGES.ERROR.TOKEN_EXPIRED) {
         return { isTokenError: true, errorCode: 'TOKEN_EXPIRED' };
       }
-      
+
       if (message === AUTH_MESSAGES.VALIDATION.TOKEN_REQUIRED) {
         return { isTokenError: true, errorCode: 'TOKEN_REQUIRED' };
       }
-      
+
       if (message === AUTH_MESSAGES.ERROR.USER_NOT_FOUND) {
         return { isTokenError: true, errorCode: 'USER_NOT_FOUND' };
       }
     }
-    
+
     return { isTokenError: false, errorCode: 'UNKNOWN_ERROR' };
   }
 
@@ -60,9 +68,9 @@ export abstract class BaseExceptionFilter {
     // Resposta minimalista padronizada
     const errorResponse = {
       error: errorCode,
-      message: exception.message || message,
+      message: exception.message|| message ,
     };
 
     response.status(status).json(errorResponse);
   }
-} 
+}

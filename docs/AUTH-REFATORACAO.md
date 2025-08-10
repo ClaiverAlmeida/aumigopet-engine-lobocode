@@ -1,4 +1,4 @@
-# Refatoração do Módulo de Auth - iFraseg
+# Refatoração do Módulo de Auth - INFRASEG
 
 ## ✅ **Resumo das Melhorias Implementadas**
 

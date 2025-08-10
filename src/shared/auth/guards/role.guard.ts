@@ -22,8 +22,7 @@ export class RoleGuard implements CanActivate {
     const authUser = request.user;
 
     const isUnauthorized =
-      authUser!.role !== Roles.SYSTEM_ADMIN &&
-      authUser!.role !== Roles.ADMIN &&
+      authUser!.role !== Roles.SYSTEM_ADMIN && 
       !requiredRoles.includes(authUser!.role);
 
     if (isUnauthorized) {
@@ -33,4 +32,4 @@ export class RoleGuard implements CanActivate {
     }
     return true;
   }
-}
+} 

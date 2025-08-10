@@ -1,4 +1,9 @@
-import { Module, NestModule, MiddlewareConsumer, ValidationPipe } from '@nestjs/common';
+import {
+  Module,
+  NestModule,
+  MiddlewareConsumer,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_PIPE, APP_FILTER } from '@nestjs/core';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
@@ -9,7 +14,6 @@ import { AppService } from './app.service';
 import { UsersModule } from './modules/users/users.module';
 import { PrismaModule } from './shared/prisma/prisma.module';
 import { AuthModule } from './shared/auth/auth.module';
-import { ProductsModule } from './modules/products/products.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { CaslModule } from './shared/casl/casl.module';
 import { TenantModule } from './shared/tenant/tenant.module';
@@ -17,7 +21,12 @@ import { LoggerModule } from './shared/common/logger/logger.module';
 import { MessagesModule } from './shared/common/messages/messages.module';
 import { SoftDeleteInterceptor } from './shared/interceptors/soft-delete.interceptor';
 import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
-import { 
+
+// modules globais
+import { RepositoriesModule } from './shared/repositories/repositories.module';
+import { ServicesModule } from './shared/services/index';
+
+import {
   HttpExceptionFilter,
   ForbiddenErrorFilter,
   NotFoundErrorFilter,
@@ -25,7 +34,7 @@ import {
   UnauthorizedErrorFilter,
   ValidationErrorFilter,
   InvalidCredentialsErrorFilter,
-  AuthErrorFilter
+  AuthErrorFilter,
 } from './shared/common/filters';
 
 //javascript es7
@@ -38,11 +47,12 @@ import {
     }),
     LoggerModule,
     MessagesModule,
+    RepositoriesModule,
+    ServicesModule,
     PrometheusModule.register(),
     UsersModule,
     PrismaModule,
     AuthModule,
-    ProductsModule,
     CompaniesModule,
     CaslModule,
     TenantModule,
@@ -52,14 +62,15 @@ import {
     AppService,
     {
       provide: APP_PIPE,
-      useFactory: () => new ValidationPipe({
-        whitelist: true,
-        forbidNonWhitelisted: true,
-        transform: true,
-        transformOptions: {
-          enableImplicitConversion: true,
-        },
-      }),
+      useFactory: () =>
+        new ValidationPipe({
+          whitelist: true,
+          forbidNonWhitelisted: true,
+          transform: true,
+          transformOptions: {
+            enableImplicitConversion: true,
+          },
+        }),
     },
     {
       provide: APP_INTERCEPTOR,
@@ -103,9 +114,7 @@ import {
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(RateLimitMiddleware)
-      .forRoutes('*');
+    consumer.apply(RateLimitMiddleware).forRoutes('*');
   }
 }
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script de Verificação de Segurança para iFraseg
+# Script de Verificação de Segurança para INFRASEG
 # Executar antes do deploy em produção
 
 set -e

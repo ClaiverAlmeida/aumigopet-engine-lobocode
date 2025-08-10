@@ -1,7 +1,7 @@
-# 🤖 Cursor AI Helper - iFraseg Engine
+# 🤖 Cursor AI Helper - INFRASEG Engine
 
 ## 📋 Contexto do Projeto
-- **Projeto**: iFraseg Engine (Sistema de Segurança Patrimonial)
+- **Projeto**: INFRASEG Engine (Sistema de Segurança Patrimonial)
 - **Stack**: NestJS + TypeScript + Prisma + PostgreSQL
 - **Arquitetura**: Multi-tenant, Sistema de Roles, Modular
 

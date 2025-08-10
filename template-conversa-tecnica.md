@@ -1,12 +1,12 @@
-# 📝 Template para Conversas Técnicas - iFraseg Engine
+# 📝 Template para Conversas Técnicas - INFRASEG Engine
 
 ## 🎯 **Início de Conversa (Sempre usar)**
 
 ```
-Olá! Vou trabalhar no projeto iFraseg Engine **seguindo as regras do projeto**:
+Olá! Vou trabalhar no projeto INFRASEG Engine **seguindo as regras do projeto**:
 
 📋 **Contexto**:
-- Projeto: iFraseg Engine (Sistema de Segurança Patrimonial)
+- Projeto: INFRASEG Engine (Sistema de Segurança Patrimonial)
 - Stack: NestJS + TypeScript + Prisma + PostgreSQL
 - Arquitetura: Multi-tenant, Sistema de Roles, Modular
 
@@ -51,7 +51,7 @@ Olá! Vou trabalhar no projeto iFraseg Engine **seguindo as regras do projeto**:
 ### **Sempre mencionar:**
 - "Seguindo as regras do projeto"
 - "Conforme estabelecido no `.cursor/rules/nestjs-rules.mdc`"
-- "Aplicando os padrões do iFraseg Engine"
+- "Aplicando os padrões do INFRASEG Engine"
 
 ### **Exemplo:**
 ```
@@ -143,7 +143,7 @@ npm run lint
 ### **📋 Copie e cole sempre:**
 
 ```
-Vou trabalhar no projeto iFraseg Engine seguindo as regras do projeto estabelecidas em .cursor/rules/nestjs-rules.mdc. Leia cursor-helper.md para padrões essenciais, projeto-context.md para contexto completo e template-conversa-tecnica.md para estrutura. Aplique arquitetura Repository → Validator → Factory → Service → Controller, métodos em português (buscarTodos, validarSeUserExiste), entidades em inglês (User, Company, Post) e sistema de 7 roles hierárquicos.
+Vou trabalhar no projeto INFRASEG Engine seguindo as regras do projeto estabelecidas em .cursor/rules/nestjs-rules.mdc. Leia cursor-helper.md para padrões essenciais, projeto-context.md para contexto completo e template-conversa-tecnica.md para estrutura. Aplique arquitetura Repository → Validator → Factory → Service → Controller, métodos em português (buscarTodos, validarSeUserExiste), entidades em inglês (User, Company, Post) e sistema de 7 roles hierárquicos.
 ```
 
 ---

@@ -1,43 +1,39 @@
-// schema.dev.prisma - Schema para desenvolvimento
-// Inclui generators extras como ERD, ferramentas de debug, etc.
+// ===============================================
+// 🎯 PRISMA SCHEMA - INFRASEG ENGINE
+// ===============================================
+// Schema consolidado para sistema multi-tenant
+// Seguindo regras do projeto: entidades em inglês
+// ===============================================
 
 generator client {
   provider = "prisma-client-js"
 }
 
+
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL") 
 }
 
-// temporário, irei remover
-model BlogPost {
-  id        String   @id @default(cuid())
-  title     String
-  content   String   @db.Text
-  published Boolean  @default(false)
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
+// ===============================================
+// 🎯 ENUMS CENTRALIZADOS
+// ===============================================
+// Todos os enums do sistema em um local centralizado
+// Seguindo regras do projeto: entidades em inglês
+// ===============================================
 
-model Product {
-  id          String @id @default(cuid())
-  name        String
-  slug        String @unique
-  description String
-  price       Float
-}
+// ===============================================
+// 👥 ROLES E USUÁRIOS
+// ===============================================
 
 enum Roles {
-  SYSTEM_ADMIN
-  ADMIN
-  HR
-  SUPERVISOR
-  GUARD
-  POST_SUPERVISOR
-  POST_RESIDENT
+  SYSTEM_ADMIN // Admin global do sistema
+  ADMIN // Admin da empresa
+  HR // Recursos humanos
+  SUPERVISOR // Supervisor
+  GUARD // Guarda de segurança
+  POST_SUPERVISOR // Supervisor de posto
+  POST_RESIDENT // Morador/residente
 
   // temporário, irei remover
   EDITOR
@@ -61,39 +57,174 @@ enum PermissionType {
   PATROL // Rota
 }
 
+// ===============================================
+// ⏰ TURNOS E OPERAÇÕES
+// ===============================================
+
+enum WorkShift {
+  DAY // Diurno
+  NIGHT // Noturno
+  MORNING   // Manhã
+  AFTERNOON // Tarde
+}
+
+enum ShiftFunction {
+  PATROL // Rota
+  SUPPORT // Apoio
+  DOORMAN // Portaria
+}
+
+enum ShiftStatus {
+  PENDING // Pendente
+  IN_PROGRESS // Em andamento
+  BREAK // Intervalo
+  COMPLETED // Concluído
+  ABSENCE // Ausência
+}
+
+// ===============================================
+// 🚶 RONDAS E CHECKPOINTS
+// ===============================================
+
+enum RoundStatus {
+  IDLE // Aguardando
+  STARTED // Em andamento
+  PAUSED // Pausada
+  COMPLETED // Concluída
+  CANCELLED // Cancelada
+}
+
+enum CheckpointStatus {
+  PENDING // Pendente
+  COMPLETED // Concluído
+  SKIPPED // Pulado
+}
+
+enum CheckpointCategory {
+  SECURITY // Segurança
+  MAINTENANCE // Manutenção
+  INSPECTION // Inspeção
+  GENERAL // Geral
+}
+
+// ===============================================
+// 📝 OCORRÊNCIAS E RELATÓRIOS
+// ===============================================
+
+enum OccurrenceStatus {
+  PENDING // Pendente
+  IN_PROGRESS // Em andamento
+  RESOLVED // Resolvida
+}
+
+// ===============================================
+// 🚗 VEÍCULOS E CHECKLISTS
+// ===============================================
+
+enum VehicleType {
+  CAR
+  MOTORCYCLE
+}
+
+enum FuelLevel {
+  FULL  // 1 - Tanque cheio
+  HALF  // 0.5 - Meio tanque  
+  EMPTY // 0 - Vazio
+}
+
+enum VehicleStatus {
+  ACTIVE // Ativo
+  MAINTENANCE // Em manutenção
+  INACTIVE // Inativo
+}
+
+enum VehicleChecklistStatus {
+  PENDING // Pendente
+  COMPLETED // Concluído
+}
+
+enum ChecklistItemStatus {
+  OK // OK
+  NOK // Não OK
+  NOT_CHECKED // Não verificado
+}
+
+// ===============================================
+// 🏢 EMPRESAS E MULTI-TENANCY
+// ===============================================
+// Modelo de empresas para sistema multi-tenant
+// Cada empresa é um tenant isolado
+// ===============================================
+
 model Company {
-  id           String    @id @default(cuid())
+  id           String  @id @default(cuid())
   name         String
-  cnpj         String    @unique
+  cnpj         String  @unique
   website      String?
   address      String?
   country      String?
   contactName  String?
   contactEmail String?
   contactPhone String?
-  posts        Post[]
-  users        User[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  deletedAt    DateTime?
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Usuários da empresa
+  users User[]
+
+  // Postos de segurança
+  posts Post[]
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Operações principais
+  shifts      Shift[]      @relation("CompanyShifts")
+  rounds      Round[]      @relation("CompanyRounds")
+  occurrences Occurrence[] @relation("CompanyOccurrences")
+
+  // Checkpoints da empresa
+  checkpoints Checkpoint[] @relation("CompanyCheckpoints")
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS DE VEÍCULOS
+  // ===============================================
+
+  // Frota da empresa
+  vehicles          Vehicle[]          @relation("CompanyVehicles")
+  vehicleChecklists VehicleChecklist[] @relation("CompanyVehicleChecklists")
+  supplies          Supply[]           @relation("CompanySupplies")
+  motorizedServices MotorizedService[] @relation("CompanyMotorizedServices")
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS DE EVENTOS
+  // ===============================================
+
+  // Logs e eventos
+  eventLogs   EventLog[]   @relation("CompanyEventLogs")
+  panicEvents PanicEvent[] @relation("CompanyPanicEvents")
+
+  // ===============================================
+  // 📊 AUDITORIA E ÍNDICES
+  // ===============================================
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([cnpj])
+  @@index([name])
+  @@index([deletedAt]) 
 }
 
-model Post {
-  id          String       @id @default(cuid())
-  name        String
-  address     String?
-  company     Company      @relation(fields: [companyId], references: [id])
-  companyId   String
-  userPosts   UserPost[] // Relacionamento com usuários (supervisor/resident)
-  rounds      Round[]
-  checkpoints Checkpoint[]
-  shifts      Shift[]
-  eventLogs   EventLog[]
-  panicEvents PanicEvent[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  deletedAt   DateTime?
-}
+// ===============================================
+// 👥 USUÁRIOS E PERMISSÕES
+// ===============================================
+// Modelo de usuários do sistema multi-tenant
+// Seguindo regras: entidades em inglês, relacionamentos claros
+// ===============================================
 
 model User {
   id             String     @id @default(cuid())
@@ -117,30 +248,56 @@ model User {
   phone   String?
   address String?
 
-  // Relacionamentos de permissões (apenas para Guards)
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Permissões (apenas para Guards)
   permissions Permission[]
 
-  // Relacionamentos operacionais
-  rounds      Round[]      @relation("UserRounds")
-  shifts      Shift[]
-  eventLogs   EventLog[]
-  panicEvents PanicEvent[]
-  userPosts   UserPost[] // Relacionamento com posts (supervisor/resident)
+  // Operações principais
+  shifts Shift[] @relation("UserShifts")
+  rounds Round[] @relation("UserRounds")
 
-  // temporário irei remover
-  BlogPost BlogPost[]
+  // Relacionamentos com postos
+  userPosts UserPost[] // Para POST_SUPERVISOR e POST_RESIDENT
 
-  // Índices para otimização
+  // Veículos e operações
+  supplies                    Supply[]           @relation("UserSupplies")
+  occurrences                 Occurrence[]       @relation("UserOccurrences")
+  vehicleChecklists           VehicleChecklist[] @relation("UserVehicleChecklists")
+  motorizedServices           MotorizedService[] @relation("UserMotorizedServices")
+  supervisorMotorizedServices MotorizedService[] @relation("SupervisorMotorizedServices")
+
+  // Aprovações e validações
+  supplyReviewedBy           Supply[]           @relation("SupplyReviewedBy")
+  occurrenceReviewedBy       Occurrence[]       @relation("OccurrenceReviewedBy")
+  vehicleChecklistReviewedBy VehicleChecklist[] @relation("VehicleChecklistReviewedBy")
+  motorizedServiceReviewedBy MotorizedService[] @relation("MotorizedServiceReviewedBy")
+
+  // Eventos e logs
+  eventLogs   EventLog[]   @relation("UserEventLogs")
+  panicEvents PanicEvent[] @relation("UserPanicEvents")
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
   @@index([companyId])
   @@index([email])
   @@index([cpf])
   @@index([status])
   @@index([deletedAt])
   @@index([role])
-  @@index([createdAt])
+  @@index([createdAt]) 
+  
 }
 
-// Tabela de relacionamento para usuários com roles específicos em posts
+// ===============================================
+// 🏢 RELACIONAMENTO USUÁRIO-POSTO
+// ===============================================
+// Tabela para roles específicos em postos
+// POST_SUPERVISOR e POST_RESIDENT
+
 model UserPost {
   id        String   @id @default(cuid())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -155,119 +312,1115 @@ model UserPost {
   @@unique([userId, postId, role])
   @@index([userId])
   @@index([postId])
-  @@index([role])
+  @@index([role]) 
 }
+
+// ===============================================
+// 🔐 PERMISSÕES DE USUÁRIOS
+// ===============================================
+// Sistema de permissões granulares
 
 model Permission {
   id             String         @id @default(cuid())
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
-  permissionType PermissionType
+  permissionType PermissionType // DOORMAN, SUPPORT, PATROL para Guardas
   granted        Boolean        @default(true)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
   @@unique([userId, permissionType])
   @@index([userId])
-  @@index([permissionType])
+  @@index([permissionType]) 
 }
 
-model Round {
-  id          String       @id @default(cuid())
-  post        Post         @relation(fields: [postId], references: [id])
-  postId      String
-  guard       User         @relation("UserRounds", fields: [guardId], references: [id])
-  guardId     String
-  start       DateTime
-  end         DateTime?
-  status      String // started, finished, failed
-  roundPoints RoundPoint[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+// ===============================================
+// 🏢 POSTOS DE SEGURANÇA
+// ===============================================
+// Modelo de postos/pontos de segurança
+// Relacionados a empresas (multi-tenant)
+// ===============================================
 
-  @@index([postId])
-  @@index([guardId])
-  @@index([status])
-  @@index([start])
+model Post {
+  id        String  @id @default(cuid())
+  name      String
+  address   String?
+  latitude  Float?  // Coordenadas GPS do posto
+  longitude Float?  // Coordenadas GPS do posto
+
+  // Relacionamento com empresa (multi-tenant)
+  company   Company @relation(fields: [companyId], references: [id])
+  companyId String
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Operações principais
+  shifts      Shift[]      @relation("PostShifts")
+  rounds      Round[]      @relation("PostRounds")
+  occurrences Occurrence[] @relation("PostOccurrences")
+  motorizedServices MotorizedService[] @relation("PostMotorizedServices")
+
+  // Checkpoints do posto
+  checkpoints Checkpoint[] @relation("PostCheckpoints")
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS DE USUÁRIOS
+  // ===============================================
+
+  // Usuários com roles específicos no posto
+  userPosts UserPost[] // POST_SUPERVISOR e POST_RESIDENT
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS DE EVENTOS
+  // ===============================================
+
+  // Eventos do posto
+  eventLogs   EventLog[]   @relation("PostEventLogs")
+  panicEvents PanicEvent[] @relation("PostPanicEvents")
+
+  // ===============================================
+  // 📊 AUDITORIA E ÍNDICES
+  // ===============================================
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([companyId])
+  @@index([name])
+  @@index([deletedAt]) 
 }
+
+// ===============================================
+// 📍 CHECKPOINTS DOS POSTOS
+// ===============================================
+// Pontos de verificação para rondas
 
 model Checkpoint {
-  id          String       @id @default(cuid())
-  post        Post         @relation(fields: [postId], references: [id])
-  postId      String
+  id          String             @id @default(cuid())
   name        String
-  location    String?
-  roundPoints RoundPoint[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  description String?
+  latitude    Float              // GPS obrigatório
+  longitude   Float              // GPS obrigatório
+  required    Boolean            @default(false) // Checkpoint obrigatório?
+  category    CheckpointCategory // Tipo de checkpoint
+  order       Int?               // Ordem na sequência de ronda
 
+  // Tempo estimado para verificação (em minutos)
+  estimatedDuration Int? @default(5)
+
+  // Status do checkpoint
+  isActive Boolean @default(true)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS
+  // ===============================================
+
+  // Relacionamento multi-tenant
+  company   Company @relation("CompanyCheckpoints", fields: [companyId], references: [id])
+  companyId String
+
+  // Relacionamento com posto
+  post   Post   @relation("PostCheckpoints", fields: [postId], references: [id])
+  postId String
+
+  // Verificações em rondas
+  roundCheckpoints RoundCheckpoint[] @relation("CheckpointRoundCheckpoints")
+
+  // ===============================================
+  // 📊 AUDITORIA E ÍNDICES
+  // ===============================================
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String?
+  updatedBy String?
+
+  @@index([companyId])
   @@index([postId])
+  @@index([category])
+  @@index([required])
+  @@index([isActive])
+  @@index([deletedAt]) 
 }
 
-model RoundPoint {
-  id           String     @id @default(cuid())
-  round        Round      @relation(fields: [roundId], references: [id])
-  roundId      String
-  checkpoint   Checkpoint @relation(fields: [checkpointId], references: [id])
-  checkpointId String
-  checkedAt    DateTime
-  status       String // ok, failed, etc
-  createdAt    DateTime   @default(now())
-
-  @@index([roundId])
-  @@index([checkpointId])
-  @@index([checkedAt])
-}
+// ===============================================
+// ⏰ TURNOS DE TRABALHO
+// ===============================================
+// Sistema de controle de turnos integrado ao frontend
+// Regras: 12h com tolerância de 5min, intervalos obrigatórios
+// ===============================================
 
 model Shift {
-  id        String   @id @default(cuid())
-  guard     User     @relation(fields: [guardId], references: [id])
-  guardId   String
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String
-  type      String // entry, exit, check-in
-  dateTime  DateTime @default(now())
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS
+  // ===============================================
+
+  // Horários do turno
+  startTime      DateTime // Início do turno
+  breakStartTime DateTime? // Início do intervalo
+  breakEndTime   DateTime? // Fim do intervalo
+  endTime        DateTime? // Fim do turno
+
+  // Configurações do turno
+  function ShiftFunction // PATROL, SUPPORT, DOORMAN
+  status   ShiftStatus   @default(PENDING)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy e hierarquia
+  company   Company @relation("CompanyShifts", fields: [companyId], references: [id])
+  companyId String
+
+  post   Post   @relation("PostShifts", fields: [postId], references: [id])
+  postId String
+
+  user   User   @relation("UserShifts", fields: [userId], references: [id])
+  userId String
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Rondas realizadas durante o turno
+  rounds Round[] @relation("ShiftRounds")
+
+  // Ocorrências registradas no turno
+  occurrences Occurrence[] @relation("ShiftOccurrences")
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+  VehicleChecklist VehicleChecklist[] @relation("ShiftVehicleChecklists")
+  MotorizedService MotorizedService[] @relation("ShiftMotorizedServices")
+  Supply           Supply[]           @relation("ShiftSupplies")
+
+  @@index([companyId])
+  @@index([postId])
+  @@index([userId])
+  @@index([status])
+  @@index([function])
+  @@index([startTime])
+  @@index([deletedAt])
+  @@index([createdAt])
+  // Índice composto para buscar turno ativo de um usuário
+  @@index([userId, status, startTime])
+  // Índice para turnos por período
+  @@index([companyId, startTime, endTime]) 
+}
+
+// ===============================================
+// 🚶 RONDAS DE SEGURANÇA
+// ===============================================
+// Sistema de rondas com GPS e checkpoints obrigatórios
+// Integrado ao frontend: PatrolPage
+// ===============================================
+
+model Round {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS
+  // ===============================================
+
+  // Horários da ronda
+  startTime DateTime // Início da ronda
+  endTime   DateTime? // Fim da ronda
+  pausedAt  DateTime? // Momento da pausa
+  resumedAt DateTime? // Momento da retomada
+
+  // Status e configurações
+  status      RoundStatus @default(IDLE)
+  description String? // Descrição/observações
+
+  // Aprovações e validações
+  supervisorApproval Boolean? // Necessita aprovação?
+  requiresValidation Boolean  @default(false)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy e hierarquia
+  company   Company @relation("CompanyRounds", fields: [companyId], references: [id])
+  companyId String
+
+  post   Post   @relation("PostRounds", fields: [postId], references: [id])
+  postId String
+
+  user   User   @relation("UserRounds", fields: [userId], references: [id])
+  userId String
+
+  // Relacionamento com turno
+  shift   Shift?  @relation("ShiftRounds", fields: [shiftId], references: [id])
+  shiftId String?
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Checkpoints verificados na ronda
+  checkpoints RoundCheckpoint[] @relation("RoundRoundCheckpoints")
+
+  // ===============================================
+  // 📊 CAMPOS CALCULADOS E MÉTRICAS
+  // ===============================================
+
+  // Duração total da ronda (em minutos)
+  totalDuration Int? // Calculado automaticamente
+
+  // Duração das pausas (em minutos)
+  pauseDuration Int? // Calculado automaticamente
+
+  // Métricas de completude
+  totalCheckpoints     Int    @default(0) // Total de checkpoints
+  completedCheckpoints Int    @default(0) // Checkpoints concluídos
+  skippedCheckpoints   Int    @default(0) // Checkpoints pulados
+  completionRate       Float? // Taxa de conclusão (%)
+
+  // Coordenadas de início e fim
+  startLatitude  Float? // GPS início
+  startLongitude Float? // GPS início
+  endLatitude    Float? // GPS fim
+  endLongitude   Float? // GPS fim
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  approvedBy      String? // ID do supervisor que aprovou
+  approvedAt      DateTime? // Data/hora da aprovação
+  rejectedBy      String? // ID de quem rejeitou
+  rejectedAt      DateTime? // Data/hora da rejeição
+  rejectionReason String? // Motivo da rejeição
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
+  @@index([postId])
+  @@index([userId])
+  @@index([shiftId])
+  @@index([status])
+  @@index([startTime])
+  @@index([deletedAt])
+  @@index([createdAt])
+  // Índice para rondas ativas
+  @@index([userId, status, startTime])
+  // Índice para rondas por período e posto
+  @@index([companyId, postId, startTime, endTime])
+}
+
+// ===============================================
+// 📍 VERIFICAÇÕES DE CHECKPOINTS
+// ===============================================
+// Registro de cada checkpoint verificado na ronda
+
+model RoundCheckpoint {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS
+  // ===============================================
+
+  // Horário da verificação
+  completedAt DateTime? // Quando foi verificado
+  startedAt   DateTime? // Quando começou a verificação
+
+  // Status da verificação
+  status CheckpointStatus @default(PENDING)
+
+  // Coordenadas GPS da verificação
+  latitude  Float? // GPS atual
+  longitude Float? // GPS atual
+  accuracy  Float? // Precisão do GPS (metros)
+
+  // Observações e notas
+  notes  String? // Observações do guarda
+  issues String? // Problemas identificados
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS
+  // ===============================================
+
+  // Relacionamento com ronda
+  round   Round  @relation("RoundRoundCheckpoints", fields: [roundId], references: [id], onDelete: Cascade)
+  roundId String
+
+  // Relacionamento com checkpoint
+  checkpoint   Checkpoint @relation("CheckpointRoundCheckpoints", fields: [checkpointId], references: [id])
+  checkpointId String
+
+  // ===============================================
+  // 📊 DADOS TÉCNICOS
+  // ===============================================
+
+  // Distância do checkpoint original (metros)
+  distanceFromOriginal Float? // Calculado automaticamente
+
+  // Tempo gasto neste checkpoint (minutos)
+  timeSpent Int? // Calculado automaticamente
+
+  // Sequência na ronda (ordem de verificação)
+  sequence Int? // Ordem de execução
+
+  // ===============================================
+  // 📊 AUDITORIA
+  // ===============================================
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@index([guardId])
-  @@index([postId])
-  @@index([type])
-  @@index([dateTime])
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([roundId])
+  @@index([checkpointId])
+  @@index([status])
+  @@index([completedAt])
+  @@index([sequence])
+  // Índice para buscar checkpoints por ronda e status
+  @@index([roundId, status, completedAt]) 
 }
 
-model EventLog {
-  id        String   @id @default(cuid())
-  post      Post     @relation(fields: [postId], references: [id])
-  postId    String
-  guard     User?    @relation(fields: [guardId], references: [id])
-  guardId   String?
-  type      String // e.g. "PANIC", "NOTE", "PHOTO", etc
-  details   String?
-  media     String?
-  createdAt DateTime @default(now())
+// ===============================================
+// 📝 OCORRÊNCIAS E RELATÓRIOS
+// ===============================================
+// Sistema de relatórios de ocorrências
+// Integrado ao frontend: OccurrenceReportPage
+// Numeração automática com reset diário
+// ===============================================
 
+model Occurrence {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS (CONFORME FRONTEND)
+  // ===============================================
+
+  // Numeração automática (reset diário às 00:00)
+  talaoNumber Int @default(autoincrement()) // Formato: "001", "002", etc.
+
+  // Data e horário
+  date           DateTime // Data da ocorrência
+  occurrenceTime String // Hora da ocorrência (HH:MM)
+
+  // Dados do solicitante/envolvidos
+  applicant String // Solicitante
+  user      User   @relation("UserOccurrences", fields: [userId], references: [id])
+  userId    String
+  rg        String // RG do usuário
+
+  // Localização
+  post        Post   @relation("PostOccurrences", fields: [postId], references: [id])
+  postId      String
+  postAddress String // Endereço do posto
+
+  // Pessoas envolvidas (opcional)
+  peopleInvolved String? // Pessoas envolvidas
+
+  // Descrição detalhada
+  description String // Descrição da ocorrência
+
+  // Status do atendimento
+  status OccurrenceStatus @default(PENDING)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy e hierarquia
+  company   Company @relation("CompanyOccurrences", fields: [companyId], references: [id])
+  companyId String
+
+  // Relacionamento com turno (opcional)
+  shift   Shift?  @relation("ShiftOccurrences", fields: [shiftId], references: [id])
+  shiftId String?
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("OccurrenceReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
   @@index([postId])
-  @@index([guardId])
-  @@index([type])
+  @@index([userId])
+  @@index([shiftId])
+  @@index([status])
+  @@index([date])
+  @@index([talaoNumber])
+  @@index([deletedAt])
   @@index([createdAt])
 }
 
+// ===============================================
+// 🚗 VEÍCULOS DA FROTA
+// ===============================================
+// Gestão de veículos para empresas de segurança
+// Integrado ao frontend: VehicleChecklistPage
+// ===============================================
+
+model Vehicle {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS DO VEÍCULO
+  // ===============================================
+
+  // Identificação básica
+  plate String      @unique // Placa única
+  type  VehicleType // CAR, MOTORCYCLE
+  model String // Modelo
+
+  // Status do veículo
+  status   VehicleStatus @default(ACTIVE)
+  isActive Boolean       @default(true)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTO MULTI-TENANT
+  // ===============================================
+
+  company   Company @relation("CompanyVehicles", fields: [companyId], references: [id])
+  companyId String
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS OPERACIONAIS
+  // ===============================================
+
+  // Checklists de verificação 
+  VehicleChecklist VehicleChecklist[] @relation("VehicleChecklists")
+
+  // Registros de abastecimento
+  supplies Supply[] @relation("VehicleSupplies")
+
+  // Relatórios de serviços motorizados
+  motorizedServices MotorizedService[] @relation("VehicleMotorizedServices")
+
+  // ===============================================
+  // 📊 DADOS DE MANUTENÇÃO E CONTROLE
+  // ===============================================
+
+  // Quilometragem
+  initialKm Int // valor inicial quando cadastrado o veiculo
+  currentKm Int // valor atual do veiculo, atualizado automaticamente
+  finalKm   Int? // valor final, nulo quando checklist em andamento 
+
+  // Observações
+  notes String? // Observações gerais
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
+  @@index([plate])
+  @@index([status])
+  @@index([isActive])
+  @@index([deletedAt])
+  @@index([createdAt])
+  // Índice para busca por empresa e status
+  @@index([companyId, status, isActive]) 
+}
+
+// ===============================================
+// ✅ CHECKLISTS DE VEÍCULOS
+// ===============================================
+// Sistema de verificação de veículos
+// Integrado ao frontend: VehicleChecklistPage
+// ===============================================
+
+model VehicleChecklist {
+  id String @id @default(cuid())
+
+  talaoNumber Int    @default(autoincrement()) // Formato: "001", "002", etc.
+  // Usuário responsável
+  user        User   @relation("UserVehicleChecklists", fields: [userId], references: [id])
+  userId      String // motorista 
+
+  // Informações do veículo
+  vehicleId String
+  vehicle   Vehicle @relation("VehicleChecklists", fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  // Dados do checklist
+  date               DateTime  @default(now())
+  initialKm          Int
+  finalKm            Int?
+  driverName         String
+  generalObservation String?
+  isCompleted        Boolean   @default(false)
+  completedAt        DateTime?
+
+  // ========================================
+  // ITENS DO CHECKLIST - CAMPOS FIXOS
+  // ========================================
+
+  // Água do Radiador
+  aguaRadiadorFuncionando Boolean @default(false)
+  aguaRadiadorAmassado    Boolean @default(false)
+  aguaRadiadorArranhado   Boolean @default(false)
+  aguaRadiadorObservacao  String?
+
+  // Água Reservatório Parabrisa
+  aguaReservatorioFuncionando Boolean @default(false)
+  aguaReservatorioAmassado    Boolean @default(false)
+  aguaReservatorioArranhado   Boolean @default(false)
+  aguaReservatorioObservacao  String?
+
+  // Óleo Motor
+  oleoMotorFuncionando Boolean @default(false)
+  oleoMotorAmassado    Boolean @default(false)
+  oleoMotorArranhado   Boolean @default(false)
+  oleoMotorObservacao  String?
+
+  // Óleo Freio
+  oleoFreioFuncionando Boolean @default(false)
+  oleoFreioAmassado    Boolean @default(false)
+  oleoFreioArranhado   Boolean @default(false)
+  oleoFreioObservacao  String?
+
+  // Lanterna Dianteira Direita
+  lanternaDianteiraDireitaFuncionando Boolean @default(false)
+  lanternaDianteiraDireitaAmassado    Boolean @default(false)
+  lanternaDianteiraDireitaArranhado   Boolean @default(false)
+  lanternaDianteiraDireitaObservacao  String?
+
+  // Lanterna Dianteira Esquerda
+  lanternaDianteiraEsquerdaFuncionando Boolean @default(false)
+  lanternaDianteiraEsquerdaAmassado    Boolean @default(false)
+  lanternaDianteiraEsquerdaArranhado   Boolean @default(false)
+  lanternaDianteiraEsquerdaObservacao  String?
+
+  // Farol Baixo Direita
+  farolBaixoDireitaFuncionando Boolean @default(false)
+  farolBaixoDireitaAmassado    Boolean @default(false)
+  farolBaixoDireitaArranhado   Boolean @default(false)
+  farolBaixoDireitaObservacao  String?
+
+  // Farol Baixo Esquerda
+  farolBaixoEsquerdaFuncionando Boolean @default(false)
+  farolBaixoEsquerdaAmassado    Boolean @default(false)
+  farolBaixoEsquerdaArranhado   Boolean @default(false)
+  farolBaixoEsquerdaObservacao  String?
+
+  // Farol Alto Direita
+  farolAltoDireitaFuncionando Boolean @default(false)
+  farolAltoDireitaAmassado    Boolean @default(false)
+  farolAltoDireitaArranhado   Boolean @default(false)
+  farolAltoDireitaObservacao  String?
+
+  // Farol Alto Esquerda
+  farolAltoEsquerdaFuncionando Boolean @default(false)
+  farolAltoEsquerdaAmassado    Boolean @default(false)
+  farolAltoEsquerdaArranhado   Boolean @default(false)
+  farolAltoEsquerdaObservacao  String?
+
+  // Seta Dianteira Direita
+  setaDianteiraDireitaFuncionando Boolean @default(false)
+  setaDianteiraDireitaAmassado    Boolean @default(false)
+  setaDianteiraDireitaArranhado   Boolean @default(false)
+  setaDianteiraDireitaObservacao  String?
+
+  // Seta Dianteira Esquerda
+  setaDianteiraEsquerdaFuncionando Boolean @default(false)
+  setaDianteiraEsquerdaAmassado    Boolean @default(false)
+  setaDianteiraEsquerdaArranhado   Boolean @default(false)
+  setaDianteiraEsquerdaObservacao  String?
+
+  // Seta Traseira Direita
+  setaTraseiraDireitaFuncionando Boolean @default(false)
+  setaTraseiraDireitaAmassado    Boolean @default(false)
+  setaTraseiraDireitaArranhado   Boolean @default(false)
+  setaTraseiraDireitaObservacao  String?
+
+  // Seta Traseira Esquerda
+  setaTraseiraEsquerdaFuncionando Boolean @default(false)
+  setaTraseiraEsquerdaAmassado    Boolean @default(false)
+  setaTraseiraEsquerdaArranhado   Boolean @default(false)
+  setaTraseiraEsquerdaObservacao  String?
+
+  // Pisca Alerta
+  piscaAlertaFuncionando Boolean @default(false)
+  piscaAlertaAmassado    Boolean @default(false)
+  piscaAlertaArranhado   Boolean @default(false)
+  piscaAlertaObservacao  String?
+
+  // Buzina
+  buzinaFuncionando Boolean @default(false)
+  buzinaAmassado    Boolean @default(false)
+  buzinaArranhado   Boolean @default(false)
+  buzinaObservacao  String?
+
+  // Limpador de Parabrisa
+  limpadorParabrisaFuncionando Boolean @default(false)
+  limpadorParabrisaAmassado    Boolean @default(false)
+  limpadorParabrisaArranhado   Boolean @default(false)
+  limpadorParabrisaObservacao  String?
+
+  // Esguicho d'Água Parabrisa
+  esguichoAguaParabrisaFuncionando Boolean @default(false)
+  esguichoAguaParabrisaAmassado    Boolean @default(false)
+  esguichoAguaParabrisaArranhado   Boolean @default(false)
+  esguichoAguaParabrisaObservacao  String?
+
+  // Lanterna Traseira Direita
+  lanternaTraseiraDireitaFuncionando Boolean @default(false)
+  lanternaTraseiraDireitaAmassado    Boolean @default(false)
+  lanternaTraseiraDireitaArranhado   Boolean @default(false)
+  lanternaTraseiraDireitaObservacao  String?
+
+  // Lanterna Traseira Esquerda
+  lanternaTraseiraEsquerdaFuncionando Boolean @default(false)
+  lanternaTraseiraEsquerdaAmassado    Boolean @default(false)
+  lanternaTraseiraEsquerdaArranhado   Boolean @default(false)
+  lanternaTraseiraEsquerdaObservacao  String?
+
+  // Luz de Freio
+  luzFreioFuncionando Boolean @default(false)
+  luzFreioAmassado    Boolean @default(false)
+  luzFreioArranhado   Boolean @default(false)
+  luzFreioObservacao  String?
+
+  // Luz de Ré
+  luzReFuncionando Boolean @default(false)
+  luzReAmassado    Boolean @default(false)
+  luzReArranhado   Boolean @default(false)
+  luzReObservacao  String?
+
+  // Pneu Dianteiro Direito
+  pneuDianteiroDireitoFuncionando Boolean @default(false)
+  pneuDianteiroDireitoAmassado    Boolean @default(false)
+  pneuDianteiroDireitoArranhado   Boolean @default(false)
+  pneuDianteiroDireitoObservacao  String?
+
+  // Pneu Dianteiro Esquerdo
+  pneuDianteiroEsquerdoFuncionando Boolean @default(false)
+  pneuDianteiroEsquerdoAmassado    Boolean @default(false)
+  pneuDianteiroEsquerdoArranhado   Boolean @default(false)
+  pneuDianteiroEsquerdoObservacao  String?
+
+  // Pneu Traseiro Direito
+  pneuTraseiroDireitoFuncionando Boolean @default(false)
+  pneuTraseiroDireitoAmassado    Boolean @default(false)
+  pneuTraseiroDireitoArranhado   Boolean @default(false)
+  pneuTraseiroDireitoObservacao  String?
+
+  // Pneu Traseiro Esquerdo
+  pneuTraseiroEsquerdoFuncionando Boolean @default(false)
+  pneuTraseiroEsquerdoAmassado    Boolean @default(false)
+  pneuTraseiroEsquerdoArranhado   Boolean @default(false)
+  pneuTraseiroEsquerdoObservacao  String?
+
+  // Pneu Estepe
+  pneuEstepeFuncionando Boolean @default(false)
+  pneuEstepeAmassado    Boolean @default(false)
+  pneuEstepeArranhado   Boolean @default(false)
+  pneuEstepeObservacao  String?
+
+  // Multi-tenancy
+  company   Company @relation("CompanyVehicleChecklists", fields: [companyId], references: [id])
+  companyId String
+
+  // Relacionamento com turno 
+  shift   Shift  @relation("ShiftVehicleChecklists", fields: [shiftId], references: [id])
+  shiftId String
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("VehicleChecklistReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão 
+
+  // ========================================
+  // ÍNDICES PARA PERFORMANCE
+  // ========================================
+  // Índices para consultas rápidas
+  @@index([vehicleId])
+  @@index([date])
+  @@index([isCompleted])
+  @@index([createdAt])
+}
+
+// ===============================================
+// ⛽ ABASTECIMENTO DE VEÍCULOS
+// ===============================================
+// Sistema de controle de abastecimento
+// Integrado ao frontend: SupplyRegistrationPage
+// ===============================================
+
+model Supply {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS (CONFORME FRONTEND)
+  // ===============================================
+
+  talaoNumber Int      @default(autoincrement()) // Formato: "001", "002", etc.
+  // Data do abastecimento
+  date        DateTime // Data do abastecimento
+
+  // Quilometragem (conforme frontend)
+  kmDeparture Int // Km de saída
+  kmSupply    Int // Km no abastecimento
+  kmReturn    Int // Km de retorno
+
+  // Dados do combustível
+  liters        Float // Quantidade em litros
+  value         Float // Valor total pago
+  pricePerLiter Float? // Preço por litro (calculado)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy
+  company   Company @relation("CompanySupplies", fields: [companyId], references: [id])
+  companyId String
+
+  // Veículo abastecido
+  vehicle   Vehicle @relation("VehicleSupplies", fields: [vehicleId], references: [id])
+  vehicleId String
+
+  // Relacionamento com turno 
+  shift   Shift  @relation("ShiftSupplies", fields: [shiftId], references: [id])
+  shiftId String
+
+  // Usuário responsável pelo registro
+  user   User   @relation("UserSupplies", fields: [userId], references: [id])
+  userId String
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("SupplyReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
+  @@index([vehicleId])
+  @@index([userId])
+  @@index([date])
+  @@index([deletedAt])
+  @@index([createdAt])
+  // Índice para relatórios por veículo e período
+  @@index([vehicleId, date])
+  // Índice para busca por quilometragem
+  @@index([vehicleId, kmSupply, date]) 
+}
+
+// ===============================================
+// 🚛 SERVIÇOS MOTORIZADOS
+// ===============================================
+// Sistema de relatórios de serviços motorizados
+// Integrado ao frontend: MotorizedServiceReportPage
+// ===============================================
+
+model MotorizedService {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS (CONFORME FRONTEND)
+  // ===============================================
+
+  // Data do serviço
+  talaoNumber Int      @default(autoincrement()) // Formato: "001", "002", etc.
+  date        DateTime // Data do serviço
+
+  // Quilometragem
+  kmInitial  Int // Km inicial
+  kmFinal    Int // Km final
+  kmTraveled Int // Km percorrido (calculado)
+
+  // Combustível
+  fuel FuelLevel //1, 0.5, 0 Combustível tanque cheio , meio tanque ou vazio
+
+  // Horários
+  timeInitial String // Hora inicial (HH:MM)
+  timeFinal   String // Hora final (HH:MM)
+
+  // Dados operacionais
+  workShift    WorkShift // Turno 
+  post         Post      @relation("PostMotorizedServices", fields: [postId], references: [id])
+  streetPatrol String? // Rua/Ronda
+  postId       String // Rua/Ronda
+
+  // Ocorrência
+  occurrence        String // Ocorrência (ocorrência, apoio, portaria)
+  vehicleInspection String // Vistoria do veículo
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy
+  company   Company @relation("CompanyMotorizedServices", fields: [companyId], references: [id])
+  companyId String
+
+  // Veículo utilizado
+  vehicle   Vehicle @relation("VehicleMotorizedServices", fields: [vehicleId], references: [id])
+  vehicleId String
+
+  // Relacionamento com turno 
+  shift   Shift  @relation("ShiftMotorizedServices", fields: [shiftId], references: [id])
+  shiftId String
+
+  // Usuário responsável
+  user         User   @relation("UserMotorizedServices", fields: [userId], references: [id])
+  userId       String // motorista
+  supervisor   User   @relation("SupervisorMotorizedServices", fields: [supervisorId], references: [id])
+  supervisorId String // supervisor
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("MotorizedServiceReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
+  @@index([vehicleId])
+  @@index([userId])
+  @@index([date])
+  @@index([deletedAt])
+  @@index([createdAt])
+  // Índice para busca por quilometragem
+  @@index([vehicleId, kmInitial, kmFinal])
+}
+
+// ===============================================
+// 📋 LOGS DE EVENTOS
+// ===============================================
+// Sistema de auditoria e logs de eventos
+// Mantendo compatibilidade com sistema existente
+// ===============================================
+
+model EventLog {
+  id        String   @id @default(cuid())
+  
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS
+  // ===============================================
+  
+  // Tipo de evento
+  type      String   // PANIC, NOTE, PHOTO, SHIFT_START, SHIFT_END, ROUND_START, etc.
+  
+  // Detalhes do evento
+  details   String?  // Descrição detalhada
+  
+  // Mídia associada
+  media     String?  // Caminho para arquivo de mídia
+  
+  // ===============================================
+  // 🔗 RELACIONAMENTOS
+  // ===============================================
+  
+  // Multi-tenancy
+  company   Company  @relation("CompanyEventLogs", fields: [companyId], references: [id])
+  companyId String
+  
+  // Posto onde ocorreu
+  post      Post     @relation("PostEventLogs", fields: [postId], references: [id])
+  postId    String
+  
+  // Usuário responsável (opcional)
+  user      User?    @relation("UserEventLogs", fields: [userId], references: [id])
+  userId    String?
+  
+  // ===============================================
+  // 📊 DADOS ADICIONAIS
+  // ===============================================
+  
+  // Localização GPS
+  latitude  Float?   // Coordenada GPS
+  longitude Float?   // Coordenada GPS
+  
+  // Metadados
+  metadata  Json?    // Dados adicionais em JSON
+  
+  // Severidade do evento
+  severity  String?  // LOW, MEDIUM, HIGH, CRITICAL
+  
+  // Status do evento
+  status    String   @default("ACTIVE") // ACTIVE, RESOLVED, ARCHIVED
+  
+  // ===============================================
+  // 📊 AUDITORIA
+  // ===============================================
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // ===============================================
+  // 📊 ÍNDICES
+  // ===============================================
+  
+  @@index([companyId])
+  @@index([postId])
+  @@index([userId])
+  @@index([type])
+  @@index([status])
+  @@index([severity])
+  @@index([createdAt])
+}
+
+// ===============================================
+// 🚨 EVENTOS DE PÂNICO
+// ===============================================
+// Sistema de botão de pânico para moradores
+// Mantendo compatibilidade com sistema existente
+// ===============================================
+
 model PanicEvent {
   id         String   @id @default(cuid())
-  resident   User     @relation(fields: [residentId], references: [id])
-  residentId String
-  post       Post     @relation(fields: [postId], references: [id])
-  postId     String
+  
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS
+  // ===============================================
+  
+  // Data e hora do evento
   dateTime   DateTime @default(now())
-  status     String // open, attended, resolved
+  
+  // Status do atendimento
+  status     String   // OPEN, ATTENDED, RESOLVED
+  
+  // ===============================================
+  // 🔗 RELACIONAMENTOS
+  // ===============================================
+  
+  // Morador que acionou o pânico
+  resident   User     @relation("UserPanicEvents", fields: [residentId], references: [id])
+  residentId String
+  
+  // Posto relacionado
+  post       Post     @relation("PostPanicEvents", fields: [postId], references: [id])
+  postId     String
+  
+  // Multi-tenancy
+  company    Company  @relation("CompanyPanicEvents", fields: [companyId], references: [id])
+  companyId  String
+  
+  // ===============================================
+  // 📊 DADOS ADICIONAIS
+  // ===============================================
+  
+  // Localização GPS do evento
+  latitude   Float?   // Coordenada GPS
+  longitude  Float?   // Coordenada GPS
+  
+  // Detalhes do evento
+  description String? // Descrição do evento
+  notes      String?  // Observações
+  
+  // Atendimento
+  attendedBy String?  // ID de quem atendeu
+  attendedAt DateTime? // Quando foi atendido
+  
+  // Resolução
+  resolvedBy String?  // ID de quem resolveu
+  resolvedAt DateTime? // Quando foi resolvido
+  resolution String?  // Descrição da resolução
+  
+  // ===============================================
+  // 📊 AUDITORIA
+  // ===============================================
+  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-
+  
+  // ===============================================
+  // 📊 ÍNDICES
+  // ===============================================
+  
+  @@index([companyId])
   @@index([residentId])
   @@index([postId])
   @@index([status])
   @@index([dateTime])
+  @@index([createdAt])
 }
-
-// Other tables for reports, dashboards, etc, can be added as needed 

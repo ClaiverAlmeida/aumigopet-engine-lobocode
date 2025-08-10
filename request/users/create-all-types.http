@@ -19,7 +19,7 @@ Content-Type: application/json
     #   "login": "postresident.empresa",
     # "login": "hr.empresa@user.com",
 
-    "password": "SystemAdmin123@Senha"
+    "password": "SystemAdmin123@Senha",
     # "password": "SystemAdmin@Senha"
 }
 

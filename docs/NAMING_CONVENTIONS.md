@@ -1,4 +1,4 @@
-# 🏷️ Convenções de Nomenclatura - iFraseg Engine
+# 🏷️ Convenções de Nomenclatura - INFRASEG Engine
 
 ## 🎯 Resumo Executivo
 
@@ -384,4 +384,4 @@ updateUserData() // Deveria ser updateUser()
 
 **Última atualização**: Dezembro 2024  
 **Versão**: 1.0  
-**Responsável**: Equipe de Desenvolvimento iFraseg
+**Responsável**: Equipe de Desenvolvimento INFRASEG

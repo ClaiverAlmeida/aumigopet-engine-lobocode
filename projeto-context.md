@@ -1,4 +1,4 @@
-# 🏢 Contexto Completo do Projeto - iFraseg Engine
+# 🏢 Contexto Completo do Projeto - INFRASEG Engine
 
 ## 📋 Informações Essenciais
 
@@ -20,7 +20,7 @@
 ### **Variáveis de Ambiente Obrigatórias**
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/ifraseg"
+DATABASE_URL="postgresql://user:password@localhost:5432/infraseg"
 
 # Auth
 JWT_SECRET="your-jwt-secret-key"
@@ -219,7 +219,7 @@ export class RoundNotFoundErrorFilter extends BaseExceptionFilter implements Exc
 // SYSTEM_ADMIN
 {
   name: "Admin Sistema",
-  email: "admin@ifraseg.com",
+  email: "admin@infraseg.com",
   role: "SYSTEM_ADMIN",
   companyId: null // Global
 }

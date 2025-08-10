@@ -1,4 +1,4 @@
-# 📋 Resumo Executivo - Estratégia Completa iFraseg Engine
+# 📋 Resumo Executivo - Estratégia Completa INFRASEG Engine
 
 ## 🎯 **Objetivo Alcançado**
 
@@ -104,12 +104,12 @@ desativar(id)              // Soft delete
 
 - "Seguindo as regras do projeto"
 - "Conforme estabelecido no `.cursor/rules/nestjs-rules.mdc`"
-- "Aplicando os padrões do iFraseg Engine"
+- "Aplicando os padrões do INFRASEG Engine"
 
 ### **Exemplo de início:**
 
 ```
-"Vou trabalhar no projeto iFraseg Engine **seguindo as regras do projeto**, 
+"Vou trabalhar no projeto INFRASEG Engine **seguindo as regras do projeto**, 
 aplicando a arquitetura Repository → Validator → Factory → Service → Controller 
 e usando nomenclatura em português para métodos."
 ```

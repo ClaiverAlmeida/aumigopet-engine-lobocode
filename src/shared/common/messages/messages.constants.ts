@@ -23,12 +23,14 @@ export const VALIDATION_MESSAGES = {
     EMAIL_INVALID: 'Email inválido',
     PASSWORD_WEAK: 'A senha deve ter pelo menos 8 caracteres, incluindo uma letra maiúscula, uma minúscula, um número e um caractere especial',
     CPF_INVALID: 'CPF inválido',
+    CNPJ_INVALID: 'CNPJ inválido',
     PHONE_INVALID: 'Telefone deve estar no formato brasileiro: (XX) XXXXX-XXXX',
     UUID_INVALID: 'ID inválido',
     FIELD_INVALID: 'Campo deve ser uma string',
     BOOLEAN_INVALID: 'Valor deve ser um booleano',
     SLUG_INVALID: 'Slug pode conter apenas letras minúsculas, números e hífens',
     ENUM_INVALID: 'Valor inválido para o enum',
+    URL_INVALID: 'URL inválida',
   },
 
   // Validações de unicidade

@@ -44,7 +44,7 @@ export class UserValidator {
   }
 
   async validarSeCompanyExiste(companyId: string) {
-    await this.companiesService.validateExists(companyId);
+    await this.companiesService.validarExistencia(companyId);
   }
 
   async validarSePostPertenceACompany(postId: string, companyId: string) {
@@ -60,7 +60,8 @@ export class UserValidator {
   }
 
   async validarSeUserPodeSerDeletado(id: string) {
-    const userWithRelations = await this.userRepository.buscarUserComRelations(id);
+    const userWithRelations =
+      await this.userRepository.buscarUserComRelations(id);
 
     if (
       userWithRelations &&

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para Remover Recursos de Monitoramento - iFraseg
+# Script para Remover Recursos de Monitoramento - INFRASEG
 # Use este script para reduzir custos removendo monitoramento avançado
 
 set -e
@@ -44,11 +44,11 @@ rm -f src/shared/common/middleware/rate-limit.middleware.ts
 # Criar docker-compose mínimo
 echo "📝 Criando docker-compose mínimo..."
 cat > docker-compose.minimal.yml << 'EOF'
-# Docker Compose Mínimo - iFraseg
+# Docker Compose Mínimo - INFRASEG
 services:
   backend:
-    image: ifraseg-backend:latest
-    container_name: ifraseg-backend
+    image: infraseg-backend:latest
+    container_name: infraseg-backend
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@db:5432/${DB_NAME}
@@ -75,7 +75,7 @@ services:
 
   db:
     image: postgres:16.8-alpine3.20
-    container_name: ifraseg-db
+    container_name: infraseg-db
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -91,7 +91,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: ifraseg-redis
+    container_name: infraseg-redis
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     volumes:
       - redis_data:/data
