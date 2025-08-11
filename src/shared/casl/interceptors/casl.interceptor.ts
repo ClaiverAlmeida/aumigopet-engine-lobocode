@@ -14,6 +14,7 @@ import {
   CaslActionMetadata,
 } from '../decorators/casl.decorator';
 import { ERROR_MESSAGES } from '../../common/messages';
+import { EntityNameCasl } from 'src/shared/universal/types';
 
 @Injectable()
 export class CaslInterceptor implements NestInterceptor {
@@ -61,7 +62,7 @@ export class CaslInterceptor implements NestInterceptor {
     for (const action of actionsArray) {
       try {
         // Validação básica de ação
-        this.caslService.validarAction(action.action, action.subject);
+        this.caslService.validarAction(action.action, action.subject as EntityNameCasl);
 
         // Se há campos específicos, validar também
         if (action.fields && action.fields.length > 0) {
@@ -76,7 +77,7 @@ export class CaslInterceptor implements NestInterceptor {
               return acc;
             }, {} as any);
             
-            this.caslService.validarPermissaoDeCampo(action.subject, updateData);
+            this.caslService.validarPermissaoDeCampo(action.subject as EntityNameCasl, updateData);
           }
         }
       } catch (error) {
@@ -103,7 +104,7 @@ export class CaslInterceptor implements NestInterceptor {
       }, {} as any);
 
       try {
-        this.caslService.validarPermissaoDeCampo(fields.subject, updateData);
+        this.caslService.validarPermissaoDeCampo(fields.subject as EntityNameCasl, updateData);
       } catch (error) {
         throw new ForbiddenException(
           ERROR_MESSAGES.AUTHORIZATION.RESOURCE_ACCESS_DENIED,

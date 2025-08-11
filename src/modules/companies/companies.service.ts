@@ -1,48 +1,59 @@
-import { Injectable } from '@nestjs/common';
-import { UniversalRepository } from '../../shared/repositories/universal.repository';
-import { UniversalService } from '../../shared/services/universal.service';
+import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+import {
+  UniversalService,
+  UniversalRepository,
+  UniversalAuditService,
+} from '../../shared/universal/index';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { ConflictError } from '../../shared/common/errors';
+import { UniversalQueryService } from 'src/shared/universal/services/query.service';
+import { UniversalPermissionService } from 'src/shared/universal/services/permission.service';
+// ✨ Importar helper de mapeamento automático
+import { createEntityConfig } from '../../shared/universal/types';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class CompaniesService extends UniversalService {
-  constructor(repository: UniversalRepository) {
-    super(repository, 'company');
+  private static readonly entityConfig = createEntityConfig('company');
+
+  constructor(
+    repository: UniversalRepository,
+    queryService: UniversalQueryService,
+    permissionService: UniversalPermissionService,
+    auditService: UniversalAuditService,
+    @Optional() @Inject(REQUEST) request: any,
+  ) {
+    const { model, casl } = CompaniesService.entityConfig;
+    super(
+      repository,
+      queryService,
+      permissionService,
+      auditService,
+      request,
+      model,
+      casl,
+    );
   }
 
-  // 🔄 Sobrescrever método criar para validar CNPJ
-  async criar(createCompanyDto: CreateCompanyDto) {
-    // Validar se CNPJ já existe
+  protected async beforeCreate(data: CreateCompanyDto): Promise<void> {
+    if (data.cnpj) await this.validarCNPJ(data.cnpj);
+  }
+
+  protected async beforeUpdate(
+    id: string,
+    data: UpdateCompanyDto,
+  ): Promise<void> {
+    if (data.cnpj) await this.validarCNPJ(data.cnpj);
+  }
+
+  private async validarCNPJ(cnpj: string): Promise<void> {
     const existingCompany = await this.repository.buscarPrimeiro(
       this.entityName,
-      { cnpj: createCompanyDto.cnpj },
+      { cnpj },
     );
     if (existingCompany) {
       throw new ConflictError('CNPJ já está em uso');
     }
-
-    return super.criar(createCompanyDto);
-  }
-
-  // 🔄 Sobrescrever método atualizar para validar CNPJ
-  async atualizar(id: string, updateCompanyDto: UpdateCompanyDto) {
-    // Se está atualizando CNPJ, validar se não existe outro com mesmo CNPJ
-    if (updateCompanyDto.cnpj) {
-      const existingCompany = await this.repository.buscarPrimeiro(
-        this.entityName,
-        { cnpj: updateCompanyDto.cnpj },
-      );
-      if (existingCompany && existingCompany.id !== id) {
-        throw new ConflictError('CNPJ já está em uso');
-      }
-    }
-
-    return super.atualizar(id, updateCompanyDto);
-  }
-
-  // 💡 Métodos específicos de Company
-  async buscarPorCNPJ(cnpj: string) {
-    return this.repository.buscarPrimeiro(this.entityName, { cnpj });
   }
 }

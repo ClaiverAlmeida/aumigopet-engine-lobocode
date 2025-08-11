@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CaslService } from '../casl.service';
 import { CrudAction } from '../casl.service';
 import { Roles, User } from '@prisma/client';
+import { EntityNameCasl } from 'src/shared/universal/types';
 
 export interface PermissionContext {
   user: User;
@@ -46,7 +47,7 @@ export class PermissionContextService {
     // Validação básica CASL
     const basicValidation = this.caslService.validarAction(
       permission.action,
-      permission.subject,
+      permission.subject as EntityNameCasl,
     );
 
     if (!basicValidation) {

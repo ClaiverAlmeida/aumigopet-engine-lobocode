@@ -23,8 +23,7 @@ import { SoftDeleteInterceptor } from './shared/interceptors/soft-delete.interce
 import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
 
 // modules globais
-import { RepositoriesModule } from './shared/repositories/repositories.module';
-import { ServicesModule } from './shared/services/index';
+import { UniversalModule } from './shared/universal/universal.module'; 
 
 import {
   HttpExceptionFilter,
@@ -47,15 +46,14 @@ import {
     }),
     LoggerModule,
     MessagesModule,
-    RepositoriesModule,
-    ServicesModule,
-    PrometheusModule.register(),
-    UsersModule,
     PrismaModule,
-    AuthModule,
-    CompaniesModule,
     CaslModule,
     TenantModule,
+    UniversalModule, 
+    PrometheusModule.register(),
+    UsersModule,
+    AuthModule,
+    CompaniesModule,
   ],
   controllers: [AppController],
   providers: [

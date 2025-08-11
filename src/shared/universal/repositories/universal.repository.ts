@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { PrismaService } from '../../prisma/prisma.service';
+import { EntityNameModel } from '../types';
 
 @Injectable()
 export class UniversalRepository {
@@ -8,15 +9,15 @@ export class UniversalRepository {
   /**
    * Repository universal que funciona para qualquer entidade
    */
-  private buscarEntidade(entityName: string) {
-    return this.prisma[entityName];
+  private buscarEntidade(entityName: EntityNameModel) {
+    return this.prisma[entityName] as any;
   }
 
   /**
    * Buscar múltiplos registros
    */
   async buscarMuitos(
-    entityName: string,
+    entityName: EntityNameModel,
     where?: any,
     options?: { skip?: number; take?: number; orderBy?: any },
     include?: any,
@@ -34,7 +35,7 @@ export class UniversalRepository {
    * Buscar com paginação
    */
   async buscarComPaginacao(
-    entityName: string,
+    entityName: EntityNameModel,
     where?: any,
     page: number = 1,
     limit: number = 10,
@@ -66,7 +67,7 @@ export class UniversalRepository {
    * Buscar registro único
    */
   async buscarUnico(
-    entityName: string,
+    entityName: EntityNameModel,
     where: any,
     include?: any,
   ): Promise<any | null> {
@@ -80,7 +81,7 @@ export class UniversalRepository {
    * Buscar primeiro registro que atenda aos critérios
    */
   async buscarPrimeiro(
-    entityName: string,
+    entityName: EntityNameModel,
     where: any,
     include?: any,
   ): Promise<any | null> {
@@ -89,11 +90,14 @@ export class UniversalRepository {
       include,
     });
   }
-
   /**
    * Criar novo registro
    */
-  async criar(entityName: string, data: any, include?: any): Promise<any> {
+  async criar(
+    entityName: EntityNameModel,
+    data: any,
+    include?: any,
+  ): Promise<any> {
     return this.buscarEntidade(entityName).create({
       data,
       include,
@@ -104,7 +108,7 @@ export class UniversalRepository {
    * Atualizar registro existente
    */
   async atualizar(
-    entityName: string,
+    entityName: EntityNameModel,
     where: any,
     data: any,
     include?: any,
@@ -119,7 +123,7 @@ export class UniversalRepository {
   /**
    * Deletar registro
    */
-  async deletar(entityName: string, where: any): Promise<any> {
+  async deletar(entityName: EntityNameModel, where: any): Promise<any> {
     return this.buscarEntidade(entityName).delete({
       where,
     });
@@ -128,14 +132,14 @@ export class UniversalRepository {
   /**
    * Contar registros
    */
-  async contarTodos(entityName: string, where?: any): Promise<number> {
+  async contarTodos(entityName: EntityNameModel, where?: any): Promise<number> {
     return this.buscarEntidade(entityName).count({ where });
   }
 
   /**
    * Verificar se existe
    */
-  async existe(entityName: string, where: any): Promise<boolean> {
+  async existe(entityName: EntityNameModel, where: any): Promise<boolean> {
     const count = await this.contarTodos(entityName, where);
     return count > 0;
   }
@@ -143,7 +147,7 @@ export class UniversalRepository {
   /**
    * Soft delete (se a entidade tiver deletedAt)
    */
-  async desativar(entityName: string, where: any): Promise<any> {
+  async desativar(entityName: EntityNameModel, where: any): Promise<any> {
     return this.buscarEntidade(entityName).update({
       where,
       data: { deletedAt: new Date() },
@@ -153,7 +157,7 @@ export class UniversalRepository {
   /**
    * Restaurar soft delete
    */
-  async reativar(entityName: string, where: any): Promise<any> {
+  async reativar(entityName: EntityNameModel, where: any): Promise<any> {
     return this.buscarEntidade(entityName).update({
       where,
       data: { deletedAt: null },
@@ -164,7 +168,7 @@ export class UniversalRepository {
    * Upsert - criar ou atualizar
    */
   async upsert(
-    entityName: string,
+    entityName: EntityNameModel,
     where: any,
     create: any,
     update: any,
@@ -181,7 +185,7 @@ export class UniversalRepository {
   /**
    * Deletar muitos
    */
-  async deletarMuitos(entityName: string, where: any): Promise<any> {
+  async deletarMuitos(entityName: EntityNameModel, where: any): Promise<any> {
     return this.buscarEntidade(entityName).deleteMany({
       where,
     });

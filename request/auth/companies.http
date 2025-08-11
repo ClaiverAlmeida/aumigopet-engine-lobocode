@@ -1,5 +1,6 @@
 @baseUrl = http://localhost:3000
 @token = {{ platformAdminLogin.response.body.access_token }}
+@adminToken = {{ adminLogin.response.body.access_token }}
 
 ### Login SYSTEM_ADMIN (necessário para acessar companies)
 # @name platformAdminLogin
@@ -7,74 +8,13 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-     "login": "System Admin Claiver", 
+    "login": "System Admin Claiver", 
     #   "login": "admin.empresA",
     #   "login": "hr.empresa",
     "password": "SystemAdmin@Senha"
 }
 
-
-### ========================================
-### COMPANIES - SYSTEM_ADMIN
-### ========================================
-
-### Listar todas as empresas (com paginação)
-GET {{baseUrl}}/companies
-Authorization: Bearer {{token}}
-
-### Listar todas as empresas
-GET {{baseUrl}}/companies/all
-Authorization: Bearer {{token}}
-
-### Buscar empresa específica
-GET {{baseUrl}}/companies/cmco084kk0000lt96pxlqot9s
-Authorization: Bearer {{token}}
-
-### Criar nova empresa
-POST {{baseUrl}}/companies
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{ 
-    "name": "Empresa Exemplo", 
-    "cnpj": "81.811.213/0001-03",
-    "website": "https://www.empresa.com",
-    "address": "Rua Exemplo, 123, São Paulo - SP",
-    "country": "Brasil",
-    "contactName": "Contato Exemplo",
-    "contactEmail": "contato@empresa.com",
-    "contactPhone": "(11) 99999-9299"
-}
-
-### Atualizar empresa
-PATCH {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf
-Content-Type: application/json
-Authorization: Bearer {{token}}
-
-{
-    "name": "Empresa Exemplo", 
-    "cnpj": "81.811.213/0001-03",
-    "website": "https://www.empresa.com",
-    "address": "Rua Exemplo, 123, São Paulo - SP",
-    "country": "Brasil",
-    "contactName": "Contato Exemplo",
-    "contactEmail": "contato@empresa.com",
-    "contactPhone": "(11) 99999-9299"
-}
-
-### Deletar empresa
-DELETE {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf
-Authorization: Bearer {{token}}
-
-### Restaurar empresa deletada
-POST {{baseUrl}}/companies/cme61n51c0000lt62w7k6xkxf/restore
-Authorization: Bearer {{token}}
-
-### ========================================
-### TESTES DE SEGURANÇA - COMPANIES
-### ========================================
-
-### ❌ TENTATIVA: ADMIN tentando acessar companies (deve falhar)
+### Login ADMIN (para testes de métricas/auditoria)
 # @name adminLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -84,10 +24,206 @@ Content-Type: application/json
     "password": "SystemAdmin123@Senha"
 }
 
-GET {{baseUrl}}/companies
-Authorization: Bearer {{adminLogin.response.body.access_token}}
+### ========================================
+### 📋 COMPANIES - CRUD BÁSICO
+### ========================================
 
-### ❌ TENTATIVA: HR tentando acessar companies (deve falhar)
+### 📖 Listar todas as empresas (com paginação)
+GET {{baseUrl}}/companies?page=2&limit=2
+Authorization: Bearer {{token}}
+
+### 📖 Listar todas as empresas
+GET {{baseUrl}}/companies/all
+Authorization: Bearer {{token}}
+
+### 📖 Buscar empresa específica por ID
+GET {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+Authorization: Bearer {{token}}
+
+### ✏️ Criar nova empresa
+POST {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{ 
+    "name": "TechCorp Ltda", 
+    "cnpj": "52.551.851/0001-26",
+    "website": "https://www.techcorp.com",
+    "address": "Rua das Inovações, 123, São Paulo - SP",
+    "country": "Brasil",
+    "contactName": "João Silva",
+    "contactEmail": "joao@techcorp.com",
+    "contactPhone": "(11) 99999-9299"
+}
+
+### ✏️ Atualizar empresa
+PATCH {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "TechCorp SA2",  
+    "website": "https://www.newtechcorp.com",
+    "contactEmail": "contato@newtechcorp.com"
+}
+
+### ❌ Deletar empresa (soft delete)
+DELETE {{baseUrl}}/companies/cme61gmki0000ltjlv2w2jf6f
+Authorization: Bearer {{token}}
+
+### ♻️ Restaurar empresa deletada
+POST {{baseUrl}}/companies/cme61gmki0000ltjlv2w2jf6f/restore
+Authorization: Bearer {{token}}
+
+### ========================================
+### 🔍 COMPANIES - BUSCA ESPECIALIZADA
+### ========================================
+
+### 🔍 Buscar empresa por CNPJ
+GET {{baseUrl}}/companies/search/cnpj/81.811.213/0001-03
+Authorization: Bearer {{token}}
+
+### 🔍 Buscar empresas por nome
+GET {{baseUrl}}/companies/search/name?name=TechCorp Ltda
+Authorization: Bearer {{token}}
+
+### 🔍 Buscar empresas por nome (parcial)
+GET {{baseUrl}}/companies/search/name?name=Tech
+Authorization: Bearer {{token}}
+
+### ========================================
+### 📊 COMPANIES - AUDITORIA E MÉTRICAS
+### ========================================
+
+### 📈 Métricas gerais de empresas
+GET {{baseUrl}}/companies/metrics
+Authorization: Bearer {{token}}
+
+### 📈 Métricas com filtro de período
+GET {{baseUrl}}/companies/metrics?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{token}}
+
+### 📈 Métricas por usuário específico
+GET {{baseUrl}}/companies/metrics?userId=user-uuid-123
+Authorization: Bearer {{token}}
+
+### 📈 Métricas por ação específica
+GET {{baseUrl}}/companies/metrics?action=create
+Authorization: Bearer {{token}}
+
+### 📈 Métricas com múltiplos filtros
+GET {{baseUrl}}/companies/metrics?startDate=2024-01-01&endDate=2024-12-31&action=create&userId=user-uuid-123
+Authorization: Bearer {{token}}
+
+### 📋 Logs de auditoria básicos
+GET {{baseUrl}}/companies/logs
+Authorization: Bearer {{token}}
+
+### 📋 Logs com limite específico
+GET {{baseUrl}}/companies/logs?limit=50
+Authorization: Bearer {{token}}
+
+### 📋 Logs por período
+GET {{baseUrl}}/companies/logs?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{token}}
+
+### 📋 Logs por usuário
+GET {{baseUrl}}/companies/logs?userId=user-uuid-123
+Authorization: Bearer {{token}}
+
+### 📋 Logs por ação
+GET {{baseUrl}}/companies/logs?action=create
+Authorization: Bearer {{token}}
+
+### 📋 Logs apenas de sucessos
+GET {{baseUrl}}/companies/logs?success=true
+Authorization: Bearer {{token}}
+
+### 📋 Logs apenas de falhas
+GET {{baseUrl}}/companies/logs?success=false
+Authorization: Bearer {{token}}
+
+### 📋 Logs com múltiplos filtros
+GET {{baseUrl}}/companies/logs?limit=100&startDate=2024-01-01&userId=user-uuid-123&action=create&success=true
+Authorization: Bearer {{token}}
+
+### ❌ Logs específicos de falhas
+GET {{baseUrl}}/companies/logs/failures
+Authorization: Bearer {{token}}
+
+### ❌ Logs de falhas com limite
+GET {{baseUrl}}/companies/logs/failures?limit=25
+Authorization: Bearer {{token}}
+
+### ❌ Logs de falhas por período
+GET {{baseUrl}}/companies/logs/failures?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{token}}
+
+### 📊 Estatísticas de uso da entidade
+GET {{baseUrl}}/companies/analytics/usage
+Authorization: Bearer {{token}}
+
+### 📊 Estatísticas por período
+GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{token}}
+
+### ========================================
+### 📤 COMPANIES - EXPORTAÇÃO (SYSTEM_ADMIN ONLY)
+### ========================================
+
+### 📤 Exportar logs em JSON
+GET {{baseUrl}}/companies/export/logs?format=json
+Authorization: Bearer {{token}}
+
+### 📤 Exportar logs em CSV
+GET {{baseUrl}}/companies/export/logs?format=csv
+Authorization: Bearer {{token}}
+
+### 📤 Exportar logs filtrados em CSV
+GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31
+Authorization: Bearer {{token}}
+
+### 📤 Exportar apenas falhas em CSV
+GET {{baseUrl}}/companies/export/logs?format=csv&success=false
+Authorization: Bearer {{token}}
+
+### 📤 Exportar logs por usuário em JSON
+GET {{baseUrl}}/companies/export/logs?format=json&userId=user-uuid-123
+Authorization: Bearer {{token}}
+
+### 📤 Exportar logs por ação em CSV
+GET {{baseUrl}}/companies/export/logs?format=csv&action=create
+Authorization: Bearer {{token}}
+
+### 📤 Exportar logs com todos os filtros
+GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31&userId=user-uuid-123&action=create&success=true
+Authorization: Bearer {{token}}
+
+### ========================================
+### 🔐 TESTES DE PERMISSÃO - ADMIN (PODE ACESSAR MÉTRICAS)
+### ========================================
+
+### ✅ ADMIN acessando métricas (deve funcionar)
+GET {{baseUrl}}/companies/metrics
+Authorization: Bearer {{adminToken}}
+
+### ✅ ADMIN acessando logs (deve funcionar)
+GET {{baseUrl}}/companies/logs
+Authorization: Bearer {{adminToken}}
+
+### ✅ ADMIN acessando análises (deve funcionar)
+GET {{baseUrl}}/companies/analytics/usage
+Authorization: Bearer {{adminToken}}
+
+### ❌ ADMIN tentando exportar (deve falhar - só SYSTEM_ADMIN)
+GET {{baseUrl}}/companies/export/logs?format=csv
+Authorization: Bearer {{adminToken}}
+
+### ========================================
+### 🔐 TESTES DE SEGURANÇA - OUTROS ROLES
+### ========================================
+
+### Login HR (para teste de negação)
 # @name hrLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
@@ -97,5 +233,136 @@ Content-Type: application/json
     "password": "SystemAdmin123@Senha"
 }
 
+### ❌ HR tentando acessar métricas (deve falhar)
+GET {{baseUrl}}/companies/metrics
+Authorization: Bearer {{hrLogin.response.body.access_token}}
+
+### ❌ HR tentando acessar logs (deve falhar)
+GET {{baseUrl}}/companies/logs
+Authorization: Bearer {{hrLogin.response.body.access_token}}
+
+### ❌ HR tentando exportar (deve falhar)
+GET {{baseUrl}}/companies/export/logs
+Authorization: Bearer {{hrLogin.response.body.access_token}}
+
+### ✅ HR acessando busca (deve funcionar)
+GET {{baseUrl}}/companies/search/name?name=TechCorp
+Authorization: Bearer {{hrLogin.response.body.access_token}}
+
+### ========================================
+### 🧪 TESTES DE VALIDAÇÃO E ERROS
+### ========================================
+
+### ❌ Buscar empresa inexistente
+GET {{baseUrl}}/companies/uuid-inexistente-123
+Authorization: Bearer {{token}}
+
+### ❌ Buscar por CNPJ inexistente
+GET {{baseUrl}}/companies/search/cnpj/00000000000000
+Authorization: Bearer {{token}}
+
+### ❌ Buscar por nome sem parâmetro (deve falhar)
+GET {{baseUrl}}/companies/search/name
+Authorization: Bearer {{token}}
+
+### ❌ Criar empresa com CNPJ inválido
+POST {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Empresa Teste",
+    "cnpj": "123456789", 
+    "contactEmail": "teste@empresa.com"
+}
+
+### ❌ Criar empresa com CNPJ duplicado
+POST {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Outra Empresa",
+    "cnpj": "81.811.213/0001-03", 
+    "contactEmail": "outra@empresa.com"
+}
+
+### ❌ Criar empresa sem dados obrigatórios
+POST {{baseUrl}}/companies
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "website": "https://www.empresa.com"
+}
+
+### ❌ Acessar sem token
 GET {{baseUrl}}/companies
-Authorization: Bearer {{hrLogin.response.body.access_token}} 
+
+### ❌ Acessar com token inválido
+GET {{baseUrl}}/companies
+Authorization: Bearer token-invalido-123
+
+### ========================================
+### 📊 TESTES DE FILTROS AVANÇADOS
+### ========================================
+
+### 📊 Métricas dos últimos 7 dias
+GET {{baseUrl}}/companies/metrics?startDate=2024-01-15&endDate=2024-01-22
+Authorization: Bearer {{token}}
+
+### 📊 Logs dos últimos 30 dias
+GET {{baseUrl}}/companies/logs?startDate=2024-01-01&endDate=2024-01-31&limit=200
+Authorization: Bearer {{token}}
+
+### 📊 Análise de uso mensal
+GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+### 📊 Exportação trimestral
+GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-03-31
+Authorization: Bearer {{token}}
+
+### ========================================
+### 🎯 TESTES DE CENÁRIOS REAIS
+### ========================================
+
+### 🎯 Cenário 1: Administrador verificando atividade suspeita
+# 1. Ver métricas gerais
+GET {{baseUrl}}/companies/metrics
+Authorization: Bearer {{token}}
+
+# 2. Ver logs de falhas
+GET {{baseUrl}}/companies/logs/failures?limit=50
+Authorization: Bearer {{token}}
+
+# 3. Exportar para análise
+GET {{baseUrl}}/companies/export/logs?format=csv&success=false&startDate=2024-01-01
+Authorization: Bearer {{token}}
+
+### 🎯 Cenário 2: Auditoria mensal
+# 1. Estatísticas do mês
+GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+# 2. Relatório completo
+GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-01-31
+Authorization: Bearer {{token}}
+
+### 🎯 Cenário 3: Busca operacional
+# 1. Buscar empresa por CNPJ
+GET {{baseUrl}}/companies/search/cnpj/81.811.213/0001-03
+Authorization: Bearer {{token}}
+
+# 2. Ver detalhes
+GET {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+Authorization: Bearer {{token}}
+
+# 3. Atualizar dados
+PATCH {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "contactPhone": "(11) 99999-0000"
+}

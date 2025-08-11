@@ -1,16 +1,23 @@
+import { Inject, Optional } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
 import { NotFoundError } from '../../common/errors';
 import { SUCCESS_MESSAGES } from '../../common/messages';
 import { UniversalQueryService } from './query.service';
 import { UniversalRepository } from '../repositories/universal.repository';
 import { UniversalPermissionService } from './permission.service';
+import {
+  UniversalAuditService,
+  AuditFilters,
+  UniversalMetrics,
+} from './audit.service';
 import { Roles } from '@prisma/client';
 import { EntityNameCasl, EntityNameModel } from '../types';
 
 /**
  * Serviço universal abstrato que fornece operações CRUD padronizadas
  * para todas as entidades do sistema.
- * 
- * Inclui hooks para personalização, validações automáticas, 
+ *
+ * Inclui hooks para personalização, validações automáticas,
  * permissões CASL e multi-tenancy.
  */
 export abstract class UniversalService {
@@ -21,6 +28,8 @@ export abstract class UniversalService {
     protected repository: UniversalRepository,
     protected queryService: UniversalQueryService,
     protected permissionService: UniversalPermissionService,
+    protected auditService: UniversalAuditService,
+    @Optional() @Inject(REQUEST) private request: any,
     entityNameModel: EntityNameModel,
     entityNameCasl: EntityNameCasl,
   ) {
@@ -157,6 +166,9 @@ export abstract class UniversalService {
 
     const entity = await this.repository.criar(this.entityName, data);
 
+    // Registra auditoria da operação de criação
+    await this.registrarOperacao('create', entity?.id, true);
+
     await this.afterCreate(data, entity);
 
     return entity;
@@ -183,10 +195,13 @@ export abstract class UniversalService {
     const updateData = this.prepararDadosParaUpdate(updateEntityDto);
 
     const updatedEntity = await this.repository.atualizar(
-      this.entityName, 
-      { id }, 
-      updateData
+      this.entityName,
+      { id },
+      updateData,
     );
+
+    // Registra auditoria da operação de atualização
+    await this.registrarOperacao('update', id, true, { updateData });
 
     await this.afterUpdate(id, updateData, updatedEntity);
 
@@ -212,6 +227,9 @@ export abstract class UniversalService {
     }
 
     await this.repository.desativar(this.entityName, { id });
+
+    // Registra auditoria da operação de desativação
+    await this.registrarOperacao('delete', id, true);
 
     await this.afterDelete(id);
 
@@ -240,6 +258,9 @@ export abstract class UniversalService {
 
     await this.repository.reativar(this.entityName, { id });
 
+    // Registra auditoria da operação de reativação
+    await this.registrarOperacao('create', id, true, { tipo: 'reativacao' }); // create pois está "criando" novamente
+
     await this.afterRestore(id);
 
     return {
@@ -264,6 +285,93 @@ export abstract class UniversalService {
       throw new NotFoundError(this.entityName, id, 'id');
     }
     return entity;
+  }
+
+  // ============================================================================
+  // 📊 MÉTODOS PÚBLICOS - AUDITORIA E MÉTRICAS
+  // ============================================================================
+
+  /**
+   * Obtém métricas específicas desta entidade
+   */
+  obterMetricas(
+    periodo?: { inicio: Date; fim: Date },
+    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
+  ): UniversalMetrics {
+    const filtros: AuditFilters = {
+      ...filtrosAdicionais,
+      entityName: this.entityName,
+    };
+
+    return this.auditService.obterMetricas(periodo, filtros);
+  }
+
+  /**
+   * Obtém logs específicos desta entidade
+   */
+  obterLogs(
+    limite: number = 1000,
+    periodo?: { inicio: Date; fim: Date },
+    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
+  ) {
+    return this.auditService.obterLogsPorEntidade(
+      this.entityName,
+      limite,
+      periodo,
+    );
+  }
+
+  /**
+   * Obtém logs de falhas/erros específicos desta entidade
+   */
+  obterLogsFalhas(limite: number = 500, periodo?: { inicio: Date; fim: Date }) {
+    const filtros: AuditFilters = {
+      entityName: this.entityName,
+      success: false,
+    };
+
+    return this.auditService.obterLogs(filtros, limite, periodo);
+  }
+
+  /**
+   * Exporta logs desta entidade em diferentes formatos
+   */
+  exportarLogs(
+    formato: 'json' | 'csv' = 'json',
+    periodo?: { inicio: Date; fim: Date },
+    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
+  ): string {
+    const filtros: AuditFilters = {
+      ...filtrosAdicionais,
+      entityName: this.entityName,
+    };
+
+    return this.auditService.exportarLogs(formato, filtros, periodo);
+  }
+
+  /**
+   * Obtém estatísticas de uso desta entidade
+   */
+  obterEstatisticasDeUso(periodo?: { inicio: Date; fim: Date }) {
+    const metricas = this.obterMetricas(periodo);
+    const totalRequests = metricas.totalRequests;
+    const entityRequests = metricas.requestsByEntity[this.entityName] || 0;
+    const percentualDoSistema =
+      totalRequests > 0 ? (entityRequests / totalRequests) * 100 : 0;
+
+    return {
+      totalOperacoes: entityRequests,
+      operacoesBemsucedidas: Math.round(
+        entityRequests * (metricas.successRate / 100),
+      ),
+      operacoesFalharam:
+        entityRequests -
+        Math.round(entityRequests * (metricas.successRate / 100)),
+      taxaDeSucesso: metricas.successRate,
+      percentualDoSistema,
+      acoesPopulares: metricas.requestsByAction,
+      periodo: periodo || { descricao: 'Histórico completo' },
+    };
   }
 
   // ============================================================================
@@ -292,7 +400,11 @@ export abstract class UniversalService {
    * Hook executado após a atualização
    * Sobrescreva para ações pós-atualização
    */
-  protected async afterUpdate(id: string, data: any, entity: any): Promise<void> {}
+  protected async afterUpdate(
+    id: string,
+    data: any,
+    entity: any,
+  ): Promise<void> {}
 
   /**
    * Hook executado antes da exclusão
@@ -406,5 +518,39 @@ export abstract class UniversalService {
     });
 
     return updateData;
+  }
+
+  /**
+   * Registra operação realizada na entidade para auditoria
+   */
+  private async registrarOperacao(
+    action: 'create' | 'read' | 'update' | 'delete',
+    resourceId?: string,
+    success: boolean = true,
+    context?: Record<string, any>,
+  ): Promise<void> {
+    try {
+      // Obter usuário do contexto da requisição
+      const user = this.request?.user;
+      
+      if (user) {
+        this.auditService.registrarOperacao(
+          user,
+          action,
+          this.entityName,
+          this.entityNameCasl,
+          success,
+          {
+            resourceId,
+            additionalContext: context,
+            ipAddress: this.request?.ip,
+            userAgent: this.request?.headers?.['user-agent'],
+          }
+        );
+      }
+    } catch (error) {
+      // Não interromper operação se auditoria falhar
+      console.warn(`Falha ao registrar auditoria: ${error.message}`);
+    }
   }
 }

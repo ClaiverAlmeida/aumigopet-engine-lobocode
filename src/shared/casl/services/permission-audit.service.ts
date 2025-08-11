@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { CaslService } from '../casl.service';
 import { CrudAction } from '../casl.service';
 import { User } from '@prisma/client';
+import { EntityNameCasl } from 'src/shared/universal/types';
 
 export interface PermissionAuditLog {
   userId: string;
@@ -115,7 +116,7 @@ export class PermissionAuditService {
     },
   ): boolean {
     try {
-      const success = this.caslService.validarAction(action, subject);
+      const success = this.caslService.validarAction(action, subject as EntityNameCasl);
       
       this.registrarTentativa(user, action, subject, success, context);
       

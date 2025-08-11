@@ -4,6 +4,7 @@ import { AppAbility } from './casl-ability/casl-ability.service';
 import { ForbiddenError } from '../common/errors';
 import { ERROR_MESSAGES } from '../common/messages';
 import { Roles } from '@prisma/client';
+import { EntityNameCasl } from '../universal/types';
 
 export type CrudAction = 'create' | 'read' | 'update' | 'delete';
 
@@ -18,7 +19,7 @@ export class CaslService {
   /**
    * Valida se o usuário pode realizar uma ação em uma entidade
    */
-  validarAction(action: CrudAction, entity: string): boolean {
+  validarAction(action: CrudAction, entity: EntityNameCasl): boolean {
     const ability = this.abilityService.ability;
 
     if (!ability.can(action as any, entity)) {
@@ -33,7 +34,7 @@ export class CaslService {
   /**
    * Valida permissões de campo para atualização
    */
-  validarPermissaoDeCampo(entity: string, updateData: any): boolean {
+  validarPermissaoDeCampo(entity: EntityNameCasl, updateData: any): boolean {
     const ability = this.abilityService.ability;
 
     // Verifica se tem permissão geral para update
@@ -84,7 +85,7 @@ export class CaslService {
    */
   validarPermissaoDeRole(
     action: CrudAction,
-    entity: string,
+    entity: EntityNameCasl,
     targetRole: Roles,
   ): boolean {
     const ability = this.abilityService.ability;
@@ -118,7 +119,7 @@ export class CaslService {
   /**
    * Extrai campos permitidos das regras CASL
    */
-  extrairCamposPermitidos(entity: string, action: string): string[] {
+  extrairCamposPermitidos(entity: EntityNameCasl, action: string): string[] {
     const ability = this.abilityService.ability;
     const rules = ability.rulesFor(action as any, entity);
     return this.extrairCamposPermitidosDasRules(rules);

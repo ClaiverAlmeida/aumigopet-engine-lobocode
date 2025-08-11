@@ -10,8 +10,8 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "systemadmin@user.com",
-    "password": "SystemAdmin123@Senha"
+    "login": "systemadmin@user.com",
+    "password": "SystemAdmin@Senha"
 }
 
 ### ========================================

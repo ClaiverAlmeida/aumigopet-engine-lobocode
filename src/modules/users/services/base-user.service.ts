@@ -6,9 +6,8 @@ import { UserPermissionService } from './user-permission.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
 import { Roles } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
-import { NotFoundError, ForbiddenError } from '../../../shared/common/errors';
-import { ERROR_MESSAGES, SUCCESS_MESSAGES } from '../../../shared/common/messages';
-import { Prisma } from '@prisma/client';
+import { NotFoundError } from '../../../shared/common/errors';
+import { SUCCESS_MESSAGES } from '../../../shared/common/messages';
 
 @Injectable()
 export class BaseUserService {
@@ -16,7 +15,7 @@ export class BaseUserService {
     protected readonly userRepository: UserRepository,
     protected readonly userValidator: UserValidator,
     protected readonly userQueryService: UserQueryService,
-    protected readonly userPermissionService: UserPermissionService, 
+    protected readonly userPermissionService: UserPermissionService,
     protected targetRole?: Roles,
   ) {}
 
@@ -27,7 +26,7 @@ export class BaseUserService {
   /**
    * Lista todos os usuários com paginação
    */
-  async buscarTodos(page = 1, limit  = 20) {
+  async buscarTodos(page = 1, limit = 20) {
     const whereClause = this.userQueryService.construirWhereClauseParaRead();
     const skip = (page - 1) * limit;
     const [users, total] = await Promise.all([
@@ -54,8 +53,10 @@ export class BaseUserService {
   /**
    * Busca usuário por ID
    */
-  async buscarPorId(id: string) { 
-    const whereClause = this.userQueryService.construirWhereClauseParaRead({ id });
+  async buscarPorId(id: string) {
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({
+      id,
+    });
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     this.validarResultadoDaBusca(user, 'User', 'id', id);
@@ -67,7 +68,9 @@ export class BaseUserService {
    * Busca usuário por email
    */
   async buscarUserPorEmail(email: string) {
-    const whereClause = this.userQueryService.construirWhereClauseParaRead({ email });
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({
+      email,
+    });
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     this.validarResultadoDaBusca(user, 'User', 'email', email);
@@ -79,7 +82,9 @@ export class BaseUserService {
    * Busca usuários por empresa
    */
   async buscarUsersPorCompany(companyId: string) {
-    const whereClause = this.userQueryService.construirWhereClauseParaRead({ companyId });
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({
+      companyId,
+    });
     const users = await this.userRepository.buscarMuitos(whereClause);
 
     return { data: users };
@@ -89,7 +94,8 @@ export class BaseUserService {
    * Atualiza usuário
    */
   async atualizar(id: string, updateUserDto: UpdateUserDto) {
-    const whereClause = this.userQueryService.construirWhereClauseParaUpdate(id);
+    const whereClause =
+      this.userQueryService.construirWhereClauseParaUpdate(id);
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     this.validarResultadoDaBusca(user, 'User', 'id', id);
@@ -104,7 +110,8 @@ export class BaseUserService {
    * Soft delete - marca usuário como deletado
    */
   async desativar(id: string) {
-    const whereClause = this.userQueryService.construirWhereClauseParaDelete(id);
+    const whereClause =
+      this.userQueryService.construirWhereClauseParaDelete(id);
     const user = await this.userRepository.buscarPrimeiro(whereClause);
 
     if (!user) {
@@ -126,11 +133,12 @@ export class BaseUserService {
   }
 
   /**
-   * Restaura usuário deletado (soft delete)  
+   * Restaura usuário deletado (soft delete)
    */
   async reativar(id: string) {
     // Busca usuário deletado
-    const whereClause = this.userQueryService.construirWhereClauseParaUpdate(id);
+    const whereClause =
+      this.userQueryService.construirWhereClauseParaUpdate(id);
     const user = await this.userRepository.buscarPrimeiro({
       ...whereClause,
       deletedAt: { not: null }, // Só restaura se estiver deletado
@@ -160,22 +168,14 @@ export class BaseUserService {
    * Útil para operações que precisam de contexto específico
    */
   async validarOperacaoCritica(user: any, action: CrudAction, context?: any) {
-    return this.userPermissionService.validarContextual(
-      user,
-      action,
-      context,
-    );
+    return this.userPermissionService.validarContextual(user, action, context);
   }
 
   /**
    * Validação para operações de RH com restrições de horário
    */
   async validarOperacaoRH(user: any, action: CrudAction, context?: any) {
-    return this.userPermissionService.validarOperacaoRH(
-      user,
-      action,
-      context,
-    );
+    return this.userPermissionService.validarOperacaoRH(user, action, context);
   }
 
   // ============================================================================
