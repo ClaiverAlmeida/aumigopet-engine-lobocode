@@ -9,7 +9,10 @@ export type EntityNameModel =
   | 'vehicle'
   | 'shift'
   | 'round'
-  | 'occurrence';
+  | 'occurrence'
+  | 'supply'
+  | 'motorizedService'
+  | 'vehicleChecklist';
 export type EntityNameCasl =
   | 'User'
   | 'Company'
@@ -17,7 +20,11 @@ export type EntityNameCasl =
   | 'Vehicle'
   | 'Shift'
   | 'Round'
-  | 'Occurrence';
+  | 'Occurrence'
+  | 'VehicleChecklist'
+  | 'Supply'
+  | 'MotorizedService'
+  | 'VehicleChecklist';
 
 // ============================================================================
 // 🔄 MAPEAMENTO AUTOMÁTICO MODEL ↔ CASL
@@ -30,15 +37,15 @@ export const ENTITY_MAPPING = {
   // Core entities
   user: 'User',
   company: 'Company',
-
-  // Content entities
   post: 'Post',
-
   // Operational entities
   vehicle: 'Vehicle',
   shift: 'Shift',
   round: 'Round',
   occurrence: 'Occurrence',
+  motorizedService: 'MotorizedService',
+  supply: 'Supply',
+  vehicleChecklist: 'VehicleChecklist',
 } as const;
 
 /**
@@ -52,6 +59,9 @@ export const CASL_TO_MODEL_MAPPING = {
   Shift: 'shift',
   Round: 'round',
   Occurrence: 'occurrence',
+  MotorizedService: 'motorizedService',
+  Supply: 'supply',
+  VehicleChecklist: 'vehicleChecklist',
 } as const;
 
 // ============================================================================
@@ -106,3 +116,33 @@ export function createEntityConfig(modelName: EntityNameModel) {
     casl: getCaslName(modelName),
   } as const;
 }
+
+// ============================================================================
+// 📋 INTERFACES PARA CONFIGURAÇÃO DE INCLUDES E TRANSFORMAÇÕES
+// ============================================================================
+
+export interface IncludeConfig {
+  [key: string]: boolean | {
+    select?: Record<string, boolean>;
+    include?: IncludeConfig;
+  };
+}
+
+export interface TransformConfig {
+  // Mapeia campos de relacionamento para campos planos
+  // Pode ser string simples ou objeto com configuração específica
+  flatten?: Record<string, string | { field: string; target: string }>;
+  // Função customizada de transformação
+  custom?: (data: any) => any;
+  // Remove campos específicos após transformação
+  exclude?: string[];
+}
+
+export interface EntityConfig {
+  includes?: IncludeConfig;
+  transform?: TransformConfig;
+}
+
+// ============================================================================
+// 🔧 TIPOS EXISTENTES
+// ============================================================================

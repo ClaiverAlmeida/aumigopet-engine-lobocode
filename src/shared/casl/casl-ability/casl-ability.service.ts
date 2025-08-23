@@ -62,23 +62,16 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
   ADMIN(user, { can }) {
     // Visualização total dos dados do próprio tenant
     can('read', 'all', { companyId: user.companyId });
-
-    //  CORRIGIDO: ADMIN só pode criar usuários de roles inferiores
-    can('create', 'User', {
+    can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
+    can(['create', 'update', 'delete'], 'User', {
       companyId: user.companyId,
       role: {
         in: ['SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
       },
     });
-    can('read', 'User', { companyId: user.companyId });
-
-    //  MELHORADO: ADMIN só pode atualizar usuários de roles inferiores
-    can('update', 'User', {
-      companyId: user.companyId,
-      role: {
-        in: ['SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
-      },
-    });
+    can('manage', 'Post', { companyId: user.companyId });
+    can('manage', 'Shift', { companyId: user.companyId });
+    can('manage', 'MotorizedService', { companyId: user.companyId });
 
     // Relatórios e ocorrências do posto
     can('read', 'Report', { companyId: user.companyId });
@@ -127,123 +120,76 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
   // SUPERVISOR - Supervisor de Guardas
   SUPERVISOR(user, { can }) {
     // Tudo que um Guarda faz
-    can('create', 'Shift', { companyId: user.companyId });
-    can('read', 'Shift', { companyId: user.companyId });
-    can('update', 'Shift', { companyId: user.companyId });
-
-    can('create', 'Round', { companyId: user.companyId });
-    can('read', 'Round', { companyId: user.companyId });
-    can('update', 'Round', { companyId: user.companyId });
-    can('cancel', 'Round', { companyId: user.companyId }); // Pode cancelar rondas
-
-    can('create', 'EventLog', { companyId: user.companyId });
-    can('read', 'EventLog', { companyId: user.companyId });
-    can('approve', 'EventLog', { companyId: user.companyId });
-
-    can('create', 'Report', { companyId: user.companyId });
-    can('read', 'Report', { companyId: user.companyId });
-    can('export', 'Report', { companyId: user.companyId });
-
-    can('create', 'Checklist', { companyId: user.companyId });
-    can('read', 'Checklist', { companyId: user.companyId });
-
-    //  CORRIGIDO: SUPERVISOR só pode gerenciar guardas
-    can('read', 'User', { companyId: user.companyId, role: 'GUARD' });
-    can('update', 'User', ['name', 'email', 'phone', 'address', 'status'], {
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
       companyId: user.companyId,
-      role: 'GUARD',
     });
-
-    // Recebe alertas de pânico
-    can('read', 'PanicEvent', { companyId: user.companyId });
-    can('update', 'PanicEvent', { companyId: user.companyId });
-
-    // Assina documentos
-    can('update', 'Document', { companyId: user.companyId, type: 'SIGNATURE' });
-  },
-
-  // POST_SUPERVISOR - Supervisor de Posto
-  POST_SUPERVISOR(user, { can }) {
-    // Tudo que um Guarda faz
-    can('create', 'Shift', { companyId: user.companyId });
-    can('read', 'Shift', { companyId: user.companyId });
-    can('update', 'Shift', { companyId: user.companyId });
-
-    can('create', 'Round', { companyId: user.companyId });
-    can('read', 'Round', { companyId: user.companyId });
-    can('update', 'Round', { companyId: user.companyId });
-    can('cancel', 'Round', { companyId: user.companyId }); // Pode cancelar rondas
-
-    can('create', 'EventLog', { companyId: user.companyId });
-    can('read', 'EventLog', { companyId: user.companyId });
-    can('approve', 'EventLog', { companyId: user.companyId });
-
-    can('create', 'Report', { companyId: user.companyId });
-    can('read', 'Report', { companyId: user.companyId });
-    can('export', 'Report', { companyId: user.companyId });
-
-    can('create', 'Checklist', { companyId: user.companyId });
-    can('read', 'Checklist', { companyId: user.companyId });
-
-    // Gestão de guardas
-    can('read', 'User', { companyId: user.companyId, role: 'GUARD' });
-    can('update', 'User', ['name', 'email', 'phone', 'address', 'status'], {
+    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
       companyId: user.companyId,
-      role: 'GUARD',
     });
-
-    // Recebe alertas de pânico
-    can('read', 'PanicEvent', { companyId: user.companyId });
-    can('update', 'PanicEvent', { companyId: user.companyId });
-
-    // Assina documentos
-    can('update', 'Document', { companyId: user.companyId, type: 'SIGNATURE' });
   },
 
   // GUARD - Operador de campo (com permissões específicas)
   GUARD(user, { can }) {
     // Verificar permissões específicas do guarda
-    const userWithPermissions = user as UserWithPermissions;
-    const hasDoormanPermission = userWithPermissions.permissions?.some(
-      (p) => p.permissionType === 'DOORMAN' && p.granted,
-    );
-    const hasSupportPermission = userWithPermissions.permissions?.some(
-      (p) => p.permissionType === 'SUPPORT' && p.granted,
-    );
-    const hasPatrolPermission = userWithPermissions.permissions?.some(
-      (p) => p.permissionType === 'PATROL' && p.granted,
-    );
-
-    // Turno e ponto (todos os guards)
-    can('create', 'Shift', { guardId: user.id });
-    can('read', 'Shift', { guardId: user.id });
-    can('update', 'Shift', { guardId: user.id });
+    // const userWithPermissions = user as UserWithPermissions;
+    // const hasDoormanPermission = userWithPermissions.permissions?.some(
+    //   (p) => p.permissionType === 'DOORMAN' && p.granted,
+    // );
+    // const hasSupportPermission = userWithPermissions.permissions?.some(
+    //   (p) => p.permissionType === 'SUPPORT' && p.granted,
+    // );
+    // const hasPatrolPermission = userWithPermissions.permissions?.some(
+    //   (p) => p.permissionType === 'PATROL' && p.granted,
+    // );
 
     // Rondas (apenas se tem permissão PATROL)
-    if (hasPatrolPermission) {
-      can('create', 'Round', { guardId: user.id });
-      can('read', 'Round', { guardId: user.id });
-      can('update', 'Round', { guardId: user.id });
-    }
+    // if (hasPatrolPermission) {
+    //   can('create', 'Round', { userId: user.id });
+    //   can('read', 'Round', { userId: user.id });
+    //   can('update', 'Round', { userId: user.id });
+    // }
+    // Perfil próprio
+    can('read', 'Post');
+    can('read', 'Vehicle');
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
 
-    // Ocorrências (todos os guards)
-    can('create', 'EventLog', { guardId: user.id });
-    can('read', 'EventLog', { guardId: user.id });
-
-    // Relatórios (todos os guards)
-    can('create', 'Report', { guardId: user.id });
-    can('read', 'Report', { guardId: user.id });
-
-    // Checklists (todos os guards)
-    can('create', 'Checklist', { guardId: user.id });
-    can('read', 'Checklist', { guardId: user.id });
-
-    // Assina documentos (todos os guards)
-    can('update', 'Document', { guardId: user.id, type: 'SIGNATURE' });
-
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+  },
+  // POST_SUPERVISOR - Supervisor de Posto
+  POST_SUPERVISOR(user, { can }) {
     // Perfil próprio
     can('read', 'User', { id: user.id });
     can('update', 'User', ['name', 'profilePicture'], { id: user.id });
+
+    // Tudo que um Guarda faz
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
   },
 
   // POST_RESIDENT - Morador

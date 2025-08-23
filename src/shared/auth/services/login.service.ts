@@ -53,8 +53,10 @@ export class LoginService {
       const payload: ITokenPayload = {
         name: user.name,
         email: user.email,
+        rg: user.rg || '', // TODO: temporariamente, para o frontend
         role: user.role,
         sub: user.id,
+        userPermissions: user.permissions.map((permission) => permission.permissionType),
         permissions: packRules(ability.rules),
       };
 
@@ -70,6 +72,7 @@ export class LoginService {
         await this.auditService.logLoginSuccess(user.id, request, {
           role: user.role,
           companyId: user.companyId,
+          userPermissions: user.permissions.map((permission) => permission.permissionType),
         });
       }
 
@@ -78,12 +81,12 @@ export class LoginService {
         refresh_token,
         expires_in,
         token_type: 'Bearer',
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        // user: {
+        //   id: user.id,
+        //   name: user.name,
+        //   email: user.email,
+        //   role: user.role,
+        // },
       };
     } catch (error) {
       // Log de falha se request estiver disponível

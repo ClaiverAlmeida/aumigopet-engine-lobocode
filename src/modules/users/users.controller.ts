@@ -40,7 +40,14 @@ import { CaslInterceptor } from 'src/shared/casl/interceptors/casl.interceptor';
 @RequiredRoles(Roles.SYSTEM_ADMIN)
 @Controller('users')
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(private readonly service: UsersService) {}
+
+  @Get('all')
+  @CaslRead('User')
+  @RequiredRoles(Roles.ADMIN, Roles.HR)
+  buscarTodosAll() {
+    return this.service.buscarTodos();
+  }
 
   @Get()
   @CaslRead('User')
@@ -49,62 +56,62 @@ export class UsersController {
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '20',
   ) {
-    return this.usersService.buscarTodos(Number(page), Number(limit));
+    return this.service.buscarTodos(Number(page), Number(limit));
   }
 
   @Get(':id')
   @CaslRead('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   buscarPorId(@Param('id') id: string) {
-    return this.usersService.buscarPorId(id);
+    return this.service.buscarPorId(id);
   }
 
   @Post('system-admin')
   @CaslCreate('User')
   criarNovoSystemAdmin(@Body() dto: CreateSystemAdminDto) {
-    return this.usersService.criarNovoSystemAdmin(dto);
+    return this.service.criarNovoSystemAdmin(dto);
   }
 
   @Post('admin')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN)
   criarNovoAdmin(@Body() dto: CreateAdminDto) {
-    return this.usersService.criarNovoAdmin(dto);
+    return this.service.criarNovoAdmin(dto);
   }
 
   @Post('hr')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   criarNovoHR(@Body() dto: CreateHRDto) {
-    return this.usersService.criarNovoHR(dto);
+    return this.service.criarNovoHR(dto);
   }
 
   @Post('supervisor')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   criarNovoSupervisor(@Body() dto: CreateSupervisorDto) {
-    return this.usersService.criarNovoSupervisor(dto);
+    return this.service.criarNovoSupervisor(dto);
   }
 
   @Post('guard')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   criarNovoGuard(@Body() dto: CreateGuardDto) {
-    return this.usersService.criarNovoGuard(dto);
+    return this.service.criarNovoGuard(dto);
   }
 
   @Post('post-supervisor')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN, Roles.POST_SUPERVISOR)
   criarNovoPostSupervisor(@Body() dto: CreatePostSupervisorDto) {
-    return this.usersService.criarNovoPostSupervisor(dto);
+    return this.service.criarNovoPostSupervisor(dto);
   }
 
   @Post('post-resident')
   @CaslCreate('User')
   @RequiredRoles(Roles.POST_RESIDENT)
   criarNovoPostResident(@Body() dto: CreatePostResidentDto) {
-    return this.usersService.criarNovoPostResident(dto);
+    return this.service.criarNovoPostResident(dto);
   }
 
   @Patch(':id')
@@ -112,20 +119,20 @@ export class UsersController {
   @CaslFields('User', ['name', 'email', 'phone', 'address', 'status'])
   @RequiredRoles(Roles.ADMIN, Roles.HR, Roles.POST_SUPERVISOR)
   atualizar(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.atualizar(id, updateUserDto);
+    return this.service.atualizar(id, updateUserDto);
   }
 
   @Delete(':id')
-  @CaslDelete('User') 
+  @CaslDelete('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR, Roles.POST_SUPERVISOR)
   desativar(@Param('id') id: string) {
-    return this.usersService.desativar(id);
+    return this.service.desativar(id);
   }
 
   @Post(':id/restore')
-  @CaslUpdate('User') 
+  @CaslUpdate('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR, Roles.POST_SUPERVISOR)
   reativar(@Param('id') id: string) {
-    return this.usersService.reativar(id);
+    return this.service.reativar(id);
   }
 }

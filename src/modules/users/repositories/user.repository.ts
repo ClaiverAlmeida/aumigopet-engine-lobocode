@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { TenantService } from '../../../shared/tenant/tenant.service';
-import { User, Prisma } from '@prisma/client';
+import { User, Prisma, PermissionType } from '@prisma/client';
 
 @Injectable()
 export class UserRepository {
@@ -13,25 +13,27 @@ export class UserRepository {
   //  Obter companyId do contexto atual
   private obterCompanyIdDoContexto(): string | null {
     const tenant = this.tenantService.getTenant();
-    
+
     // Se for tenant global (SYSTEM_ADMIN), retorna null
     if (tenant?.isGlobal) {
       return null;
     }
-    
+
     // Se for tenant temporário ou normal, retorna o companyId
     return tenant?.id || null;
   }
 
   //  Aplicar companyId automaticamente nos dados de criação
-  private aplicarCompanyIdAosDadosDeCreate(data: Prisma.UserCreateInput): Prisma.UserCreateInput {
+  private aplicarCompanyIdAosDadosDeCreate(
+    data: Prisma.UserCreateInput,
+  ): Prisma.UserCreateInput {
     const companyId = this.obterCompanyIdDoContexto();
-    
+
     // Se não tem companyId no contexto, mantém o dos dados (para SYSTEM_ADMIN)
     if (!companyId) {
       return data;
     }
-    
+
     // Se tem companyId no contexto, sobrescreve o dos dados
     return {
       ...data,
@@ -64,7 +66,11 @@ export class UserRepository {
     };
   }
 
-  async buscarMuitos(where: Prisma.UserWhereInput, options?: { skip?: number; take?: number }, include?: Prisma.UserInclude) {
+  async buscarMuitos(
+    where: Prisma.UserWhereInput,
+    options?: { skip?: number; take?: number },
+    include?: Prisma.UserInclude,
+  ) {
     return this.prisma.user.findMany({
       where,
       skip: options?.skip,
@@ -73,14 +79,20 @@ export class UserRepository {
     });
   }
 
-  async buscarPrimeiro(where: Prisma.UserWhereInput, include?: Prisma.UserInclude) {
+  async buscarPrimeiro(
+    where: Prisma.UserWhereInput,
+    include?: Prisma.UserInclude,
+  ) {
     return this.prisma.user.findFirst({
       where,
       include: include || this.defaultInclude,
     });
   }
 
-  async buscarUnico(where: Prisma.UserWhereUniqueInput, include?: Prisma.UserInclude) {
+  async buscarUnico(
+    where: Prisma.UserWhereUniqueInput,
+    include?: Prisma.UserInclude,
+  ) {
     return this.prisma.user.findUnique({
       where,
       include: include || this.defaultInclude,
@@ -94,7 +106,23 @@ export class UserRepository {
     });
   }
 
-  async atualizar(where: Prisma.UserWhereUniqueInput, data: Prisma.UserUpdateInput) {
+  async criarPermissaoDeGuarda(data: {
+    userId: string;
+    permissionType: PermissionType[];
+  }) {
+    return await this.prisma.permission.createMany({
+      data: data.permissionType.map((type) => ({
+        userId: data.userId,
+        permissionType: type,
+      })),
+      skipDuplicates: true,
+    });
+  }
+
+  async atualizar(
+    where: Prisma.UserWhereUniqueInput,
+    data: Prisma.UserUpdateInput,
+  ) {
     return this.prisma.user.update({
       where,
       data,
@@ -117,7 +145,7 @@ export class UserRepository {
 
   async conectarUserAosPosts(userId: string, postIds: string[]) {
     // Com a nova estrutura, precisamos criar registros na tabela UserPost
-    const userPosts = postIds.map(postId => ({
+    const userPosts = postIds.map((postId) => ({
       userId,
       postId,
       role: 'GUARD' as const, // Assumindo que é para conectar guards
@@ -132,4 +160,4 @@ export class UserRepository {
   async contar(where: Prisma.UserWhereInput) {
     return this.prisma.user.count({ where });
   }
-} 
+}

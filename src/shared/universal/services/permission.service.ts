@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CaslService } from '../../casl/casl.service';
 import { PermissionContextService } from '../../casl/services/permission-context.service';
 import { PermissionAuditService } from '../../casl/services/permission-audit.service';
-import { UniversalAuditService } from './audit.service';
+
 import { Roles, User } from '@prisma/client';
 import { CrudAction } from '../../common/types';
 import { EntityNameCasl, getModelName } from '../types';
@@ -13,7 +13,6 @@ export class UniversalPermissionService {
     private caslService: CaslService,
     private contextService: PermissionContextService,
     private auditService: PermissionAuditService,
-    private universalAuditService: UniversalAuditService,
   ) {}
 
   // ============================================================================
@@ -47,22 +46,7 @@ export class UniversalPermissionService {
       errorMessage = error instanceof Error ? error.message : 'Permission denied';
       throw error;
     } finally {
-      // TODO: Registrar auditoria quando contexto de usuário estiver disponível
-      // if (user && !context?.skipAudit) {
-      //   this.universalAuditService.registrarTentativaPermissao(
-      //     user,
-      //     action,
-      //     entityName,
-      //     success,
-      //     {
-      //       resourceId: context?.resourceId,
-      //       relatedIds: context?.relatedIds,
-      //       ipAddress: context?.ipAddress,
-      //       userAgent: context?.userAgent,
-      //       errorMessage,
-      //     }
-      //   );
-      // }
+
     }
   }
 

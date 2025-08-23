@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsArray,
 } from 'class-validator';
-import { Roles } from '@prisma/client';
+import { PermissionType, Roles } from '@prisma/client';
 import {
   IsCPF,
   IsPhoneNumberBR,
@@ -39,7 +39,7 @@ export class CreateGuardDto {
   password: string;
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
-  companyId: string;
+  companyId?: string;
 
   @IsExpectedRole(Roles.GUARD, { message: VALIDATION_MESSAGES.REQUIRED.ROLE })
   role: Roles; // Deve ser Roles.GUARD
@@ -56,4 +56,9 @@ export class CreateGuardDto {
   @IsOptional()
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   address?: string;
+
+  @IsOptional()
+  @IsArray({ message: VALIDATION_MESSAGES.FORMAT.ARRAY_INVALID })
+  @IsEnum(PermissionType, { each: true, message: VALIDATION_MESSAGES.FORMAT.ENUM_INVALID })
+  permissions?: PermissionType[];
 }

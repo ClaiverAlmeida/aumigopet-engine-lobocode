@@ -47,10 +47,6 @@ export class UserValidator {
     await this.companiesService.validarExistencia(companyId);
   }
 
-  async validarSePostPertenceACompany(postId: string, companyId: string) {
-    await this.postsService.validateBelongsToCompany(postId, companyId);
-  }
-
   async validarSeUserExiste(id: string) {
     const user = await this.userRepository.buscarUnico({ id });
     if (!user) {

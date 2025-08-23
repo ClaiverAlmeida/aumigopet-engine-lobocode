@@ -31,9 +31,10 @@ async function seedUser() {
     password: 'SystemAdmin123@Senha',
     email: 'systemadmin@user.com',
     role: Roles.SYSTEM_ADMIN,
-    profilePicture: null,
+    profilePicture: null, 
     status: UserStatus.ACTIVE,
     cpf: '021.564.766-16',
+    rg: '1234567890',
     phone: '(11) 97073-6987',
     address: 'Rua Jabuticabeira, 393',
   };

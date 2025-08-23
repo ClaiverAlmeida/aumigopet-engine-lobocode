@@ -16,6 +16,13 @@ export const VALIDATION_MESSAGES = {
     PASSWORD: 'Senha é obrigatória',
     ID: 'ID é obrigatório',
     ROLE: 'Role é obrigatória',
+    PLATE: 'Placa é obrigatória',
+    MODEL: 'Modelo é obrigatório',
+    INITIAL_KM: 'Quilometragem inicial é obrigatória',
+    CURRENT_KM: 'Quilometragem atual é obrigatória',
+    FUEL_TYPE: 'Tipo de combustível é obrigatório',
+    FUEL_QUANTITY: 'Quantidade de combustível é obrigatória',
+    FUEL_PRICE: 'Preço do combustível é obrigatório',
   },
 
   // Validações de formato
@@ -26,11 +33,14 @@ export const VALIDATION_MESSAGES = {
     CNPJ_INVALID: 'CNPJ inválido',
     PHONE_INVALID: 'Telefone deve estar no formato brasileiro: (XX) XXXXX-XXXX',
     UUID_INVALID: 'ID inválido',
-    FIELD_INVALID: 'Campo deve ser uma string',
+    FIELD_INVALID: 'Campo deve ser um texto',
     BOOLEAN_INVALID: 'Valor deve ser um booleano',
     SLUG_INVALID: 'Slug pode conter apenas letras minúsculas, números e hífens',
     ENUM_INVALID: 'Valor inválido para o enum',
     URL_INVALID: 'URL inválida',
+    NUMBER_INVALID: 'Valor deve ser um número',
+    DATE_INVALID: 'Data inválida',
+    ARRAY_INVALID: 'Campo deve ser um array',
   },
 
   // Validações de unicidade
@@ -93,6 +103,7 @@ export const ERROR_MESSAGES = {
     USER_NOT_FOUND: 'Usuário não encontrado',
     COMPANY_NOT_FOUND: 'Empresa não encontrada',
     POST_NOT_FOUND: 'Posto não encontrado',
+    REQUIRED_FIELD: 'Campo obrigatório',
   },
 
   // Erros de validação

@@ -1,10 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../prisma/prisma.service';
 import { EntityNameModel } from '../types';
+import { TenantService } from 'src/shared/tenant';
 
 @Injectable()
-export class UniversalRepository {
-  constructor(private readonly prisma: PrismaService) {}
+export class UniversalRepository<DtoCreate, DtoUpdate> {
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly tenantService: TenantService,
+  ) {}
 
   /**
    * Repository universal que funciona para qualquer entidade
@@ -21,7 +25,7 @@ export class UniversalRepository {
     where?: any,
     options?: { skip?: number; take?: number; orderBy?: any },
     include?: any,
-  ): Promise<any[]> {
+  ): Promise<any[]> { 
     return this.buscarEntidade(entityName).findMany({
       where,
       skip: options?.skip,
@@ -95,11 +99,15 @@ export class UniversalRepository {
    */
   async criar(
     entityName: EntityNameModel,
-    data: any,
+    data: DtoCreate,
     include?: any,
   ): Promise<any> {
+    const transformedData = this.transformarDadosParaPrisma(
+      this.aplicarCompanyIdAosDadosDeCreate(data),
+    );
+
     return this.buscarEntidade(entityName).create({
-      data,
+      data: transformedData,
       include,
     });
   }
@@ -110,12 +118,14 @@ export class UniversalRepository {
   async atualizar(
     entityName: EntityNameModel,
     where: any,
-    data: any,
+    data: DtoUpdate,
     include?: any,
   ): Promise<any> {
+    const transformedData = this.transformarDadosParaPrisma(data);
+
     return this.buscarEntidade(entityName).update({
       where,
-      data,
+      data: transformedData,
       include,
     });
   }
@@ -174,10 +184,15 @@ export class UniversalRepository {
     update: any,
     include?: any,
   ): Promise<any> {
+    const transformedCreate = this.transformarDadosParaPrisma(
+      this.aplicarCompanyIdAosDadosDeCreate(create),
+    );
+    const transformedUpdate = this.transformarDadosParaPrisma(update);
+
     return this.buscarEntidade(entityName).upsert({
       where,
-      create,
-      update,
+      create: transformedCreate,
+      update: transformedUpdate,
       include,
     });
   }
@@ -189,5 +204,73 @@ export class UniversalRepository {
     return this.buscarEntidade(entityName).deleteMany({
       where,
     });
+  }
+
+  //  Obter companyId do contexto atual
+  private obterCompanyIdDoContexto(): string | null {
+    const tenant = this.tenantService.getTenant();
+
+    // Se for tenant global (SYSTEM_ADMIN), retorna null
+    if (tenant?.isGlobal) {
+      return null;
+    }
+
+    // Se for tenant temporário ou normal, retorna o companyId
+    return tenant?.id || null;
+  }
+
+  /**
+   * Transforma dados com campos "Id" em relacionamentos Prisma
+   * Exemplo: { postId: "abc", userId: "xyz" } -> { post: { connect: { id: "abc" } }, user: { connect: { id: "xyz" } } }
+   */
+  private transformarDadosParaPrisma(data: any): any {
+    if (!data || typeof data !== 'object') {
+      return data;
+    }
+
+    const transformedData = { ...data };
+
+    // Detecta campos que terminam com "Id" e os transforma em relacionamentos
+    Object.keys(data).forEach((key) => {
+      if (key.endsWith('Id') && data[key] !== null && data[key] !== undefined) {
+        const relationName = key.slice(0, -2); // Remove "Id" do final
+
+        // Pula se já existe um relacionamento com esse nome
+        if (transformedData[relationName]) {
+          return;
+        }
+
+        // Cria o relacionamento Prisma
+        transformedData[relationName] = {
+          connect: { id: data[key] },
+        };
+
+        // Remove o campo original "Id"
+        delete transformedData[key];
+      }
+    });
+
+    return transformedData;
+  }
+
+  //  Aplicar companyId automaticamente nos dados de criação
+  private aplicarCompanyIdAosDadosDeCreate(data: any): any {
+    const companyId = this.obterCompanyIdDoContexto();
+
+    // Se não tem companyId no contexto, mantém o dos dados (para SYSTEM_ADMIN)
+    if (!companyId) {
+      return data;
+    }
+
+    //  Remover companyId do data
+    delete data.companyId;
+
+    // Se tem companyId no contexto, sobrescreve o dos dados
+    return {
+      ...data,
+      company: {
+        connect: { id: companyId },
+      },
+    };
   }
 }

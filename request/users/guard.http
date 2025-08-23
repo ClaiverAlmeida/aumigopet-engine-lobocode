@@ -7,9 +7,10 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email": "guard@user.com",
-    "password": "SystemAdmin123@Senha"
+    "login": "systemadmin@user.com",
+    "password": "SystemAdmin@Senha"
 }
+
 
 ### ========================================
 ### USERS - GUARD (Apenas Próprio Perfil)
@@ -55,15 +56,18 @@ DELETE {{baseUrl}}/users/cmco084n70001lt96th7lafk8
 Authorization: Bearer {{token}}
 
 ### ❌ TENTATIVA: Criar usuário (deve falhar)
-POST {{baseUrl}}/users/hr
+POST {{baseUrl}}/users/guard
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "Tentativa de Criar",
-    "email": "tentativa@user.com",
+    "name": "Guard 3",
+    "login": "guard3.user",
+    "email": "guard3@user.com",
     "password": "SystemAdmin123@Senha",
-    "companyId": "cmco084kk0000lt96pxlqot9s"
+    "companyId": "cmcy2a0bg0000ltjnu6o728nr",
+    "role": "GUARD",
+    "permissions": ["PATROL", "DOORMAN"]
 }
 
 ### ❌ TENTATIVA: Atualizar campos não permitidos (deve falhar)

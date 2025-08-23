@@ -23,6 +23,9 @@ export class AuthValidator {
       where: {
         OR: [{ email: login }, { login: login }],
       },
+      include: {
+        permissions: true,
+      },
     });
 
     if (!user) {
@@ -55,7 +58,7 @@ export class AuthValidator {
   async validateUserExists(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, name: true, status: true, role: true },
+      select: { id: true, email: true, name: true, status: true, role: true, permissions: true },
     });
 
     if (!user) {

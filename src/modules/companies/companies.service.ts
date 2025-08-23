@@ -1,27 +1,31 @@
 import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-import {
-  UniversalService,
-  UniversalRepository,
-  UniversalAuditService,
-} from '../../shared/universal/index';
+// dto imports
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { ConflictError } from '../../shared/common/errors';
-import { UniversalQueryService } from 'src/shared/universal/services/query.service';
-import { UniversalPermissionService } from 'src/shared/universal/services/permission.service';
-// ✨ Importar helper de mapeamento automático
-import { createEntityConfig } from '../../shared/universal/types';
+// universal imports
+import {
+  UniversalService,
+  UniversalRepository,
+  UniversalMetricsService,
+  UniversalQueryService,
+  UniversalPermissionService,
+  createEntityConfig,
+} from '../../shared/universal/index';
 
 @Injectable({ scope: Scope.REQUEST })
-export class CompaniesService extends UniversalService {
+export class CompaniesService extends UniversalService<
+  CreateCompanyDto,
+  UpdateCompanyDto
+> {
   private static readonly entityConfig = createEntityConfig('company');
 
   constructor(
-    repository: UniversalRepository,
+    repository: UniversalRepository<CreateCompanyDto, UpdateCompanyDto>,
     queryService: UniversalQueryService,
     permissionService: UniversalPermissionService,
-    auditService: UniversalAuditService,
+    metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
   ) {
     const { model, casl } = CompaniesService.entityConfig;
@@ -29,18 +33,18 @@ export class CompaniesService extends UniversalService {
       repository,
       queryService,
       permissionService,
-      auditService,
+      metricsService,
       request,
       model,
       casl,
     );
   }
 
-  protected async beforeCreate(data: CreateCompanyDto): Promise<void> {
+  protected async antesDeCriar(data: CreateCompanyDto): Promise<void> {
     if (data.cnpj) await this.validarCNPJ(data.cnpj);
   }
 
-  protected async beforeUpdate(
+  protected async antesDeAtualizar(
     id: string,
     data: UpdateCompanyDto,
   ): Promise<void> {

@@ -1,14 +1,17 @@
+import { PermissionType } from '@prisma/client';
+
 export interface IAuthResponse {
   access_token: string;
   refresh_token?: string;
   expires_in: number;
   token_type: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
+  // user: {
+  //   id: string;
+  //   name: string;
+  //   email: string;
+  //   role: string;
+  //   userPermissions?: PermissionType[];
+  // };
 }
 
 export interface IRefreshResponse {
@@ -32,4 +35,4 @@ export interface IForgotPasswordResponse {
 export interface IResetPasswordResponse {
   message: string;
   success: boolean;
-} 
+}

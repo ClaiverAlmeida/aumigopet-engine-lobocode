@@ -2,6 +2,8 @@
 @token = {{ platformAdminLogin.response.body.access_token }}
 @adminToken = {{ adminLogin.response.body.access_token }}
 
+@entity = companies
+
 ### Login SYSTEM_ADMIN (necessário para acessar companies)
 # @name platformAdminLogin
 POST {{baseUrl}}/auth/login
@@ -29,19 +31,19 @@ Content-Type: application/json
 ### ========================================
 
 ### 📖 Listar todas as empresas (com paginação)
-GET {{baseUrl}}/companies?page=2&limit=2
+GET {{baseUrl}}/{{entity}}?page=2&limit=2
 Authorization: Bearer {{token}}
 
 ### 📖 Listar todas as empresas
-GET {{baseUrl}}/companies/all
+GET {{baseUrl}}/{{entity}}/all
 Authorization: Bearer {{token}}
 
-### 📖 Buscar empresa específica por ID
-GET {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+### 📖 Buscar empresa específica por ID 
+GET {{baseUrl}}/{{entity}}/cme607g2l0000ltmhx27ay7zm
 Authorization: Bearer {{token}}
 
-### ✏️ Criar nova empresa
-POST {{baseUrl}}/companies
+### ✏️ Criar nova empresa 
+POST {{baseUrl}}/{{entity}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -57,22 +59,23 @@ Authorization: Bearer {{token}}
 }
 
 ### ✏️ Atualizar empresa
-PATCH {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+PATCH {{baseUrl}}/{{entity}}/cme607g2l0000ltmhx27ay7zm
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
     "name": "TechCorp SA2",  
+    "cnpj": "52.551.851/0001-26",
     "website": "https://www.newtechcorp.com",
     "contactEmail": "contato@newtechcorp.com"
 }
 
 ### ❌ Deletar empresa (soft delete)
-DELETE {{baseUrl}}/companies/cme61gmki0000ltjlv2w2jf6f
+DELETE {{baseUrl}}/{{entity}}/cme61gmki0000ltjlv2w2jf6f
 Authorization: Bearer {{token}}
 
 ### ♻️ Restaurar empresa deletada
-POST {{baseUrl}}/companies/cme61gmki0000ltjlv2w2jf6f/restore
+POST {{baseUrl}}/{{entity}}/cme61gmki0000ltjlv2w2jf6f/restore
 Authorization: Bearer {{token}}
 
 ### ========================================
@@ -80,15 +83,15 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### 🔍 Buscar empresa por CNPJ
-GET {{baseUrl}}/companies/search/cnpj/81.811.213/0001-03
+GET {{baseUrl}}/{{entity}}/search/cnpj/81.811.213/0001-03
 Authorization: Bearer {{token}}
 
 ### 🔍 Buscar empresas por nome
-GET {{baseUrl}}/companies/search/name?name=TechCorp Ltda
+GET {{baseUrl}}/{{entity}}/search/name?name=TechCorp Ltda
 Authorization: Bearer {{token}}
 
 ### 🔍 Buscar empresas por nome (parcial)
-GET {{baseUrl}}/companies/search/name?name=Tech
+GET {{baseUrl}}/{{entity}}/search/name?name=Tech
 Authorization: Bearer {{token}}
 
 ### ========================================
@@ -96,75 +99,75 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### 📈 Métricas gerais de empresas
-GET {{baseUrl}}/companies/metrics
+GET {{baseUrl}}/{{entity}}/metrics
 Authorization: Bearer {{token}}
 
 ### 📈 Métricas com filtro de período
-GET {{baseUrl}}/companies/metrics?startDate=2024-01-01&endDate=2024-12-31
+GET {{baseUrl}}/{{entity}}/metrics?startDate=2024-01-01&endDate=2024-12-31
 Authorization: Bearer {{token}}
 
 ### 📈 Métricas por usuário específico
-GET {{baseUrl}}/companies/metrics?userId=user-uuid-123
+GET {{baseUrl}}/{{entity}}/metrics?userId=user-uuid-123
 Authorization: Bearer {{token}}
 
 ### 📈 Métricas por ação específica
-GET {{baseUrl}}/companies/metrics?action=create
+GET {{baseUrl}}/{{entity}}/metrics?action=create
 Authorization: Bearer {{token}}
 
 ### 📈 Métricas com múltiplos filtros
-GET {{baseUrl}}/companies/metrics?startDate=2024-01-01&endDate=2024-12-31&action=create&userId=user-uuid-123
+GET {{baseUrl}}/{{entity}}/metrics?startDate=2024-01-01&endDate=2024-12-31&action=create&userId=user-uuid-123
 Authorization: Bearer {{token}}
 
 ### 📋 Logs de auditoria básicos
-GET {{baseUrl}}/companies/logs
+GET {{baseUrl}}/{{entity}}/logs
 Authorization: Bearer {{token}}
 
 ### 📋 Logs com limite específico
-GET {{baseUrl}}/companies/logs?limit=50
+GET {{baseUrl}}/{{entity}}/logs?limit=50
 Authorization: Bearer {{token}}
 
 ### 📋 Logs por período
-GET {{baseUrl}}/companies/logs?startDate=2024-01-01&endDate=2024-12-31
+GET {{baseUrl}}/{{entity}}/logs?startDate=2024-01-01&endDate=2024-12-31
 Authorization: Bearer {{token}}
 
 ### 📋 Logs por usuário
-GET {{baseUrl}}/companies/logs?userId=user-uuid-123
+GET {{baseUrl}}/{{entity}}/logs?userId=user-uuid-123
 Authorization: Bearer {{token}}
 
 ### 📋 Logs por ação
-GET {{baseUrl}}/companies/logs?action=create
+GET {{baseUrl}}/{{entity}}/logs?action=create
 Authorization: Bearer {{token}}
 
 ### 📋 Logs apenas de sucessos
-GET {{baseUrl}}/companies/logs?success=true
+GET {{baseUrl}}/{{entity}}/logs?success=true
 Authorization: Bearer {{token}}
 
 ### 📋 Logs apenas de falhas
-GET {{baseUrl}}/companies/logs?success=false
+GET {{baseUrl}}/{{entity}}/logs?success=false
 Authorization: Bearer {{token}}
 
 ### 📋 Logs com múltiplos filtros
-GET {{baseUrl}}/companies/logs?limit=100&startDate=2024-01-01&userId=user-uuid-123&action=create&success=true
+GET {{baseUrl}}/{{entity}}/logs?limit=100&startDate=2024-01-01&userId=user-uuid-123&action=create&success=true
 Authorization: Bearer {{token}}
 
 ### ❌ Logs específicos de falhas
-GET {{baseUrl}}/companies/logs/failures
+GET {{baseUrl}}/{{entity}}/logs/failures
 Authorization: Bearer {{token}}
 
 ### ❌ Logs de falhas com limite
-GET {{baseUrl}}/companies/logs/failures?limit=25
+GET {{baseUrl}}/{{entity}}/logs/failures?limit=25
 Authorization: Bearer {{token}}
 
 ### ❌ Logs de falhas por período
-GET {{baseUrl}}/companies/logs/failures?startDate=2024-01-01&endDate=2024-12-31
+GET {{baseUrl}}/{{entity}}/logs/failures?startDate=2024-01-01&endDate=2024-12-31
 Authorization: Bearer {{token}}
 
 ### 📊 Estatísticas de uso da entidade
-GET {{baseUrl}}/companies/analytics/usage
+GET {{baseUrl}}/{{entity}}/analytics/usage
 Authorization: Bearer {{token}}
 
 ### 📊 Estatísticas por período
-GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-12-31
+GET {{baseUrl}}/{{entity}}/analytics/usage?startDate=2024-01-01&endDate=2024-12-31
 Authorization: Bearer {{token}}
 
 ### ========================================
@@ -172,31 +175,31 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### 📤 Exportar logs em JSON
-GET {{baseUrl}}/companies/export/logs?format=json
+GET {{baseUrl}}/{{entity}}/export/logs?format=json
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar logs em CSV
-GET {{baseUrl}}/companies/export/logs?format=csv
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar logs filtrados em CSV
-GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar apenas falhas em CSV
-GET {{baseUrl}}/companies/export/logs?format=csv&success=false
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&success=false
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar logs por usuário em JSON
-GET {{baseUrl}}/companies/export/logs?format=json&userId=user-uuid-123
+GET {{baseUrl}}/{{entity}}/export/logs?format=json&userId=user-uuid-123
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar logs por ação em CSV
-GET {{baseUrl}}/companies/export/logs?format=csv&action=create
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&action=create
 Authorization: Bearer {{token}}
 
 ### 📤 Exportar logs com todos os filtros
-GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31&userId=user-uuid-123&action=create&success=true
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&startDate=2024-01-01&endDate=2024-12-31&userId=user-uuid-123&action=create&success=true
 Authorization: Bearer {{token}}
 
 ### ========================================
@@ -204,19 +207,19 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### ✅ ADMIN acessando métricas (deve funcionar)
-GET {{baseUrl}}/companies/metrics
+GET {{baseUrl}}/{{entity}}/metrics
 Authorization: Bearer {{adminToken}}
 
 ### ✅ ADMIN acessando logs (deve funcionar)
-GET {{baseUrl}}/companies/logs
+GET {{baseUrl}}/{{entity}}/logs
 Authorization: Bearer {{adminToken}}
 
 ### ✅ ADMIN acessando análises (deve funcionar)
-GET {{baseUrl}}/companies/analytics/usage
+GET {{baseUrl}}/{{entity}}/analytics/usage
 Authorization: Bearer {{adminToken}}
 
 ### ❌ ADMIN tentando exportar (deve falhar - só SYSTEM_ADMIN)
-GET {{baseUrl}}/companies/export/logs?format=csv
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv
 Authorization: Bearer {{adminToken}}
 
 ### ========================================
@@ -234,19 +237,19 @@ Content-Type: application/json
 }
 
 ### ❌ HR tentando acessar métricas (deve falhar)
-GET {{baseUrl}}/companies/metrics
+GET {{baseUrl}}/{{entity}}/metrics
 Authorization: Bearer {{hrLogin.response.body.access_token}}
 
 ### ❌ HR tentando acessar logs (deve falhar)
-GET {{baseUrl}}/companies/logs
+GET {{baseUrl}}/{{entity}}/logs
 Authorization: Bearer {{hrLogin.response.body.access_token}}
 
 ### ❌ HR tentando exportar (deve falhar)
-GET {{baseUrl}}/companies/export/logs
+GET {{baseUrl}}/{{entity}}/export/logs
 Authorization: Bearer {{hrLogin.response.body.access_token}}
 
 ### ✅ HR acessando busca (deve funcionar)
-GET {{baseUrl}}/companies/search/name?name=TechCorp
+GET {{baseUrl}}/{{entity}}/search/name?name=TechCorp
 Authorization: Bearer {{hrLogin.response.body.access_token}}
 
 ### ========================================
@@ -254,19 +257,19 @@ Authorization: Bearer {{hrLogin.response.body.access_token}}
 ### ========================================
 
 ### ❌ Buscar empresa inexistente
-GET {{baseUrl}}/companies/uuid-inexistente-123
+GET {{baseUrl}}/{{entity}}/uuid-inexistente-123
 Authorization: Bearer {{token}}
 
 ### ❌ Buscar por CNPJ inexistente
-GET {{baseUrl}}/companies/search/cnpj/00000000000000
+GET {{baseUrl}}/{{entity}}/search/cnpj/00000000000000
 Authorization: Bearer {{token}}
 
 ### ❌ Buscar por nome sem parâmetro (deve falhar)
-GET {{baseUrl}}/companies/search/name
+GET {{baseUrl}}/{{entity}}/search/name
 Authorization: Bearer {{token}}
 
 ### ❌ Criar empresa com CNPJ inválido
-POST {{baseUrl}}/companies
+POST {{baseUrl}}/{{entity}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -277,7 +280,7 @@ Authorization: Bearer {{token}}
 }
 
 ### ❌ Criar empresa com CNPJ duplicado
-POST {{baseUrl}}/companies
+POST {{baseUrl}}/{{entity}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -288,7 +291,7 @@ Authorization: Bearer {{token}}
 }
 
 ### ❌ Criar empresa sem dados obrigatórios
-POST {{baseUrl}}/companies
+POST {{baseUrl}}/{{entity}}
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
@@ -297,10 +300,10 @@ Authorization: Bearer {{token}}
 }
 
 ### ❌ Acessar sem token
-GET {{baseUrl}}/companies
+GET {{baseUrl}}/{{entity}}
 
 ### ❌ Acessar com token inválido
-GET {{baseUrl}}/companies
+GET {{baseUrl}}/{{entity}}
 Authorization: Bearer token-invalido-123
 
 ### ========================================
@@ -308,19 +311,19 @@ Authorization: Bearer token-invalido-123
 ### ========================================
 
 ### 📊 Métricas dos últimos 7 dias
-GET {{baseUrl}}/companies/metrics?startDate=2024-01-15&endDate=2024-01-22
+GET {{baseUrl}}/{{entity}}/metrics?startDate=2024-01-15&endDate=2024-01-22
 Authorization: Bearer {{token}}
 
 ### 📊 Logs dos últimos 30 dias
-GET {{baseUrl}}/companies/logs?startDate=2024-01-01&endDate=2024-01-31&limit=200
+GET {{baseUrl}}/{{entity}}/logs?startDate=2024-01-01&endDate=2024-01-31&limit=200
 Authorization: Bearer {{token}}
 
 ### 📊 Análise de uso mensal
-GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
+GET {{baseUrl}}/{{entity}}/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
 Authorization: Bearer {{token}}
 
 ### 📊 Exportação trimestral
-GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-03-31
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&startDate=2024-01-01&endDate=2024-03-31
 Authorization: Bearer {{token}}
 
 ### ========================================
@@ -329,37 +332,37 @@ Authorization: Bearer {{token}}
 
 ### 🎯 Cenário 1: Administrador verificando atividade suspeita
 # 1. Ver métricas gerais
-GET {{baseUrl}}/companies/metrics
+GET {{baseUrl}}/{{entity}}/metrics
 Authorization: Bearer {{token}}
 
 # 2. Ver logs de falhas
-GET {{baseUrl}}/companies/logs/failures?limit=50
+GET {{baseUrl}}/{{entity}}/logs/failures?limit=50
 Authorization: Bearer {{token}}
 
 # 3. Exportar para análise
-GET {{baseUrl}}/companies/export/logs?format=csv&success=false&startDate=2024-01-01
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&success=false&startDate=2024-01-01
 Authorization: Bearer {{token}}
 
 ### 🎯 Cenário 2: Auditoria mensal
 # 1. Estatísticas do mês
-GET {{baseUrl}}/companies/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
+GET {{baseUrl}}/{{entity}}/analytics/usage?startDate=2024-01-01&endDate=2024-01-31
 Authorization: Bearer {{token}}
 
 # 2. Relatório completo
-GET {{baseUrl}}/companies/export/logs?format=csv&startDate=2024-01-01&endDate=2024-01-31
+GET {{baseUrl}}/{{entity}}/export/logs?format=csv&startDate=2024-01-01&endDate=2024-01-31
 Authorization: Bearer {{token}}
 
 ### 🎯 Cenário 3: Busca operacional
 # 1. Buscar empresa por CNPJ
-GET {{baseUrl}}/companies/search/cnpj/81.811.213/0001-03
+GET {{baseUrl}}/{{entity}}/search/cnpj/81.811.213/0001-03
 Authorization: Bearer {{token}}
 
 # 2. Ver detalhes
-GET {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+GET {{baseUrl}}/{{entity}}/cme607g2l0000ltmhx27ay7zm
 Authorization: Bearer {{token}}
 
 # 3. Atualizar dados
-PATCH {{baseUrl}}/companies/cme607g2l0000ltmhx27ay7zm
+PATCH {{baseUrl}}/{{entity}}/cme607g2l0000ltmhx27ay7zm
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

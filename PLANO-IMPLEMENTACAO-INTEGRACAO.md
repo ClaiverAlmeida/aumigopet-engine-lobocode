@@ -228,7 +228,7 @@ model Occurrence {
   postAddress           String            // Endereço do posto
   peopleInvolved        String?           // Pessoas envolvidas
   description           String            // Descrição da ocorrência
-  status                OccurrenceStatus  @default(PENDING)
+  status                ReportStatus  @default(PENDING)
   
   // Relacionamentos
   user                  User              @relation(fields: [userId], references: [id])
@@ -249,7 +249,7 @@ model Occurrence {
   @@index([companyId])
 }
 
-enum OccurrenceStatus {
+enum ReportStatus {
   PENDING       // Pendente
   IN_PROGRESS   // Em andamento
   RESOLVED      // Resolvida

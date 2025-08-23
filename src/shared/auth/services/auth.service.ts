@@ -43,12 +43,13 @@ export class AuthService {
       refresh_token: refreshResponse.refresh_token,
       expires_in: refreshResponse.expires_in,
       token_type: 'Bearer',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   email: user.email,
+      //   role: user.role, 
+      //   userPermissions: user.permissions.map((permission) => permission.permissionType),
+      // },
     };
   }
 

@@ -1,5 +1,11 @@
 import { AUTH_MESSAGES } from "../auth/constants";
 
+export class RequiredFieldError extends Error {
+  constructor(field: string) {
+    super(`${field} é obrigatório`);
+  }
+}
+
 export class NotFoundError extends Error {
   constructor(entity: string, key: string, attribute: string = 'id') {
     super(`${entity} with ${attribute} ${key} not found`);

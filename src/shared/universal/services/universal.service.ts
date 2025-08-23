@@ -5,30 +5,36 @@ import { SUCCESS_MESSAGES } from '../../common/messages';
 import { UniversalQueryService } from './query.service';
 import { UniversalRepository } from '../repositories/universal.repository';
 import { UniversalPermissionService } from './permission.service';
-import {
-  UniversalAuditService,
-  AuditFilters,
-  UniversalMetrics,
-} from './audit.service';
+import { UniversalMetricsService } from './metrics.service';
 import { Roles } from '@prisma/client';
-import { EntityNameCasl, EntityNameModel } from '../types';
+import {
+  EntityNameCasl,
+  EntityNameModel,
+  IncludeConfig,
+  TransformConfig,
+  EntityConfig,
+} from '../types';
 
 /**
  * Serviço universal abstrato que fornece operações CRUD padronizadas
  * para todas as entidades do sistema.
  *
  * Inclui hooks para personalização, validações automáticas,
- * permissões CASL e multi-tenancy.
+ * permissões CASL, multi-tenancy e sistema de includes/transformações.
  */
-export abstract class UniversalService {
+export abstract class UniversalService<DtoCreate, DtoUpdate> {
   protected readonly entityName: EntityNameModel;
   protected readonly entityNameCasl: EntityNameCasl;
+  protected removeCompanyIdInWhereClause: boolean = false;
+
+  // Configuração de includes e transformações
+  protected entityConfig: EntityConfig = {};
 
   constructor(
-    protected repository: UniversalRepository,
+    protected repository: UniversalRepository<DtoCreate, DtoUpdate>,
     protected queryService: UniversalQueryService,
     protected permissionService: UniversalPermissionService,
-    protected auditService: UniversalAuditService,
+    protected metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) private request: any,
     entityNameModel: EntityNameModel,
     entityNameCasl: EntityNameCasl,
@@ -44,16 +50,50 @@ export abstract class UniversalService {
   /**
    * Busca entidade por ID
    */
-  async buscarPorId(id: string) {
-    const whereClause = this.queryService.construirWhereClauseParaRead(
-      this.entityNameCasl,
-      { id },
-    );
-    const entity = await this.buscarEntidade(whereClause);
+  async buscarPorId(id: string, include?: any) {
+    const startTime = Date.now();
+    const user = this.request?.user;
 
-    this.validarResultadoDaBusca(entity, this.entityName, 'id', id);
+    try {
+      this.permissionService.validarAction(this.entityNameCasl, 'read');
 
-    return { data: entity };
+      const whereClause = this.queryService.construirWhereClauseParaRead(
+        this.entityNameCasl,
+        { id },
+      );
+
+      const includeConfig = include || this.getIncludeConfig();
+
+      const entity = await this.buscarEntidade(
+        whereClause,
+        includeConfig,
+        false,
+      );
+
+      this.validarResultadoDaBusca(entity, this.entityName, 'id', id);
+
+      // Registra métricas de sucesso
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'read',
+        'success',
+        user,
+        Date.now() - startTime,
+      );
+
+      return { data: this.transformData(entity) };
+    } catch (error) {
+      // Registra métricas de erro
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'read',
+        'error',
+        user,
+        Date.now() - startTime,
+      );
+
+      throw error;
+    }
   }
 
   /**
@@ -71,26 +111,41 @@ export abstract class UniversalService {
   /**
    * Lista todas as entidades com paginação
    */
-  async buscarComPaginacao(page = 1, limit = 20) {
+  async buscarComPaginacao(page = 1, limit = 20, include?: any) {
     this.permissionService.validarAction(this.entityNameCasl, 'read');
 
     const whereClause = this.queryService.construirWhereClauseParaRead(
       this.entityNameCasl,
     );
+
+    if (this.removeCompanyIdInWhereClause) delete whereClause.companyId;
+
+    // Usa includes da configuração se não for fornecido
+    const includeConfig = include || this.getIncludeConfig();
+
     const skip = (page - 1) * limit;
     const [entities, total] = await Promise.all([
-      this.repository.buscarMuitos(this.entityName, whereClause, {
-        skip,
-        take: limit,
-      }),
+      this.repository.buscarMuitos(
+        this.entityName,
+        whereClause,
+        {
+          orderBy: { createdAt: 'desc' },
+          skip,
+          take: limit,
+        },
+        includeConfig,
+      ),
       this.repository.contarTodos(this.entityName, whereClause),
     ]);
 
     const { totalPages, hasNextPage, hasPreviousPage } =
       this.calcularInformacoesDePaginacao(page, limit, total);
 
+    // Aplica transformações se configurado
+    const transformedData = this.transformData(entities);
+
     return {
-      data: entities,
+      data: transformedData,
       pagination: {
         page,
         limit,
@@ -105,44 +160,46 @@ export abstract class UniversalService {
   /**
    * Busca entidade por campo específico
    */
-  async buscarPorCampo(field: string, value: any) {
+  async buscarPorCampo(field: string, value: any, include?: any) {
     this.permissionService.validarAction(this.entityNameCasl, 'read');
 
     const whereClause = this.queryService.construirWhereClauseParaRead(
       this.entityNameCasl,
       { [field]: value },
     );
+
+    const includeConfig = include || this.getIncludeConfig();
+
+    // Aplica transformações se configurado
     const entity = await this.repository.buscarPrimeiro(
       this.entityName,
       whereClause,
+      includeConfig,
     );
 
-    this.validarResultadoDaBusca(
-      entity,
-      this.entityName,
-      field,
-      value.toString(),
-    );
-
-    return { data: entity };
+    return { data: this.transformData(entity) };
   }
 
   /**
    * Busca múltiplas entidades por campo específico
    */
-  async buscarMuitosPorCampo(field: string, value: any) {
+  async buscarMuitosPorCampo(field: string, value: any, include?: any) {
     this.permissionService.validarAction(this.entityNameCasl, 'read');
 
     const whereClause = this.queryService.construirWhereClauseParaRead(
       this.entityNameCasl,
       { [field]: value },
     );
+
+    const includeConfig = include || this.getIncludeConfig();
+
     const entities = await this.repository.buscarMuitos(
       this.entityName,
       whereClause,
+      includeConfig,
     );
 
-    return { data: entities };
+    return { data: this.transformData(entities) };
   }
 
   // ============================================================================
@@ -152,60 +209,138 @@ export abstract class UniversalService {
   /**
    * Cria nova entidade
    */
-  async criar(data: any, callback?: () => void, role?: Roles) {
-    this.permissionService.validarAction(this.entityNameCasl, 'create');
+  async criar(data: DtoCreate, include?: any, role?: Roles) {
+    const startTime = Date.now();
+    const user = this.request?.user;
 
-    if (role) {
-      this.permissionService.validarCriacaoDeEntidadeComRole(
-        this.entityNameCasl,
-        role,
+    try {
+      // Incrementa operações concorrentes
+      this.metricsService.incrementConcurrentOperations(
+        this.entityName,
+        'create',
+      );
+
+      this.permissionService.validarAction(this.entityNameCasl, 'create');
+
+      if (role) {
+        this.permissionService.validarCriacaoDeEntidadeComRole(
+          this.entityNameCasl,
+          role,
+        );
+      }
+
+      await this.antesDeCriar(data);
+
+      // Usa includes da configuração se não for fornecido
+      const includeConfig = include || this.getIncludeConfig();
+
+      const entity = await this.repository.criar(
+        this.entityName,
+        data,
+        includeConfig,
+      );
+
+      // Registra métricas de sucesso
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'create',
+        'success',
+        user,
+        Date.now() - startTime,
+      );
+
+      await this.depoisDeCriar(data);
+
+      // Aplica transformações se configurado
+      return this.transformData(entity);
+    } catch (error) {
+      // Registra métricas de erro
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'create',
+        'error',
+        user,
+        Date.now() - startTime,
+      );
+
+      throw error;
+    } finally {
+      // Decrementa operações concorrentes
+      this.metricsService.decrementConcurrentOperations(
+        this.entityName,
+        'create',
       );
     }
-
-    await this.beforeCreate(data);
-
-    const entity = await this.repository.criar(this.entityName, data);
-
-    // Registra auditoria da operação de criação
-    await this.registrarOperacao('create', entity?.id, true);
-
-    await this.afterCreate(data, entity);
-
-    return entity;
   }
 
   /**
    * Atualiza entidade existente
    */
-  async atualizar(id: string, updateEntityDto: any) {
-    this.permissionService.validarAction(this.entityNameCasl, 'update');
+  async atualizar(id: string, updateEntityDto: DtoUpdate, include?: any) {
+    const startTime = Date.now();
+    const user = this.request?.user;
 
-    await this.beforeUpdate(id, updateEntityDto);
+    try {
+      // Incrementa operações concorrentes
+      this.metricsService.incrementConcurrentOperations(
+        this.entityName,
+        'update',
+      );
 
-    const whereClause = this.queryService.construirWhereClauseParaUpdate(
-      this.entityNameCasl,
-      id,
-    );
+      this.permissionService.validarAction(this.entityNameCasl, 'update');
 
-    const entity = await this.buscarEntidade(whereClause);
+      await this.antesDeAtualizar(id, updateEntityDto);
 
-    this.validarResultadoDaBusca(entity, this.entityName, 'id', id);
+      const whereClause = this.queryService.construirWhereClauseParaUpdate(
+        this.entityNameCasl,
+        id,
+      );
 
-    // Prepara dados para atualização (remove campos vazios)
-    const updateData = this.prepararDadosParaUpdate(updateEntityDto);
+      const entity = await this.buscarEntidade(whereClause);
 
-    const updatedEntity = await this.repository.atualizar(
-      this.entityName,
-      { id },
-      updateData,
-    );
+      this.validarResultadoDaBusca(entity, this.entityName, 'id', id);
 
-    // Registra auditoria da operação de atualização
-    await this.registrarOperacao('update', id, true, { updateData });
+      // Usa includes da configuração se não for fornecido
+      const includeConfig = include || this.getIncludeConfig();
 
-    await this.afterUpdate(id, updateData, updatedEntity);
+      const updatedEntity = await this.repository.atualizar(
+        this.entityName,
+        { id },
+        updateEntityDto,
+        includeConfig,
+      );
 
-    return updatedEntity;
+      // Registra métricas de sucesso
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'update',
+        'success',
+        user,
+        Date.now() - startTime,
+      );
+
+      await this.depoisDeAtualizar(id, updateEntityDto);
+
+      // Aplica transformações se configurado
+      return this.transformData(updatedEntity);
+    } catch (error) {
+      // Registra métricas de erro
+      this.metricsService.recordEntityOperation(
+        this.entityName,
+        'update',
+        'error',
+        user,
+        Date.now() - startTime,
+      );
+
+      throw error;
+    } finally {
+      // Decrementa operações concorrentes
+      this.metricsService.decrementConcurrentOperations(
+        this.entityName,
+        'update',
+      );
+    }
   }
 
   /**
@@ -214,7 +349,7 @@ export abstract class UniversalService {
   async desativar(id: string) {
     this.permissionService.validarAction(this.entityNameCasl, 'delete');
 
-    await this.beforeDelete(id);
+    await this.antesDeDesativar(id);
 
     const whereClause = this.queryService.construirWhereClauseParaDelete(
       this.entityNameCasl,
@@ -228,10 +363,7 @@ export abstract class UniversalService {
 
     await this.repository.desativar(this.entityName, { id });
 
-    // Registra auditoria da operação de desativação
-    await this.registrarOperacao('delete', id, true);
-
-    await this.afterDelete(id);
+    await this.depoisDeDesativar(id);
 
     return {
       message: SUCCESS_MESSAGES.CRUD.DELETED,
@@ -244,7 +376,7 @@ export abstract class UniversalService {
   async reativar(id: string) {
     this.permissionService.validarAction(this.entityNameCasl, 'delete');
 
-    await this.beforeRestore(id);
+    await this.antesDeReativar(id);
 
     const whereClause = this.queryService.construirWhereClauseParaUpdate(
       this.entityNameCasl,
@@ -258,10 +390,7 @@ export abstract class UniversalService {
 
     await this.repository.reativar(this.entityName, { id });
 
-    // Registra auditoria da operação de reativação
-    await this.registrarOperacao('create', id, true, { tipo: 'reativacao' }); // create pois está "criando" novamente
-
-    await this.afterRestore(id);
+    await this.depoisDeReativar(id);
 
     return {
       message: SUCCESS_MESSAGES.CRUD.RESTORED,
@@ -288,147 +417,136 @@ export abstract class UniversalService {
   }
 
   // ============================================================================
-  // 📊 MÉTODOS PÚBLICOS - AUDITORIA E MÉTRICAS
-  // ============================================================================
-
-  /**
-   * Obtém métricas específicas desta entidade
-   */
-  obterMetricas(
-    periodo?: { inicio: Date; fim: Date },
-    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
-  ): UniversalMetrics {
-    const filtros: AuditFilters = {
-      ...filtrosAdicionais,
-      entityName: this.entityName,
-    };
-
-    return this.auditService.obterMetricas(periodo, filtros);
-  }
-
-  /**
-   * Obtém logs específicos desta entidade
-   */
-  obterLogs(
-    limite: number = 1000,
-    periodo?: { inicio: Date; fim: Date },
-    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
-  ) {
-    return this.auditService.obterLogsPorEntidade(
-      this.entityName,
-      limite,
-      periodo,
-    );
-  }
-
-  /**
-   * Obtém logs de falhas/erros específicos desta entidade
-   */
-  obterLogsFalhas(limite: number = 500, periodo?: { inicio: Date; fim: Date }) {
-    const filtros: AuditFilters = {
-      entityName: this.entityName,
-      success: false,
-    };
-
-    return this.auditService.obterLogs(filtros, limite, periodo);
-  }
-
-  /**
-   * Exporta logs desta entidade em diferentes formatos
-   */
-  exportarLogs(
-    formato: 'json' | 'csv' = 'json',
-    periodo?: { inicio: Date; fim: Date },
-    filtrosAdicionais?: Omit<AuditFilters, 'entityName'>,
-  ): string {
-    const filtros: AuditFilters = {
-      ...filtrosAdicionais,
-      entityName: this.entityName,
-    };
-
-    return this.auditService.exportarLogs(formato, filtros, periodo);
-  }
-
-  /**
-   * Obtém estatísticas de uso desta entidade
-   */
-  obterEstatisticasDeUso(periodo?: { inicio: Date; fim: Date }) {
-    const metricas = this.obterMetricas(periodo);
-    const totalRequests = metricas.totalRequests;
-    const entityRequests = metricas.requestsByEntity[this.entityName] || 0;
-    const percentualDoSistema =
-      totalRequests > 0 ? (entityRequests / totalRequests) * 100 : 0;
-
-    return {
-      totalOperacoes: entityRequests,
-      operacoesBemsucedidas: Math.round(
-        entityRequests * (metricas.successRate / 100),
-      ),
-      operacoesFalharam:
-        entityRequests -
-        Math.round(entityRequests * (metricas.successRate / 100)),
-      taxaDeSucesso: metricas.successRate,
-      percentualDoSistema,
-      acoesPopulares: metricas.requestsByAction,
-      periodo: periodo || { descricao: 'Histórico completo' },
-    };
-  }
-
-  // ============================================================================
   // 🎯 HOOKS DO CICLO DE VIDA - PARA SOBRESCRITA NAS CLASSES FILHAS
   // ============================================================================
+
+  /**
+   * Configura includes e transformações para a entidade
+   * Sobrescreva para definir configurações específicas
+   */
+  protected getEntityConfig(): EntityConfig {
+    return this.entityConfig;
+  }
+
+  /**
+   * Obtém configuração de includes
+   */
+  protected getIncludeConfig(): IncludeConfig | undefined {
+    return this.getEntityConfig().includes;
+  }
+
+  /**
+   * Obtém configuração de transformação
+   */
+  protected getTransformConfig(): TransformConfig | undefined {
+    return this.getEntityConfig().transform;
+  }
+
+  /**
+   * Aplica transformações nos dados baseado na configuração
+   */
+  protected transformData(data: any | any[]): any[] {
+    const config = this.getTransformConfig();
+    if (!config) return data;
+
+    const transformedData = (Array.isArray(data) ? data : [data]).map(
+      (entity) => {
+        let transformed = { ...entity };
+
+        // Aplica flatten (mapeia campos de relacionamento para campos planos)
+        if (config.flatten) {
+          Object.entries(config.flatten).forEach(([relation, config]) => {
+            if (transformed[relation]) {
+              if (typeof config === 'string') {
+                // Configuração simples: relation -> targetField
+                transformed[config] = transformed[relation];
+              } else {
+                // Configuração específica: extrai campo específico do relacionamento
+                const { field, target } = config;
+                if (
+                  transformed[relation] &&
+                  typeof transformed[relation] === 'object'
+                ) {
+                  transformed[target] = transformed[relation][field];
+                }
+              }
+              delete transformed[relation];
+            }
+          });
+        }
+
+        // Aplica transformação customizada
+        if (config.custom) {
+          transformed = config.custom(transformed);
+        }
+
+        // Remove campos excluídos
+        if (config.exclude) {
+          config.exclude.forEach((field) => {
+            delete transformed[field];
+          });
+        }
+
+        return transformed;
+      },
+    );
+
+    return Array.isArray(data) ? transformedData : transformedData[0];
+  }
 
   /**
    * Hook executado antes da criação
    * Sobrescreva para validações específicas
    */
-  protected async beforeCreate(data: any): Promise<void> {}
+  protected async antesDeCriar(data: DtoCreate): Promise<void> {}
 
   /**
    * Hook executado após a criação
    * Sobrescreva para ações pós-criação
    */
-  protected async afterCreate(data: any, entity: any): Promise<void> {}
+  protected async depoisDeCriar(data: DtoCreate): Promise<void> {}
 
   /**
    * Hook executado antes da atualização
    * Sobrescreva para validações específicas
    */
-  protected async beforeUpdate(id: string, data: any): Promise<void> {}
+  protected async antesDeAtualizar(
+    id: string,
+    data: DtoUpdate,
+  ): Promise<void> {}
 
   /**
    * Hook executado após a atualização
    * Sobrescreva para ações pós-atualização
    */
-  protected async afterUpdate(
+  protected async depoisDeAtualizar(
     id: string,
-    data: any,
-    entity: any,
+    data: DtoUpdate,
   ): Promise<void> {}
 
   /**
    * Hook executado antes da exclusão
    * Sobrescreva para validações específicas
    */
-  protected async beforeDelete(id: string): Promise<void> {}
+  protected async antesDeDesativar(id: string): Promise<void> {}
 
   /**
    * Hook executado após a exclusão
    * Sobrescreva para ações pós-exclusão
    */
-  protected async afterDelete(id: string): Promise<void> {}
+  protected async depoisDeDesativar(id: string): Promise<void> {}
 
   /**
    * Hook executado antes da restauração
    * Sobrescreva para validações específicas
    */
-  protected async beforeRestore(id: string): Promise<void> {}
+  protected async antesDeReativar(id: string): Promise<void> {}
 
   /**
    * Hook executado após a restauração
    * Sobrescreva para ações pós-restauração
    */
-  protected async afterRestore(id: string): Promise<void> {}
+  protected async depoisDeReativar(id: string): Promise<void> {}
 
   // ============================================================================
   // 🛡️ MÉTODOS PROTEGIDOS - VALIDAÇÕES E UTILITÁRIOS INTERNOS
@@ -438,11 +556,11 @@ export abstract class UniversalService {
    * Valida se um campo é único na entidade
    */
   protected async validarSeEhUnico(
-    campo: string,
-    valor: any,
+    field: string,
+    value: any,
     excludeId?: string,
   ): Promise<boolean> {
-    const whereClause: any = { [campo]: valor };
+    const whereClause: any = { [field]: value };
 
     if (excludeId) {
       whereClause.id = { not: excludeId };
@@ -475,17 +593,43 @@ export abstract class UniversalService {
   }
 
   // ============================================================================
+  // 🔧 MÉTODOS PROTEGIDOS - UTILITÁRIOS PARA CLASSES FILHAS
+  // ============================================================================
+
+  /**
+   * Obtém o usuário logado do contexto da requisição
+   */
+  protected obterUsuarioLogado(): any {
+    return this.request?.user || null;
+  }
+
+  /**
+   * Obtém o ID do usuário logado
+   */
+  protected obterUsuarioLogadoId(): string | null {
+    return this.request?.user?.id || null;
+  }
+
+  // ============================================================================
   // 🔧 MÉTODOS PRIVADOS - UTILITÁRIOS INTERNOS
   // ============================================================================
 
   /**
    * Busca entidade aplicando filtros de soft delete
    */
-  private async buscarEntidade(where: any, deletedAt: boolean = false) {
-    const entity = await this.repository.buscarPrimeiro(this.entityName, {
-      ...where,
-      deletedAt: deletedAt ? { not: null } : null,
-    });
+  private async buscarEntidade(
+    where: any,
+    include: any = {},
+    deletedAt: boolean = false,
+  ) {
+    const entity = await this.repository.buscarPrimeiro(
+      this.entityName,
+      {
+        ...where,
+        deletedAt: deletedAt ? { not: null } : null,
+      },
+      include,
+    );
     return entity;
   }
 
@@ -502,55 +646,5 @@ export abstract class UniversalService {
     const hasPreviousPage = page > 1;
 
     return { totalPages, hasNextPage, hasPreviousPage };
-  }
-
-  /**
-   * Prepara dados para atualização removendo campos vazios
-   */
-  private prepararDadosParaUpdate(data: any): Record<string, any> {
-    const updateData: Record<string, any> = {};
-
-    // Só inclui campos que foram fornecidos e têm valor
-    Object.entries(data).forEach(([key, value]) => {
-      if (value !== undefined && value !== null && value !== '') {
-        updateData[key] = value;
-      }
-    });
-
-    return updateData;
-  }
-
-  /**
-   * Registra operação realizada na entidade para auditoria
-   */
-  private async registrarOperacao(
-    action: 'create' | 'read' | 'update' | 'delete',
-    resourceId?: string,
-    success: boolean = true,
-    context?: Record<string, any>,
-  ): Promise<void> {
-    try {
-      // Obter usuário do contexto da requisição
-      const user = this.request?.user;
-      
-      if (user) {
-        this.auditService.registrarOperacao(
-          user,
-          action,
-          this.entityName,
-          this.entityNameCasl,
-          success,
-          {
-            resourceId,
-            additionalContext: context,
-            ipAddress: this.request?.ip,
-            userAgent: this.request?.headers?.['user-agent'],
-          }
-        );
-      }
-    } catch (error) {
-      // Não interromper operação se auditoria falhar
-      console.warn(`Falha ao registrar auditoria: ${error.message}`);
-    }
   }
 }

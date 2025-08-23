@@ -1,33 +1,73 @@
-import { Injectable } from '@nestjs/common'; 
-import { NotFoundError, ValidationError } from 'src/shared/common/errors';
-import { PrismaService } from 'src/shared/prisma/prisma.service';
+import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
+import { REQUEST } from '@nestjs/core';
+// dto imports
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
+import { ConflictError } from '../../shared/common/errors';
+// universal imports
+import {
+  UniversalService,
+  UniversalRepository,
+  UniversalMetricsService,
+  UniversalQueryService,
+  UniversalPermissionService,
+  createEntityConfig,
+} from '../../shared/universal/index';
 
-@Injectable()
-export class PostsService {
-  constructor(private prisma: PrismaService) {}
+@Injectable({ scope: Scope.REQUEST })
+export class PostsService extends UniversalService<
+  CreatePostDto,
+  UpdatePostDto
+> {
+  private static readonly entityConfig = createEntityConfig('post');
 
-  async getById(id: string) {
-    return this.prisma.post.findUnique({ where: { id } });
+  constructor(
+    repository: UniversalRepository<CreatePostDto, UpdatePostDto>,
+    queryService: UniversalQueryService,
+    permissionService: UniversalPermissionService,
+    metricsService: UniversalMetricsService,
+    @Optional() @Inject(REQUEST) request: any,
+  ) {
+    const { model, casl } = PostsService.entityConfig;
+    super(
+      repository,
+      queryService,
+      permissionService,
+      metricsService,
+      request,
+      model,
+      casl,
+    );
   }
 
-  async validateExists(id: string) {
-    const post = await this.getById(id);
-    if (!post) {
-      throw new NotFoundError('Post', id, 'id');
-    }
-    return post;
+  protected async antesDeCriar(data: CreatePostDto): Promise<void> {
+    if (data.latitude) await this.validarLatitude(data.latitude);
+    if (data.longitude) await this.validarLongitude(data.longitude);
   }
 
-  async validateBelongsToCompany(postId: string, companyId: string) {
-    const post = await this.getById(postId);
-    if (!post) {
-      throw new NotFoundError('Post', postId, 'id');
-    }
-    if (post.companyId !== companyId) {
-      throw new ValidationError('Post does not belong to the specified company');
-    }
-    return post;
+  protected async antesDeAtualizar(
+    id: string,
+    data: UpdatePostDto,
+  ): Promise<void> {
+    if (data.latitude) await this.validarLatitude(data.latitude);
+    if (data.longitude) await this.validarLongitude(data.longitude);
   }
 
-  // Adicione outros métodos conforme necessário
-} 
+  private async validarLatitude(latitude: number): Promise<void> {
+    const existingPost = await this.repository.buscarPrimeiro(this.entityName, {
+      latitude,
+    });
+    if (existingPost) {
+      throw new ConflictError('Latitude já está em uso');
+    }
+  }
+
+  private async validarLongitude(longitude: number): Promise<void> {
+    const existingPost = await this.repository.buscarPrimeiro(this.entityName, {
+      longitude,
+    });
+    if (existingPost) {
+      throw new ConflictError('Longitude já está em uso');
+    }
+  }
+}
