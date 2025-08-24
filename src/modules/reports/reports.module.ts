@@ -7,6 +7,10 @@ import { SuppliesController } from './supplies/supplies.controller';
 import { SuppliesService } from './supplies/supplies.service';
 import { MotorizedServicesController } from './motorized-services/motorized-service.controller';
 import { MotorizedServicesService } from './motorized-services/motorized-service.service';
+import { OccurrencesDispatchesController } from './occurrence-dispatch/occurrences-dispatches.controller';
+import { OccurrencesDispatchesService } from './occurrence-dispatch/occurrences-dispatches.service';
+import { DoormanChecklistsController } from './doorman-checklists/doorman-checklists.controller';
+import { DoormanChecklistsService } from './doorman-checklists/doorman-checklists.service';
 
 @Module({
   controllers: [
@@ -14,18 +18,24 @@ import { MotorizedServicesService } from './motorized-services/motorized-service
     VehicleChecklistsController,
     SuppliesController,
     MotorizedServicesController,
+    OccurrencesDispatchesController,
+    DoormanChecklistsController,
   ],
   providers: [
     OccurrencesService,
     VehicleChecklistsService,
     SuppliesService,
     MotorizedServicesService,
+    OccurrencesDispatchesService,
+    DoormanChecklistsService,
   ],
   exports: [
     OccurrencesService,
     VehicleChecklistsService,
     SuppliesService,
     MotorizedServicesService,
+    OccurrencesDispatchesService,
+    DoormanChecklistsService,
   ],
 })
 export class ReportsModule {}

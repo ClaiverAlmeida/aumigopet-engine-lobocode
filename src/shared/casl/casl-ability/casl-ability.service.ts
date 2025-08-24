@@ -163,12 +163,20 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
 
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
     can('manage', 'MotorizedService', {
       userId: user.id,
       companyId: user.companyId,
     });
     can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
     can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'DoormanChecklist', {
       userId: user.id,
       companyId: user.companyId,
     });

@@ -1,8 +1,7 @@
 import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-// dto imports
-import { CreateSupplyDto } from './dto/create-supply.dto';
-import { UpdateSupplyDto } from './dto/update-supply.dto';
+import { CreateDoormanChecklistDto } from './dto/create-doorman-checklist.dto';
+import { UpdateDoormanChecklistDto } from './dto/update-doorman-checklist.dto';
 // universal imports
 import {
   UniversalService,
@@ -13,21 +12,28 @@ import {
   createEntityConfig,
 } from '../../../shared/universal/index';
 
+/**
+ * Serviço para gerenciamento de checklists de porteiro
+ * Seguindo exatamente a mesma lógica dos outros serviços do sistema
+ */
 @Injectable({ scope: Scope.REQUEST })
-export class SuppliesService extends UniversalService<
-  CreateSupplyDto,
-  UpdateSupplyDto
+export class DoormanChecklistsService extends UniversalService<
+  CreateDoormanChecklistDto,
+  UpdateDoormanChecklistDto
 > {
-  private static readonly entityConfig = createEntityConfig('supply');
+  private static readonly entityConfig = createEntityConfig('doormanChecklist');
 
   constructor(
-    repository: UniversalRepository<CreateSupplyDto, UpdateSupplyDto>,
+    repository: UniversalRepository<
+      CreateDoormanChecklistDto,
+      UpdateDoormanChecklistDto
+    >,
     queryService: UniversalQueryService,
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
   ) {
-    const { model, casl } = SuppliesService.entityConfig;
+    const { model, casl } = DoormanChecklistsService.entityConfig;
     super(
       repository,
       queryService,
@@ -37,9 +43,10 @@ export class SuppliesService extends UniversalService<
       model,
       casl,
     );
+
     this.setEntityConfig();
   }
-
+  
   setEntityConfig() {
     this.entityConfig = {
       ...this.entityConfig,
@@ -49,24 +56,24 @@ export class SuppliesService extends UniversalService<
             name: true,
           },
         },
-        vehicle: {
+        user: {
           select: {
-            model: true,
+            name: true,
           },
         },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
-          vehicle: { field: 'model', target: 'vehicleModel' },
+          user: { field: 'name', target: 'userName' },
         },
-        exclude: ['post', 'vehicle'],
+        exclude: ['post', 'user'],
       },
     };
-  }  
-  
+  }
+
   protected async antesDeCriar(
-    data: CreateSupplyDto & { userId: string },
+    data: CreateDoormanChecklistDto & { userId: string },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;

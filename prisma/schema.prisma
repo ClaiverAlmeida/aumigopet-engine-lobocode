@@ -192,11 +192,12 @@ model Company {
   // ===============================================
 
   // Frota da empresa
-  vehicles          Vehicle[]          @relation("CompanyVehicles")
-  vehicleChecklists VehicleChecklist[] @relation("CompanyVehicleChecklists")
-  supplies          Supply[]           @relation("CompanySupplies")
-  motorizedServices MotorizedService[] @relation("CompanyMotorizedServices")
-
+  vehicles           Vehicle[]            @relation("CompanyVehicles")
+  vehicleChecklists  VehicleChecklist[]   @relation("CompanyVehicleChecklists")
+  supplies           Supply[]             @relation("CompanySupplies")
+  motorizedServices  MotorizedService[]   @relation("CompanyMotorizedServices")
+  OccurrenceDispatch OccurrenceDispatch[] @relation("CompanyOccurrencesDispatches")
+  DoormanChecklist   DoormanChecklist[]   @relation("CompanyDoormanChecklists")
   // ===============================================
   // 🔗 RELACIONAMENTOS DE EVENTOS
   // ===============================================
@@ -262,17 +263,22 @@ model User {
   userPosts UserPost[] // Para POST_SUPERVISOR e POST_RESIDENT
 
   // Veículos e operações
-  supplies                    Supply[]           @relation("UserSupplies")
-  occurrences                 Occurrence[]       @relation("UserOccurrences")
-  vehicleChecklists           VehicleChecklist[] @relation("UserVehicleChecklists")
-  motorizedServices           MotorizedService[] @relation("UserMotorizedServices")
-  supervisorMotorizedServices MotorizedService[] @relation("SupervisorMotorizedServices")
+  supplies                    Supply[]             @relation("UserSupplies")
+  occurrences                 Occurrence[]         @relation("UserOccurrences")
+  vehicleChecklists           VehicleChecklist[]   @relation("UserVehicleChecklists")
+  motorizedServices           MotorizedService[]   @relation("UserMotorizedServices")
+  supervisorMotorizedServices MotorizedService[]   @relation("SupervisorMotorizedServices")
+  OccurrenceDispatch          OccurrenceDispatch[] @relation("UserOccurrencesDispatches")
+  OccurrenceDispatchGuard     OccurrenceDispatch[] @relation("GuardOccurrencesDispatches")
+  DoormanChecklist            DoormanChecklist[]   @relation("UserDoormanChecklists")
 
   // Aprovações e validações
-  supplyReviewedBy           Supply[]           @relation("SupplyReviewedBy")
-  occurrenceReviewedBy       Occurrence[]       @relation("OccurrenceReviewedBy")
-  vehicleChecklistReviewedBy VehicleChecklist[] @relation("VehicleChecklistReviewedBy")
-  motorizedServiceReviewedBy MotorizedService[] @relation("MotorizedServiceReviewedBy")
+  supplyReviewedBy             Supply[]             @relation("SupplyReviewedBy")
+  occurrenceReviewedBy         Occurrence[]         @relation("OccurrenceReviewedBy")
+  occurrenceDispatchReviewedBy OccurrenceDispatch[] @relation("OccurrencesDispatchesReviewedBy")
+  vehicleChecklistReviewedBy   VehicleChecklist[]   @relation("VehicleChecklistReviewedBy")
+  motorizedServiceReviewedBy   MotorizedService[]   @relation("MotorizedServiceReviewedBy")
+  DoormanChecklistReviewedBy   DoormanChecklist[]   @relation("DoormanChecklistReviewedBy")
 
   // Eventos e logs
   eventLogs   EventLog[]   @relation("UserEventLogs")
@@ -355,15 +361,16 @@ model Post {
   // ===============================================
 
   // Operações principais
-  shifts            Shift[]            @relation("PostShifts")
-  rounds            Round[]            @relation("PostRounds")
-  occurrences       Occurrence[]       @relation("PostOccurrences")
-  motorizedServices MotorizedService[] @relation("PostMotorizedServices")
-  Supply            Supply[]           @relation("PostSupplies")
-  vehicleChecklists VehicleChecklist[] @relation("PostVehicleChecklists")
-
+  shifts             Shift[]              @relation("PostShifts")
+  rounds             Round[]              @relation("PostRounds")
+  occurrences        Occurrence[]         @relation("PostOccurrences")
+  OccurrenceDispatch OccurrenceDispatch[] @relation("PostOccurrencesDispatches")
+  motorizedServices  MotorizedService[]   @relation("PostMotorizedServices")
+  Supply             Supply[]             @relation("PostSupplies")
+  vehicleChecklists  VehicleChecklist[]   @relation("PostVehicleChecklists")
+  DoormanChecklist   DoormanChecklist[]   @relation("PostDoormanChecklists")
   // Checkpoints do posto
-  checkpoints Checkpoint[] @relation("PostCheckpoints")
+  checkpoints        Checkpoint[]         @relation("PostCheckpoints")
 
   // ===============================================
   // 🔗 RELACIONAMENTOS DE USUÁRIOS
@@ -491,7 +498,12 @@ model Shift {
   rounds Round[] @relation("ShiftRounds")
 
   // Ocorrências registradas no turno
-  occurrences Occurrence[] @relation("ShiftOccurrences")
+  occurrences        Occurrence[]         @relation("ShiftOccurrences")
+  OccurrenceDispatch OccurrenceDispatch[] @relation("ShiftOccurrencesDispatches")
+  DoormanChecklist   DoormanChecklist[]   @relation("ShiftDoormanChecklists")
+  VehicleChecklist   VehicleChecklist[]   @relation("ShiftVehicleChecklists")
+  MotorizedService   MotorizedService[]   @relation("ShiftMotorizedServices")
+  Supply             Supply[]             @relation("ShiftSupplies")
 
   // ===============================================
   // 📊 AUDITORIA E CONTROLE
@@ -506,9 +518,6 @@ model Shift {
   // ===============================================
   // 📊 ÍNDICES PARA PERFORMANCE
   // ===============================================
-  VehicleChecklist VehicleChecklist[] @relation("ShiftVehicleChecklists")
-  MotorizedService MotorizedService[] @relation("ShiftMotorizedServices")
-  Supply           Supply[]           @relation("ShiftSupplies")
 
   @@index([companyId])
   @@index([postId])
@@ -726,8 +735,8 @@ model Occurrence {
   talaoNumber Int @default(autoincrement()) // Formato: "001", "002", etc.
 
   // Data e horário
-  date           DateTime // Data da ocorrência
-  occurrenceTime String // Hora da ocorrência (HH:MM)
+  date DateTime // Data da ocorrência
+  time String // Hora da ocorrência (HH:MM)
 
   // Dados do solicitante/envolvidos
   applicant String // Solicitante
@@ -777,6 +786,82 @@ model Occurrence {
   supervisorReview Boolean? // Revisão do supervisor
   reviewedById     String? // ID do supervisor que revisou
   reviewedBy       User?     @relation("OccurrenceReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão
+
+  // ===============================================
+  // 📊 ÍNDICES PARA PERFORMANCE
+  // ===============================================
+
+  @@index([companyId])
+  @@index([postId])
+  @@index([userId])
+  @@index([shiftId])
+  @@index([status])
+  @@index([date])
+  @@index([talaoNumber])
+  @@index([deletedAt])
+  @@index([createdAt])
+}
+
+model OccurrenceDispatch {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS PRINCIPAIS (CONFORME FRONTEND)
+  // ===============================================
+
+  // Numeração automática (reset diário às 00:00)
+  talaoNumber Int @default(autoincrement()) // Formato: "001", "002", etc.
+
+  // Data e horário
+  date        DateTime // Data da ocorrência 
+  timeInitial String // Data e hora da solicitação
+  arrivalTime String? // Data e hora da chegada
+  timeFinal   String? // Data e hora do término
+
+  // Dados do solicitante/envolvidos
+  user     User    @relation("UserOccurrencesDispatches", fields: [userId], references: [id])
+  userId   String
+  userName String // Nome do usuário 
+  guard    User?   @relation("GuardOccurrencesDispatches", fields: [guardId], references: [id])
+  guardId  String? // Vigilante
+
+  // Localização
+  post              Post   @relation("PostOccurrencesDispatches", fields: [postId], references: [id])
+  postId            String
+  postName          String // Nome do posto
+  occurrenceAddress String // Endereço da ocorrência
+
+  // Status do atendimento
+  status ReportStatus @default(PENDING)
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS PRINCIPAIS
+  // ===============================================
+
+  // Multi-tenancy e hierarquia
+  company   Company @relation("CompanyOccurrencesDispatches", fields: [companyId], references: [id])
+  companyId String
+
+  // Relacionamento com turno (opcional)
+  shift   Shift?  @relation("ShiftOccurrencesDispatches", fields: [shiftId], references: [id])
+  shiftId String?
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("OccurrencesDispatchesReviewedBy", fields: [reviewedById], references: [id])
   reviewedAt       DateTime? // Data/hora da revisão
   reviewNotes      String? // Notas da revisão
 
@@ -907,8 +992,8 @@ model VehicleChecklist {
   // Dados do checklist
   date               DateTime  @default(now())
   initialKm          Int
-  finalKm            Int? 
-  generalObservation String? 
+  finalKm            Int?
+  generalObservation String?
   completedAt        DateTime?
 
   // ========================================
@@ -1098,7 +1183,7 @@ model VehicleChecklist {
   // ========================================
   // Índices para consultas rápidas
   @@index([vehicleId])
-  @@index([date]) 
+  @@index([date])
   @@index([createdAt])
 }
 
@@ -1283,6 +1368,82 @@ model MotorizedService {
   @@index([createdAt])
   // Índice para busca por quilometragem
   @@index([vehicleId, kmInitial, kmFinal])
+}
+
+// ===============================================
+// ✅ CHECKLISTS DE VEÍCULOS
+// ===============================================
+// Sistema de verificação de veículos
+// Integrado ao frontend: VehicleChecklistPage
+// ===============================================
+
+model DoormanChecklist {
+  id String @id @default(cuid())
+
+  talaoNumber        Int      @default(autoincrement()) // Formato: "001", "002", etc.
+  // Usuário responsável
+  user               User     @relation("UserDoormanChecklists", fields: [userId], references: [id])
+  userId             String // motorista 
+  userName           String // nome do motorista 
+  // Dados do checklist
+  date               DateTime @default(now())
+  time               String // Hora do checklist
+  generalObservation String?
+
+  // Status do atendimento
+  status ReportStatus @default(PENDING)
+
+  // Multi-tenancy
+  company   Company @relation("CompanyDoormanChecklists", fields: [companyId], references: [id])
+  companyId String
+  // Relacionamento com turno 
+  shift     Shift   @relation("ShiftDoormanChecklists", fields: [shiftId], references: [id])
+  shiftId   String
+  // Posto onde ocorreu
+  post      Post    @relation("PostDoormanChecklists", fields: [postId], references: [id])
+  postId    String
+
+  // ========================================
+  // ITENS DO CHECKLIST - CAMPOS FIXOS
+  // ========================================
+
+  // Portão
+  portaoFuncionando Boolean @default(false)
+  portaoAmassado    Boolean @default(false)
+  portaoObservacao  String?
+
+  // Computador
+  computadorFuncionando Boolean @default(false)
+  computadorAmassado    Boolean @default(false)
+  computadorObservacao  String?
+
+  // Sistema de Monitoramento
+  sistemaDeMonitoramentoFuncionando Boolean @default(false)
+  sistemaDeMonitoramentoAmassado    Boolean @default(false)
+  sistemaDeMonitoramentoObservacao  String?
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("DoormanChecklistReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão  
+
+  // ========================================
+  // ÍNDICES PARA PERFORMANCE
+  // ========================================
+  // Índices para consultas rápidas 
+  @@index([date])
+  @@index([createdAt])
 }
 
 // ===============================================

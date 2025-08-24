@@ -221,7 +221,7 @@ model Occurrence {
   postId                String
   shiftId               String?           // Relacionar com turno
   date                  DateTime
-  occurrenceTime        String            // HH:MM format
+  time        String            // HH:MM format
   applicant             String            // Solicitante
   collaboratorName      String            // Nome do colaborador
   rg                    String            // RG

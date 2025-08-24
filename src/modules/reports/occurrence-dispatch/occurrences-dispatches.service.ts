@@ -1,8 +1,8 @@
 import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 // dto imports
-import { CreateSupplyDto } from './dto/create-supply.dto';
-import { UpdateSupplyDto } from './dto/update-supply.dto';
+import { CreateOccurrenceDispatchDto } from './dto/create-occurrences-dispatches.dto';
+import { UpdateOccurrenceDispatchDto } from './dto/update-occurrences-dispatches.dto';
 // universal imports
 import {
   UniversalService,
@@ -14,20 +14,20 @@ import {
 } from '../../../shared/universal/index';
 
 @Injectable({ scope: Scope.REQUEST })
-export class SuppliesService extends UniversalService<
-  CreateSupplyDto,
-  UpdateSupplyDto
+export class OccurrencesDispatchesService extends UniversalService<
+  CreateOccurrenceDispatchDto,
+  UpdateOccurrenceDispatchDto
 > {
-  private static readonly entityConfig = createEntityConfig('supply');
+  private static readonly entityConfig = createEntityConfig('occurrenceDispatch');
 
   constructor(
-    repository: UniversalRepository<CreateSupplyDto, UpdateSupplyDto>,
+    repository: UniversalRepository<CreateOccurrenceDispatchDto, UpdateOccurrenceDispatchDto>,
     queryService: UniversalQueryService,
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
   ) {
-    const { model, casl } = SuppliesService.entityConfig;
+    const { model, casl } = OccurrencesDispatchesService.entityConfig;
     super(
       repository,
       queryService,
@@ -37,6 +37,7 @@ export class SuppliesService extends UniversalService<
       model,
       casl,
     );
+
     this.setEntityConfig();
   }
 
@@ -49,24 +50,18 @@ export class SuppliesService extends UniversalService<
             name: true,
           },
         },
-        vehicle: {
-          select: {
-            model: true,
-          },
-        },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
-          vehicle: { field: 'model', target: 'vehicleModel' },
         },
-        exclude: ['post', 'vehicle'],
+        exclude: ['post'],
       },
     };
-  }  
-  
+  }
+
   protected async antesDeCriar(
-    data: CreateSupplyDto & { userId: string },
+    data: CreateOccurrenceDispatchDto & { userId: string },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;

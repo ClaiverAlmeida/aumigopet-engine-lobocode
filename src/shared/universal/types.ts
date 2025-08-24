@@ -12,7 +12,9 @@ export type EntityNameModel =
   | 'occurrence'
   | 'supply'
   | 'motorizedService'
-  | 'vehicleChecklist';
+  | 'vehicleChecklist'
+  | 'occurrenceDispatch'
+  | 'doormanChecklist';
 export type EntityNameCasl =
   | 'User'
   | 'Company'
@@ -24,7 +26,9 @@ export type EntityNameCasl =
   | 'VehicleChecklist'
   | 'Supply'
   | 'MotorizedService'
-  | 'VehicleChecklist';
+  | 'VehicleChecklist'
+  | 'OccurrenceDispatch'
+  | 'DoormanChecklist';
 
 // ============================================================================
 // 🔄 MAPEAMENTO AUTOMÁTICO MODEL ↔ CASL
@@ -46,6 +50,8 @@ export const ENTITY_MAPPING = {
   motorizedService: 'MotorizedService',
   supply: 'Supply',
   vehicleChecklist: 'VehicleChecklist',
+  occurrenceDispatch: 'OccurrenceDispatch',
+  doormanChecklist: 'DoormanChecklist',
 } as const;
 
 /**
@@ -62,6 +68,8 @@ export const CASL_TO_MODEL_MAPPING = {
   MotorizedService: 'motorizedService',
   Supply: 'supply',
   VehicleChecklist: 'vehicleChecklist',
+  OccurrenceDispatch: 'occurrenceDispatch',
+  DoormanChecklist: 'doormanChecklist',
 } as const;
 
 // ============================================================================
