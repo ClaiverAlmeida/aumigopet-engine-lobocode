@@ -1,4 +1,4 @@
-@baseUrl = http://localhost:3000
+@baseUrl = https://localhost
 @token = {{ platformAdminLogin.response.body.access_token }}
 @adminToken = {{ adminLogin.response.body.access_token }}
 
@@ -10,11 +10,11 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    # "login": "System Admin Claiver", 
+    "login": "System Admin Claiver", 
     # "password": "SystemAdmin@Senha"
     #   "login": "hr.turno",
     #   "login": "admin.empresA",
-      "login": "guard3.user",
+    #   "login": "guard3.user",
     "password": "SystemAdmin123@Senha"
 }
 

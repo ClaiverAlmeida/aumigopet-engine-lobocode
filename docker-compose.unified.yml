@@ -1,4 +1,49 @@
 services:
+  # Nginx Reverse Proxy
+  # nginx:
+  #   image: nginx:alpine
+  #   container_name: infraseg-nginx
+  #   ports:
+  #     - '80:80'
+  #     - '443:443'
+  #   volumes:
+  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - ./nginx/ssl:/etc/nginx/ssl
+  #     - ./nginx/logs:/var/log/nginx
+  #   depends_on:
+  #     - backend
+  #   restart: unless-stopped
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 128M
+  #         cpus: '0.2'
+  #       reservations:
+  #         memory: 64M
+  #         cpus: '0.1'
+
+  # Migration Service (executa ANTES do backend)
+  migration:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: infraseg-migration
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+    command: sh -c "echo '🔄 Aguardando banco...' && sleep 10 && echo '📦 Executando migrações...' && npx prisma migrate deploy && echo '🌱 Executando seed...' && npx prisma db seed && echo '✅ Migrações concluídas!'"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: "no"
+    networks:
+      - app-net
 
   # Backend NestJS
   backend:
@@ -14,6 +59,8 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - REDIS_URL=redis://redis:6379
     depends_on:
+      migration:
+        condition: service_completed_successfully
       db:
         condition: service_healthy
       redis:
@@ -30,7 +77,7 @@ services:
     networks:
       - app-net
 
-  # Database PostgreSQL (usar rede externa)
+  # Database PostgreSQL
   db:
     image: postgres:16.8-alpine3.20
     container_name: infraseg-db
@@ -44,7 +91,7 @@ services:
       - postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
       interval: 30s
       timeout: 10s
       retries: 3
@@ -61,7 +108,7 @@ services:
     networks:
       - app-net
 
-  # Redis Cache (usar rede externa)
+  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: infraseg-redis

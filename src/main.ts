@@ -1,13 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
-import { AppModule } from './app.module';
-import { runSeed } from 'prisma/seed';
+import { AppModule } from './app.module'; 
 import { CustomLoggerService } from './shared/common/logger/logger.service';
 import { MetricsInterceptor } from './shared/common/interceptors/metrics.interceptor';
 
 async function bootstrap() {
-  try {
-    await runSeed();
+  try { 
 
     const app = await NestFactory.create(AppModule);
     const logger = app.get(CustomLoggerService);

@@ -1,13 +1,14 @@
 services:
-
   # Backend NestJS
   backend:
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     container_name: infraseg-backend
     env_file:
       - .env
+    ports:
+      - '3000:3000'
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
@@ -18,64 +19,65 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    restart: unless-stopped
     deploy:
       resources:
         limits:
-          memory: 512M
+          memory: 1G
           cpus: '0.5'
         reservations:
-          memory: 256M
+          memory: 512M
           cpus: '0.2'
+    restart: unless-stopped
     networks:
       - app-net
 
-  # Database PostgreSQL (usar rede externa)
+  # Database PostgreSQL
   db:
     image: postgres:16.8-alpine3.20
     container_name: infraseg-db
-    env_file:
-      - .env
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+    ports:
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./backups:/backups
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     deploy:
       resources:
         limits:
-          memory: 512M
-          cpus: '0.3'
+          memory: 1G
+          cpus: '0.5'
         reservations:
-          memory: 256M
-          cpus: '0.1'
+          memory: 512M
+          cpus: '0.2'
+    restart: unless-stopped
     networks:
       - app-net
 
-  # Redis Cache (usar rede externa)
+  # Redis Cache
   redis:
     image: redis:7-alpine
     container_name: infraseg-redis
+    ports:
+      - '6379:6379'
     volumes:
       - redis_data:/data
-    restart: unless-stopped
     deploy:
       resources:
         limits:
+          memory: 256M
+          cpus: '0.2'
+        reservations:
           memory: 128M
           cpus: '0.1'
-        reservations:
-          memory: 64M
-          cpus: '0.05'
+    restart: unless-stopped
     networks:
       - app-net
 
