@@ -12,8 +12,8 @@ async function bootstrap() {
 
     app.enableCors({
       origin: [
-        'https://meusite.com',
-        'https://app.meusite.com',
+        'https://appinfraseg.com',
+        'https://appinfraseg.com',
         'http://localhost:4200',
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
