@@ -23,6 +23,7 @@ show_help() {
     echo "  unified     - Deploy completo unificado"
     echo "  database    - Iniciar apenas database"
     echo "  monitoring  - Iniciar monitoramento"
+    echo "  minio       - Iniciar apenas MinIO"
     echo "  status      - Verificar status dos serviços"
     echo "  logs        - Ver logs dos serviços"
     echo "  stop        - Parar todos os serviços"
@@ -95,6 +96,20 @@ start_monitoring() {
     echo "✅ Monitoramento iniciado!"
 }
 
+# Função para iniciar MinIO
+start_minio() {
+    echo -e "${BLUE}📁 Iniciando MinIO - INFRASEG${NC}"
+    
+    # Criar rede se não existir
+    if ! docker network ls | grep -q "app-net"; then
+        echo "📡 Criando rede app-net..."
+        docker network create --driver bridge app-net
+    fi
+    
+    docker compose -f docker/docker-compose.minio.yml up -d
+    echo "✅ MinIO iniciado!"
+}
+
 # Função para verificar status
 check_status() {
     echo -e "${BLUE}📊 Status dos Serviços - INFRASEG${NC}"
@@ -118,12 +133,13 @@ show_logs() {
     echo "  1. Backend"
     echo "  2. Database"
     echo "  3. Redis"
-    echo "  4. Nginx"
-    echo "  5. Prometheus"
-    echo "  6. Grafana"
-    echo "  7. Todos"
+    echo "  4. MinIO"
+    echo "  5. Nginx"
+    echo "  6. Prometheus"
+    echo "  7. Grafana"
+    echo "  8. Todos"
     echo ""
-    read -p "Digite o número (1-7): " choice
+    read -p "Digite o número (1-8): " choice
     
     case $choice in
         1)
@@ -136,15 +152,18 @@ show_logs() {
             docker compose -f docker/docker-compose.database.yml logs -f redis
             ;;
         4)
-            docker compose -f docker/docker-compose.infrastructure.yml logs -f nginx
+            docker compose -f docker/docker-compose.unified.yml logs -f minio
             ;;
         5)
-            docker compose -f docker/docker-compose.monitoring.yml logs -f prometheus
+            docker compose -f docker/docker-compose.infrastructure.yml logs -f nginx
             ;;
         6)
-            docker compose -f docker/docker-compose.monitoring.yml logs -f grafana
+            docker compose -f docker/docker-compose.monitoring.yml logs -f prometheus
             ;;
         7)
+            docker compose -f docker/docker-compose.monitoring.yml logs -f grafana
+            ;;
+        8)
             docker compose -f docker/docker-compose.unified.yml logs -f
             ;;
         *)
@@ -207,6 +226,9 @@ case "${1:-help}" in
         ;;
     monitoring)
         start_monitoring
+        ;;
+    minio)
+        start_minio
         ;;
     status)
         check_status
