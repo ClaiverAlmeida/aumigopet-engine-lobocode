@@ -3,7 +3,7 @@
 echo "🏗️ Deploy Infraestrutura - INFRASEG"
 
 # Verificar se está no diretório correto
-if [ ! -f "docker-compose.infrastructure.yml" ]; then
+if [ ! -f "docker/docker-compose.infrastructure.yml" ]; then
     echo "❌ Erro: Execute este script no diretório do projeto"
     exit 1
 fi
@@ -34,11 +34,11 @@ fi
 
 # Parar infraestrutura existente
 echo "🛑 Parando infraestrutura..."
-docker compose -f docker-compose.infrastructure.yml down
+docker compose -f docker/docker-compose.infrastructure.yml down
 
 # Iniciar infraestrutura
 echo "🚀 Iniciando infraestrutura..."
-docker compose -f docker-compose.infrastructure.yml up -d
+docker compose -f docker/docker-compose.infrastructure.yml up -d
 
 # Aguardar inicialização
 echo "⏳ Aguardando inicialização..."
@@ -46,7 +46,7 @@ sleep 5
 
 # Verificar status
 echo "📊 Status da infraestrutura:"
-docker compose -f docker-compose.infrastructure.yml ps
+docker compose -f docker/docker-compose.infrastructure.yml ps
 
 # Testar Nginx
 echo "🌐 Testando Nginx..."

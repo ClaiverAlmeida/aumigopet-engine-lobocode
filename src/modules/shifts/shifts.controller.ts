@@ -33,18 +33,18 @@ export class ShiftsController extends UniversalController<
   }
 
   @RequiredRoles(Roles.GUARD, Roles.HR)
-  @Get('in-progress')
-  buscarEmAndamento() { 
-    return this.service.buscarEmAndamento();
-  }
-
-  @RequiredRoles(Roles.GUARD, Roles.HR)
   @Get()
   buscarComPaginacao(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
     return super.buscarComPaginacao(page, limit);
+  }
+  
+  @RequiredRoles(Roles.GUARD, Roles.HR)
+  @Get('current')
+  buscarEmAndamento() { 
+    return this.service.buscarEmAndamento();
   }
 
   @RequiredRoles(Roles.GUARD)

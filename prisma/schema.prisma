@@ -206,6 +206,9 @@ model Company {
   eventLogs   EventLog[]   @relation("CompanyEventLogs")
   panicEvents PanicEvent[] @relation("CompanyPanicEvents")
 
+  // Arquivos da empresa
+  files File[] @relation("CompanyFiles")
+
   // ===============================================
   // 📊 AUDITORIA E ÍNDICES
   // ===============================================
@@ -283,6 +286,9 @@ model User {
   // Eventos e logs
   eventLogs   EventLog[]   @relation("UserEventLogs")
   panicEvents PanicEvent[] @relation("UserPanicEvents")
+
+  // Arquivos enviados pelo usuário
+  files File[] @relation("UserFiles")
 
   // ===============================================
   // 📊 ÍNDICES PARA PERFORMANCE
@@ -1132,35 +1138,90 @@ model VehicleChecklist {
   luzReArranhado   Boolean @default(false)
   luzReObservacao  String?
 
-  // Pneu Dianteiro Direito
-  pneuDianteiroDireitoFuncionando Boolean @default(false)
-  pneuDianteiroDireitoAmassado    Boolean @default(false)
-  pneuDianteiroDireitoArranhado   Boolean @default(false)
-  pneuDianteiroDireitoObservacao  String?
+  // Pneus Dianteiro Direito
+  pneusDianteiroFuncionando Boolean @default(false)
+  pneusDianteiroAmassado    Boolean @default(false)
+  pneusDianteiroArranhado   Boolean @default(false)
+  pneusDianteiroObservacao  String?
+ 
 
-  // Pneu Dianteiro Esquerdo
-  pneuDianteiroEsquerdoFuncionando Boolean @default(false)
-  pneuDianteiroEsquerdoAmassado    Boolean @default(false)
-  pneuDianteiroEsquerdoArranhado   Boolean @default(false)
-  pneuDianteiroEsquerdoObservacao  String?
-
-  // Pneu Traseiro Direito
-  pneuTraseiroDireitoFuncionando Boolean @default(false)
-  pneuTraseiroDireitoAmassado    Boolean @default(false)
-  pneuTraseiroDireitoArranhado   Boolean @default(false)
-  pneuTraseiroDireitoObservacao  String?
-
-  // Pneu Traseiro Esquerdo
-  pneuTraseiroEsquerdoFuncionando Boolean @default(false)
-  pneuTraseiroEsquerdoAmassado    Boolean @default(false)
-  pneuTraseiroEsquerdoArranhado   Boolean @default(false)
-  pneuTraseiroEsquerdoObservacao  String?
+  // Pneus Traseiro 
+  pneusTraseiroFuncionando Boolean @default(false)
+  pneusTraseiroAmassado    Boolean @default(false)
+  pneusTraseiroArranhado   Boolean @default(false)
+  pneusTraseiroObservacao  String? 
 
   // Pneu Estepe
-  pneuEstepeFuncionando Boolean @default(false)
-  pneuEstepeAmassado    Boolean @default(false)
-  pneuEstepeArranhado   Boolean @default(false)
-  pneuEstepeObservacao  String?
+  estepeFuncionando Boolean @default(false)
+  estepeAmassado    Boolean @default(false)
+  estepeArranhado   Boolean @default(false)
+  estepeObservacao  String?
+
+  // Limpador de Vidro Traseiro
+  limpadorVidroTraseiroFuncionando Boolean @default(false)
+  limpadorVidroTraseiroAmassado    Boolean @default(false)
+  limpadorVidroTraseiroArranhado   Boolean @default(false)
+  limpadorVidroTraseiroObservacao  String?
+
+  // Esguicho d'Água Vidro Traseiro
+  esguichoAguaVidroTraseiroFuncionando Boolean @default(false)
+  esguichoAguaVidroTraseiroAmassado    Boolean @default(false)
+  esguichoAguaVidroTraseiroArranhado   Boolean @default(false)
+  esguichoAguaVidroTraseiroObservacao  String?
+
+  // Porta Motorista
+  portaMotoristaFuncionando Boolean @default(false)
+  portaMotoristaAmassado    Boolean @default(false)
+  portaMotoristaArranhado   Boolean @default(false)
+  portaMotoristaObservacao  String?
+
+  // Porta Passageiro Dianteiro
+  portaPassageiroDianteiroFuncionando Boolean @default(false)
+  portaPassageiroDianteiroAmassado    Boolean @default(false)
+  portaPassageiroDianteiroArranhado   Boolean @default(false)
+  portaPassageiroDianteiroObservacao  String?
+
+  // Porta Traseira Esquerda
+  portaTraseiraEsquerdaFuncionando Boolean @default(false)
+  portaTraseiraEsquerdaAmassado    Boolean @default(false)
+  portaTraseiraEsquerdaArranhado   Boolean @default(false)
+  portaTraseiraEsquerdaObservacao  String?
+
+  // Porta Traseira Direita
+  portaTraseiraDireitaFuncionando Boolean @default(false)
+  portaTraseiraDireitaAmassado    Boolean @default(false)
+  portaTraseiraDireitaArranhado   Boolean @default(false)
+  portaTraseiraDireitaObservacao  String?
+
+  // Botões do Painel Interno
+  botoesPainelInternoFuncionando Boolean @default(false)
+  botoesPainelInternoAmassado    Boolean @default(false)
+  botoesPainelInternoArranhado   Boolean @default(false)
+  botoesPainelInternoObservacao  String?
+
+  // Rádio FM
+  radioFmFuncionando Boolean @default(false)
+  radioFmAmassado    Boolean @default(false)
+  radioFmArranhado   Boolean @default(false)
+  radioFmObservacao  String?
+
+  // Giriflex
+  giriflexFuncionando Boolean @default(false)
+  giriflexAmassado    Boolean @default(false)
+  giriflexArranhado   Boolean @default(false)
+  giriflexObservacao  String?
+
+  // Chave de Roda
+  chaveDeRodaFuncionando Boolean @default(false)
+  chaveDeRodaAmassado    Boolean @default(false)
+  chaveDeRodaArranhado   Boolean @default(false)
+  chaveDeRodaObservacao  String?
+
+  // Macaco
+  macacoFuncionando Boolean @default(false)
+  macacoAmassado    Boolean @default(false)
+  macacoArranhado   Boolean @default(false)
+  macacoObservacao  String?
   // ===============================================
   // 📊 AUDITORIA E CONTROLE
   // ===============================================
@@ -1596,4 +1657,81 @@ model PanicEvent {
   @@index([status])
   @@index([dateTime])
   @@index([createdAt])
+}
+
+// ===============================================
+// 📁 ARMAZENAMENTO DE ARQUIVOS
+// ===============================================
+// Sistema de armazenamento de arquivos com MinIO
+// Suporte a múltiplos tipos de arquivo
+// ===============================================
+
+enum FileType {
+  PROFILE_IMAGE // Imagem de perfil
+  DOCUMENT // Documentos (PDF, DOC, etc.)
+  REPORT // Relatórios
+  VIDEO // Vídeos
+  AUDIO // Áudios
+  OTHER // Outros tipos
+}
+
+model File {
+  id String @id @default(cuid())
+
+  // ===============================================
+  // 📋 DADOS DO ARQUIVO
+  // ===============================================
+
+  // Nome original do arquivo
+  originalName String
+
+  // Nome do arquivo no storage (MinIO)
+  fileName String @unique
+
+  // Tipo do arquivo
+  type FileType
+
+  // Tamanho em bytes
+  size Int
+
+  // MIME type
+  mimeType String
+
+  // URL pública do arquivo
+  url String @unique
+
+  // Descrição opcional
+  description String?
+
+  // ===============================================
+  // 🔗 RELACIONAMENTOS
+  // ===============================================
+
+  // Multi-tenancy
+  company   Company? @relation("CompanyFiles", fields: [companyId], references: [id])
+  companyId String?
+
+  // Usuário que fez upload
+  uploadedByUser   User? @relation("UserFiles", fields: [uploadedBy], references: [id])
+  uploadedBy   String?
+
+  // ===============================================
+  // 📊 AUDITORIA
+  // ===============================================
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime? // Soft delete
+
+  // ===============================================
+  // 📊 ÍNDICES
+  // ===============================================
+
+  @@index([companyId])
+  @@index([uploadedBy])
+  @@index([type])
+  @@index([fileName])
+  @@index([url])
+  @@index([createdAt])
+  @@index([deletedAt])
 }

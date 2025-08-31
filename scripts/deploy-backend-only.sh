@@ -3,7 +3,7 @@
 echo "🚀 Deploy Backend Apenas - INFRASEG"
 
 # Verificar se está no diretório correto
-if [ ! -f "docker-compose.prod.yml" ]; then
+if [ ! -f "docker/docker-compose.prod.yml" ]; then
     echo "❌ Erro: Execute este script no diretório do projeto"
     exit 1
 fi
@@ -32,11 +32,11 @@ fi
 
 # Parar apenas o backend
 echo "🛑 Parando backend..."
-docker compose -f docker-compose.prod.yml stop backend
+docker compose -f docker/docker-compose.prod.yml stop backend
 
 # Reconstruir e iniciar apenas o backend
 echo "🔨 Reconstruindo backend..."
-docker compose -f docker-compose.prod.yml up -d --build backend
+docker compose -f docker/docker-compose.prod.yml up -d --build backend
 
 # Aguardar inicialização
 echo "⏳ Aguardando inicialização..."
@@ -44,7 +44,7 @@ sleep 15
 
 # Verificar status
 echo "📊 Status do backend:"
-docker compose -f docker-compose.prod.yml ps backend
+docker compose -f docker/docker-compose.prod.yml ps backend
 
 # Testar health check
 echo "🏥 Testando health check..."
@@ -56,5 +56,5 @@ echo "✅ Deploy do backend concluído!"
 echo "🌐 API disponível em: https://localhost"
 echo ""
 echo "📋 Comandos úteis:"
-echo "  - Logs: docker compose -f docker-compose.prod.yml logs -f backend"
-echo "  - Restart: docker compose -f docker-compose.prod.yml restart backend"
+echo "  - Logs: docker compose -f docker/docker-compose.prod.yml logs -f backend"
+echo "  - Restart: docker compose -f docker/docker-compose.prod.yml restart backend"

@@ -43,6 +43,8 @@ import {
   PrismaErrorFilter,
 } from './shared/common/filters';
 import { VehiclesModule } from './modules/vehicle/vehicles.module';
+import { ServiceBusModule } from './modules/service-bus/service-bus.module';
+import { FilesModule } from './shared/files/files.module';
 
 //javascript es7
 
@@ -66,6 +68,8 @@ import { VehiclesModule } from './modules/vehicle/vehicles.module';
     ShiftsModule,
     PostsModule,
     ReportsModule,
+    ServiceBusModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [

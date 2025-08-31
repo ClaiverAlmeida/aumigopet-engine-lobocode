@@ -38,7 +38,7 @@ show_help() {
 
 # Função para verificar se está no diretório correto
 check_directory() {
-    if [ ! -f "docker-compose.yml" ]; then
+    if [ ! -f "docker/docker-compose.yml" ]; then
         echo -e "${RED}❌ Erro: Execute este script no diretório do projeto${NC}"
         exit 1
     fi
@@ -77,7 +77,7 @@ start_database() {
         docker network create --driver bridge app-net
     fi
     
-    docker compose -f docker-compose.database.yml up -d
+    docker compose -f docker/docker-compose.database.yml up -d
     echo "✅ Database iniciado!"
 }
 
@@ -91,7 +91,7 @@ start_monitoring() {
         docker network create --driver bridge app-net
     fi
     
-    docker compose -f docker-compose.monitoring.yml up -d
+    docker compose -f docker/docker-compose.monitoring.yml up -d
     echo "✅ Monitoramento iniciado!"
 }
 
@@ -127,25 +127,25 @@ show_logs() {
     
     case $choice in
         1)
-            docker compose -f docker-compose.prod.yml logs -f backend
+            docker compose -f docker/docker-compose.prod.yml logs -f backend
             ;;
         2)
-            docker compose -f docker-compose.database.yml logs -f db
+            docker compose -f docker/docker-compose.database.yml logs -f db
             ;;
         3)
-            docker compose -f docker-compose.database.yml logs -f redis
+            docker compose -f docker/docker-compose.database.yml logs -f redis
             ;;
         4)
-            docker compose -f docker-compose.infrastructure.yml logs -f nginx
+            docker compose -f docker/docker-compose.infrastructure.yml logs -f nginx
             ;;
         5)
-            docker compose -f docker-compose.monitoring.yml logs -f prometheus
+            docker compose -f docker/docker-compose.monitoring.yml logs -f prometheus
             ;;
         6)
-            docker compose -f docker-compose.monitoring.yml logs -f grafana
+            docker compose -f docker/docker-compose.monitoring.yml logs -f grafana
             ;;
         7)
-            docker compose -f docker-compose.unified.yml logs -f
+            docker compose -f docker/docker-compose.unified.yml logs -f
             ;;
         *)
             echo "Opção inválida"
@@ -157,12 +157,12 @@ show_logs() {
 stop_all() {
     echo -e "${BLUE}🛑 Parando todos os serviços - INFRASEG${NC}"
     
-    docker compose -f docker-compose.unified.yml down
-    docker compose -f docker-compose.prod.yml down
-    docker compose -f docker-compose.backend.yml down
-    docker compose -f docker-compose.database.yml down
-    docker compose -f docker-compose.infrastructure.yml down
-    docker compose -f docker-compose.monitoring.yml down
+    docker compose -f docker/docker-compose.unified.yml down
+    docker compose -f docker/docker-compose.prod.yml down
+    docker compose -f docker/docker-compose.backend.yml down
+    docker compose -f docker/docker-compose.database.yml down
+    docker compose -f docker/docker-compose.infrastructure.yml down
+    docker compose -f docker/docker-compose.monitoring.yml down
     
     echo "✅ Todos os serviços parados!"
 }
@@ -172,12 +172,12 @@ cleanup() {
     echo -e "${BLUE}🧹 Limpeza de recursos - INFRASEG${NC}"
     
     # Parar containers órfãos
-    docker compose -f docker-compose.unified.yml down --remove-orphans
-    docker compose -f docker-compose.prod.yml down --remove-orphans
-    docker compose -f docker-compose.backend.yml down --remove-orphans
-    docker compose -f docker-compose.database.yml down --remove-orphans
-    docker compose -f docker-compose.infrastructure.yml down --remove-orphans
-    docker compose -f docker-compose.monitoring.yml down --remove-orphans
+    docker compose -f docker/docker-compose.unified.yml down --remove-orphans
+    docker compose -f docker/docker-compose.prod.yml down --remove-orphans
+    docker compose -f docker/docker-compose.backend.yml down --remove-orphans
+    docker compose -f docker/docker-compose.database.yml down --remove-orphans
+    docker compose -f docker/docker-compose.infrastructure.yml down --remove-orphans
+    docker compose -f docker/docker-compose.monitoring.yml down --remove-orphans
     
     # Limpar recursos não utilizados
     docker system prune -f

@@ -3,7 +3,7 @@
 echo "🚀 Deploy Unificado - INFRASEG"
 
 # Verificar se está no diretório correto
-if [ ! -f "docker-compose.unified.yml" ]; then
+if [ ! -f "docker/docker-compose.unified.yml" ]; then
     echo "❌ Erro: Execute este script no diretório do projeto"
     exit 1
 fi
@@ -20,16 +20,16 @@ fi
 
 # Parar todos os containers existentes
 echo "🛑 Parando containers existentes..."
-docker compose -f docker-compose.unified.yml down
+docker compose -f docker/docker-compose.unified.yml down
 
 # Remover containers órfãos
 echo "🧹 Limpando containers órfãos..."
-docker compose -f docker-compose.unified.yml down --remove-orphans
+docker compose -f docker/docker-compose.unified.yml down --remove-orphans
 
 # Iniciar todos os serviços (migration executa automaticamente)
 echo "🚀 Iniciando todos os serviços..."
 echo "📦 Migration será executada automaticamente antes do backend"
-docker compose -f docker-compose.unified.yml up -d --build
+docker compose -f docker/docker-compose.unified.yml up -d --build
 
 # Aguardar migration e inicialização
 echo "⏳ Aguardando migration e inicialização..."
@@ -37,7 +37,7 @@ sleep 60
 
 # Verificar status
 echo "📊 Status dos containers:"
-docker compose -f docker-compose.unified.yml ps
+docker compose -f docker/docker-compose.unified.yml ps
 
 # Aguardar mais um pouco para o backend inicializar
 echo "⏳ Aguardando backend inicializar..."
@@ -53,6 +53,6 @@ echo "✅ Deploy unificado concluído!"
 echo "🌐 API disponível em: https://localhost"
 echo ""
 echo "📋 Comandos úteis:"
-echo "  - Logs: docker compose -f docker-compose.unified.yml logs -f"
-echo "  - Restart: docker compose -f docker-compose.unified.yml restart"
-echo "  - Parar: docker compose -f docker-compose.unified.yml down"
+echo "  - Logs: docker compose -f docker/docker-compose.unified.yml logs -f"
+echo "  - Restart: docker compose -f docker/docker-compose.unified.yml restart"
+echo "  - Parar: docker compose -f docker/docker-compose.unified.yml down"
