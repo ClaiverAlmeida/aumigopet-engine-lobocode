@@ -3,11 +3,13 @@ services:
   # Backend NestJS
   backend:
     build:
-      context: .
-      dockerfile: Dockerfile.prod
+      context: ..
+      dockerfile: docker/Dockerfile.prod
     container_name: infraseg-backend
     env_file:
       - .env
+    ports:
+      - '3000:3000'
     environment:
       - NODE_ENV=production
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}
@@ -40,8 +42,10 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
+    ports:
+      - '5432:5432'
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - infraseg-engine-lobocode_postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres']
@@ -80,9 +84,12 @@ services:
       - app-net
 
 volumes:
-  postgres_data:
+  infraseg-engine-lobocode_postgres_data:
+    external: true
   redis_data:
 
 networks:
   app-net:
     external: true
+
+

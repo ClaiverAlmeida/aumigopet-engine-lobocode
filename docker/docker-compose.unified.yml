@@ -1,26 +1,48 @@
 services:
   # Nginx Reverse Proxy
-  # nginx:
-  #   image: nginx:alpine
-  #   container_name: infraseg-nginx
-  #   ports:
-  #     - '80:80'
-  #     - '443:443'
-  #   volumes:
-  #     - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-  #     - ./nginx/ssl:/etc/nginx/ssl
-  #     - ./nginx/logs:/var/log/nginx
-  #   depends_on:
-  #     - backend
-  #   restart: unless-stopped
-  #   deploy:
-  #     resources:
-  #       limits:
-  #         memory: 128M
-  #         cpus: '0.2'
-  #       reservations:
-  #         memory: 64M
-  #         cpus: '0.1'
+  nginx:
+    image: nginx:alpine
+    container_name: infraseg-nginx
+    ports:
+      - '80:80'
+      - '443:443'
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/api.conf:/etc/nginx/api.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - backend
+      - frontend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.2'
+        reservations:
+          memory: 64M
+          cpus: '0.1'
+    networks:
+      - app-net
+
+  # Frontend Angular
+  frontend:
+    image: infraseg-app-lobocode-frontend
+    container_name: infraseg-frontend
+    ports:
+      - '4200:80'
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.3'
+        reservations:
+          memory: 128M
+          cpus: '0.1'
+    networks:
+      - app-net
 
   # Migration Service (executa ANTES do backend)
   migration:
@@ -83,6 +105,8 @@ services:
   db:
     image: postgres:16.8-alpine3.20
     container_name: infraseg-db
+    ports:
+      - '5432:5432'  # Expor PostgreSQL externamente
     env_file:
       - .env
     environment:
@@ -90,7 +114,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - infraseg-engine-lobocode_postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
@@ -161,7 +185,8 @@ services:
       - app-net
 
 volumes:
-  postgres_data:
+  infraseg-engine-lobocode_postgres_data:
+    external: true
   redis_data:
   minio_data:
 

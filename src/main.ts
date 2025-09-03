@@ -15,8 +15,8 @@ async function bootstrap() {
     app.enableCors({
       origin: [
         'https://appinfraseg.com',
-        'https://appinfraseg.com',
-        'http://localhost:4200',
+        'http://31.97.166.94',           // Nginx proxy
+        'http://localhost:4200',          // Para desenvolvimento local
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],

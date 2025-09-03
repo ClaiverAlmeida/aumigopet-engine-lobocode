@@ -16,11 +16,11 @@ fi
 
 # Parar containers existentes
 echo "🛑 Parando containers existentes..."
-docker compose -f docker/docker-compose.minio.yml down
+docker compose -f docker/docker-compose.minio.yml --env-file .env down
 
 # Iniciar MinIO
 echo "▶️ Iniciando MinIO..."
-docker compose -f docker/docker-compose.minio.yml up -d
+docker compose -f docker/docker-compose.minio.yml --env-file .env up -d
 
 # Aguardar inicialização
 echo "⏳ Aguardando inicialização..."
@@ -28,7 +28,7 @@ sleep 10
 
 # Verificar status
 echo "📊 Status dos containers:"
-docker compose -f docker/docker-compose.minio.yml ps
+docker compose -f docker/docker-compose.minio.yml --env-file .env ps
 
 echo ""
 echo "✅ MinIO iniciado!"
