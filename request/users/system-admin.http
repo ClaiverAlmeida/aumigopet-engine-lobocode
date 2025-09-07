@@ -1,5 +1,5 @@
 @baseUrl = http://localhost:3000
-@companyId = cmco084kk0000lt96pxlqot9s
+@companyId = cmf03p4950000ltn8twe926jf
 
 
 @token = {{ platformAdminLogin.response.body.access_token }}
@@ -10,8 +10,9 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "login": "systemadmin@user.com",
-    "password": "SystemAdmin@Senha"
+    # "login": "systemadmin@user.com",
+    "login": "bruna oliveira",
+    "password": "SystemAdmin123@Senha"
 }
 
 ### ========================================
@@ -57,14 +58,21 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### Criar novo SYSTEM_ADMIN
-POST {{baseUrl}}/users/system-admin
+POST {{baseUrl}}/users/guard
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "Novo Platform Admin",
-    "email": "novo.systemadmin@user.com",
-    "password": "SystemAdmin123@Senha"
+  "name": "213123",
+  "email": "testssse@tedte.com",
+  "login": "testeTAxss2@",
+  "password": "1231SssADASD@",
+  "role": "GUARD",
+  "phone": "(12) 3123-2313",
+  "address": "asdasd",
+  "rg": "123123123123",
+  "cpf": "735.582.210-10",
+  "registration": "123123123"
 }
 
 ### Criar ADMIN em empresa específica
@@ -85,7 +93,9 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-    "name": "HR Empresa A",
+    "name": "Bruna Oliveira",
+    "login": "bruna oliveira",
+    "role": "HR",
     "email": "hr.empresaA@user.com",
     "password": "SystemAdmin123@Senha",
     "companyId": "{{companyId}}"

@@ -30,7 +30,7 @@ enum Roles {
   ADMIN // Admin da empresa
   HR // Recursos humanos
   SUPERVISOR // Supervisor
-  GUARD // Guarda de segurança
+  GUARD // Vigilante de segurança
   POST_SUPERVISOR // Supervisor de posto
   POST_RESIDENT // Morador/residente
 
@@ -238,6 +238,7 @@ model User {
   company        Company?   @relation(fields: [companyId], references: [id])
   companyId      String?
   profilePicture String?
+  registration   String?    @unique
   status         UserStatus @default(ACTIVE)
 
   // Campos de auditoria
@@ -334,7 +335,7 @@ model Permission {
   id             String         @id @default(cuid())
   user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId         String
-  permissionType PermissionType // DOORMAN, SUPPORT, PATROL para Guardas
+  permissionType PermissionType // DOORMAN, SUPPORT, PATROL para Vigilantes
   granted        Boolean        @default(true)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -1143,13 +1144,12 @@ model VehicleChecklist {
   pneusDianteiroAmassado    Boolean @default(false)
   pneusDianteiroArranhado   Boolean @default(false)
   pneusDianteiroObservacao  String?
- 
 
   // Pneus Traseiro 
   pneusTraseiroFuncionando Boolean @default(false)
   pneusTraseiroAmassado    Boolean @default(false)
   pneusTraseiroArranhado   Boolean @default(false)
-  pneusTraseiroObservacao  String? 
+  pneusTraseiroObservacao  String?
 
   // Pneu Estepe
   estepeFuncionando Boolean @default(false)
@@ -1712,15 +1712,15 @@ model File {
   companyId String?
 
   // Usuário que fez upload
-  uploadedByUser   User? @relation("UserFiles", fields: [uploadedBy], references: [id])
-  uploadedBy   String?
+  uploadedByUser User?   @relation("UserFiles", fields: [uploadedBy], references: [id])
+  uploadedBy     String?
 
   // ===============================================
   // 📊 AUDITORIA
   // ===============================================
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime? // Soft delete
 
   // ===============================================

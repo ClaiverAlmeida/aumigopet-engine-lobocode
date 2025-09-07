@@ -117,9 +117,9 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
     can('export', 'Report', { companyId: user.companyId, type: 'HR' });
   },
 
-  // SUPERVISOR - Supervisor de Guardas
+  // SUPERVISOR - Supervisor de Vigilantes
   SUPERVISOR(user, { can }) {
-    // Tudo que um Guarda faz
+    // Tudo que um Vigilante faz
     can('read', 'User', { id: user.id });
     can('update', 'User', ['name', 'profilePicture'], { id: user.id });
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
@@ -187,7 +187,7 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
     can('read', 'User', { id: user.id });
     can('update', 'User', ['name', 'profilePicture'], { id: user.id });
 
-    // Tudo que um Guarda faz
+    // Tudo que um Vigilante faz
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
     can('manage', 'MotorizedService', {

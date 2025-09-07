@@ -51,8 +51,13 @@ export class UserRepository {
           id: true,
           name: true,
         },
-      },
-      userPosts: true,
+      }, 
+      permissions:{
+        select: {
+          permissionType: true,
+        },
+      }
+
     };
   }
 
@@ -106,7 +111,7 @@ export class UserRepository {
     });
   }
 
-  async criarPermissaoDeGuarda(data: {
+  async criarPermissaoDeVigilante(data: {
     userId: string;
     permissionType: PermissionType[];
   }) {

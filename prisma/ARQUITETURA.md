@@ -9,7 +9,7 @@ Este sistema é uma plataforma completa para gestão de operações de seguranç
 ## Perfis de Usuário
 
 - **Vigilante**: Realiza rondas, registra ocorrências, recebe advertências, acessa notificações, chat, escala e modo offline.
-- **RH**: Gerencia cadastro de vigilantes, funcionários, relatórios, advertências, escalas e controle de ponto.
+- **RH**: Gerencia Cadastro de Funcionários, funcionários, relatórios, advertências, escalas e controle de ponto.
 - **ADM/Gestão**: Painel centralizado, gestão de frota, relatórios gerenciais, clientes, configurações, supervisores, checklists, notificações, chat, auditoria.
 - **Cliente**: Visualiza ocorrências, recebe notificações, histórico, feedback e suporte.
 

@@ -12,7 +12,7 @@ O sistema gerencia **7 tipos de usuários** com diferentes níveis de acesso:
 2. **ADMIN** - Administrador da empresa/condomínio
 3. **SUPERVISOR** - Supervisor de segurança da empresa
 4. **HR** - Recursos Humanos da empresa
-5. **GUARD** - Guarda de segurança (não associado a postos)
+5. **GUARD** - Vigilante de segurança (não associado a postos)
 6. **POST_SUPERVISOR** - Supervisor de um posto específico (1 posto)
 7. **POST_RESIDENT** - Morador/residente de um posto específico (1 posto)
 

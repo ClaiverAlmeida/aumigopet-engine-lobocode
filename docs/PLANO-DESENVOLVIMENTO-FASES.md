@@ -157,9 +157,9 @@ Este documento define as fases de desenvolvimento do sistema Infraseg, organizad
   - Acompanhamento de status
   - Relatórios de despacho
 
-### **Sprint 11-12: Gestão de Guardas**
+### **Sprint 11-12: Gestão de Vigilantes**
 
-- [ ] 🆕 **Módulo de Guardas**
+- [ ] 🆕 **Módulo de Vigilantes**
   - Cadastro completo de guardas
   - Associação a postos
   - Gestão de documentos
@@ -348,7 +348,7 @@ Este documento define as fases de desenvolvimento do sistema Infraseg, organizad
 
 ### **Sprint 27-28: Funcionalidades Premium**
 
-- [ ] 🆕 **Avaliação de Guardas**
+- [ ] 🆕 **Avaliação de Vigilantes**
   - Sistema de avaliação
   - Ranking de performance
   - Feedback automático

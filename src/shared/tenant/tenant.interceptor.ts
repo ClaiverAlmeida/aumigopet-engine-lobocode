@@ -77,7 +77,7 @@ export class TenantInterceptor implements NestInterceptor {
       // Valida se apenas SYSTEM_ADMIN pode especificar companyId
       if (!ability.can('manage', 'all')) {
         throw new ForbiddenException(
-          'Only platform administrators can specify companyId in requests'
+          'Somente administradores de plataforma podem especificar companyId em solicitações'
         );
       }
 

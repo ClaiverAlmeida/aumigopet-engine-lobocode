@@ -113,8 +113,8 @@ async function seedUser(companyId: string) {
   }
 
   const userGuardData = {
-    name: 'Guarda Claiver Almeida de Araújo',
-    login: 'Guarda Claiver',
+    name: 'Vigilante Claiver Almeida de Araújo',
+    login: 'Vigilante Claiver',
     password: 'SystemAdmin123@Senha',
     email: 'guard@user.com',
     role: Roles.GUARD,

@@ -35,7 +35,7 @@ Company (Tenant)
 | **ADMIN** | Administrador da empresa/condomínio | Company | ❌ Não associado |
 | **SUPERVISOR** | Supervisor de segurança | Company | ❌ Não associado |
 | **HR** | Recursos Humanos | Company | ❌ Não associado |
-| **GUARD** | Guarda de segurança | Company | ❌ Não associado |
+| **GUARD** | Vigilante de segurança | Company | ❌ Não associado |
 | **POST_SUPERVISOR** | Supervisor de posto específico | Post | ✅ **1 posto** |
 | **POST_RESIDENT** | Morador/residente | Post | ✅ **1 posto** |
 
@@ -75,7 +75,7 @@ POST_RESIDENT (Post) (Mínimo)
 - **ADMIN**: Acesso total à empresa/condomínio
 - **SUPERVISOR**: Supervisão geral de segurança
 - **HR**: Gestão de recursos humanos
-- **GUARD**: Guarda de segurança (pode ser alocado dinamicamente)
+- **GUARD**: Vigilante de segurança (pode ser alocado dinamicamente)
 
 #### **Usuários Associados a 1 Posto**
 

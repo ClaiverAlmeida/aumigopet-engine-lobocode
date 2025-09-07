@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
-import { Roles } from '@prisma/client';
+import { Roles, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { CreateSystemAdminDto } from '../dto/create-system-admin.dto';
 import { CreateAdminDto } from '../dto/create-admin.dto';
@@ -57,6 +57,13 @@ export class UserFactory {
       name: dto.name,
       login: dto.login,
       email: dto.email,
+      registration: dto.registration,
+      cpf: dto.cpf,
+      rg: dto.rg,
+      phone: dto.phone,
+      address: dto.address,
+      profilePicture: dto?.profilePicture,
+      status: dto?.status,
       password: this.criptografarPassword(dto.password),
       role: Roles.GUARD,
       company: {
