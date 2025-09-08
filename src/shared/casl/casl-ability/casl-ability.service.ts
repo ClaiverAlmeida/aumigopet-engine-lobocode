@@ -72,7 +72,7 @@ const rolePermissionsMap = {
     can(['create', 'update', 'delete'], 'User', {
       companyId: user.companyId,
       role: {
-        in: ['SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+        in: ['ADMIN', 'SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
       },
     });
 
@@ -105,7 +105,7 @@ const rolePermissionsMap = {
     cannot('read', 'User', {
       companyId: user.companyId,
       role: {
-        in: ['ADMIN', 'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+        in: ['ADMIN',  'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
       },
     });
 

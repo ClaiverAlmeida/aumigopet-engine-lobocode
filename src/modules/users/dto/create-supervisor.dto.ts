@@ -1,5 +1,5 @@
-import { IsArray, IsEnum, IsOptional } from 'class-validator';
-import { PermissionType, Roles } from '@prisma/client';
+import { IsOptional } from 'class-validator';
+import { Roles } from '@prisma/client';
 import { IsCUID, IsExpectedRole } from '../../../shared/validators';
 import { VALIDATION_MESSAGES } from '../../../shared/common/messages';
 import { BaseUserDto } from './base-user.dto';
@@ -13,12 +13,4 @@ export class CreateSupervisorDto extends BaseUserDto {
     message: VALIDATION_MESSAGES.REQUIRED.ROLE,
   })
   role: Roles; // Deve ser Roles.SUPERVISOR
-
-  @IsOptional()
-  @IsArray({ message: VALIDATION_MESSAGES.FORMAT.ARRAY_INVALID })
-  @IsEnum(PermissionType, {
-    each: true,
-    message: VALIDATION_MESSAGES.FORMAT.ENUM_INVALID,
-  })
-  permissions?: PermissionType[];
 }

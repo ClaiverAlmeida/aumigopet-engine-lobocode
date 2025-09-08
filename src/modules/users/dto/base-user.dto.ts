@@ -4,6 +4,7 @@ import {
   MinLength,
   IsOptional,
   IsEnum,
+  IsArray,
 } from 'class-validator';
 import {
   IsCPF,
@@ -14,7 +15,7 @@ import {
   IsUniqueLogin,
 } from '../../../shared/validators';
 import { VALIDATION_MESSAGES } from '../../../shared/common/messages';
-import { UserStatus } from '@prisma/client';
+import { PermissionType, UserStatus } from '@prisma/client';
 
 export class BaseUserDto {
   @IsString({ message: VALIDATION_MESSAGES.REQUIRED.NAME })
@@ -61,4 +62,10 @@ export class BaseUserDto {
   @IsOptional()
   @IsEnum(UserStatus, { message: VALIDATION_MESSAGES.FORMAT.ENUM_INVALID })
   status?: UserStatus;
+
+  
+  @IsOptional()
+  @IsArray({ message: VALIDATION_MESSAGES.FORMAT.ARRAY_INVALID })
+  @IsEnum(PermissionType, { each: true, message: VALIDATION_MESSAGES.FORMAT.ENUM_INVALID })
+  permissions?: PermissionType[];
 }
