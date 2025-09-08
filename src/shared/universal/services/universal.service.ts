@@ -202,6 +202,50 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
     return { data: this.transformData(entities) };
   }
 
+  /**
+   * Busca uma entidade por múltiplos campos
+   */
+  async buscarPorCampos(fields: Record<string, any>, include?: any) {
+    this.permissionService.validarAction(this.entityNameCasl, 'read');
+
+    const whereClause = this.queryService.construirWhereClauseParaRead(
+      this.entityNameCasl,
+      fields,
+    );
+
+    const includeConfig = include || this.getIncludeConfig();
+
+    const entity = await this.repository.buscarPrimeiro(
+      this.entityName,
+      whereClause,
+      includeConfig,
+    );
+
+    return { data: this.transformData(entity) };
+  }
+
+  /**
+   * Busca múltiplas entidades por múltiplos campos
+   */
+  async buscarMuitosPorCampos(fields: Record<string, any>, include?: any) {
+    this.permissionService.validarAction(this.entityNameCasl, 'read');
+
+    const whereClause = this.queryService.construirWhereClauseParaRead(
+      this.entityNameCasl,
+      fields,
+    );
+
+    const includeConfig = include || this.getIncludeConfig();
+
+    const entities = await this.repository.buscarMuitos(
+      this.entityName,
+      whereClause,
+      includeConfig,
+    );
+
+    return { data: this.transformData(entities) };
+  }
+
   // ============================================================================
   // ✏️ MÉTODOS PÚBLICOS - OPERAÇÕES DE ESCRITA
   // ============================================================================

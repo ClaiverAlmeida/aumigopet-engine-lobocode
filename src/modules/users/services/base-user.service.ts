@@ -36,9 +36,11 @@ export class BaseUserService {
 
     const { totalPages, hasNextPage, hasPreviousPage } =
       this.calcularInformacoesDePaginacao(page, limit, total);
-
+   
+    const transformedData = this.transformData(users);
+    
     return {
-      data: users,
+      data: transformedData,
       pagination: {
         page,
         limit,
@@ -100,10 +102,19 @@ export class BaseUserService {
 
     this.validarResultadoDaBusca(user, 'User', 'id', id);
 
-    // Prepara dados para atualização
-    const updateData = this.prepararDadosParaUpdate(updateUserDto);
+    // Prepara dados para atualização (sem permissões)
+    const { permissions, ...userData } = updateUserDto;
+    const updateData = this.prepararDadosParaUpdate(userData);
 
-    return this.userRepository.atualizar({ id }, updateData);
+    // Atualiza o usuário
+    const updatedUser = await this.userRepository.atualizar({ id }, updateData);
+
+    // Atualiza permissões se fornecidas
+    if (permissions !== undefined) {
+      await this.userRepository.atualizarPermissoesDoUsuario(id, permissions);
+    }
+
+    return updatedUser;
   }
 
   /**
@@ -292,5 +303,15 @@ export class BaseUserService {
     const hasPreviousPage = page > 1;
 
     return { totalPages, hasNextPage, hasPreviousPage };
+  }
+
+  /**
+   * Transforma os dados dos usuários para o formato esperado pelo frontend
+   */
+  private transformData(users: any[]): any[] {
+    return users.map(user => ({
+      ...user,
+      permissions: user.permissions?.map((permission: any) => permission.permissionType) || []
+    }));
   }
 }

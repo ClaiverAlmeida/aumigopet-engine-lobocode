@@ -52,92 +52,122 @@ export type DefinePermissions = (
   builder: AbilityBuilder<AppAbility>,
 ) => void;
 
-const rolePermissionsMap: Record<Roles, DefinePermissions> = {
-  // ADMIN (Empresa) - Super usuário
+const rolePermissionsMap = {
+  // ========================================
+  // ROLES ADMINISTRATIVOS
+  // ========================================
+
+  // SYSTEM_ADMIN - Super usuário do sistema
   SYSTEM_ADMIN(user, { can }) {
     can('manage', 'all');
   },
 
-  // ADMIN (Cliente) - Representante do cliente
+  // ADMIN - Administrador da empresa
   ADMIN(user, { can }) {
-    // Visualização total dos dados do próprio tenant
+    // Permissões gerais da empresa
     can('read', 'all', { companyId: user.companyId });
     can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
+
+    // Gestão de usuários (exceto SYSTEM_ADMIN)
     can(['create', 'update', 'delete'], 'User', {
       companyId: user.companyId,
       role: {
         in: ['SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
       },
     });
+
+    // Gestão de recursos da empresa
     can('manage', 'Post', { companyId: user.companyId });
     can('manage', 'Shift', { companyId: user.companyId });
     can('manage', 'MotorizedService', { companyId: user.companyId });
 
-    // Relatórios e ocorrências do posto
+    // Relatórios e monitoramento
     can('read', 'Report', { companyId: user.companyId });
     can('export', 'Report', { companyId: user.companyId });
     can('read', 'EventLog', { companyId: user.companyId });
     can('read', 'Checklist', { companyId: user.companyId });
 
-    // Botão de pânico
+    // Funcionalidades específicas
     can('create', 'PanicEvent', { companyId: user.companyId });
-
-    // Solicitações
     can('create', 'Notification', { companyId: user.companyId });
   },
 
-  // RH - Gestão de pessoas e documentos
-  HR(user, { can }) {
-    //  CORRIGIDO: HR pode gerenciar HR, SUPERVISOR e GUARD
+  // ========================================
+  // ROLES OPERACIONAIS
+  // ========================================
+
+  // HR - Recursos Humanos
+  HR(user, { can, cannot }) {
+    // Leitura geral da empresa
+    can('read', 'all', { companyId: user.companyId });
+
+    // Restrições de usuários
+    cannot('read', 'User', {
+      companyId: user.companyId,
+      role: {
+        in: ['ADMIN', 'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+      },
+    });
+
+    // Gestão de usuários permitidos
     can('manage', 'User', {
       companyId: user.companyId,
       role: { in: ['HR', 'SUPERVISOR', 'GUARD'] },
     });
+    can('update', 'User', ['name', 'email', 'phone', 'address', 'status', 'cpf'], {
+      companyId: user.companyId,
+      role: { in: ['HR', 'SUPERVISOR', 'GUARD'] },
+    });
 
-    //  MELHORADO: HR pode atualizar campos específicos de usuários
-    can(
-      'update',
-      'User',
-      ['name', 'email', 'phone', 'address', 'status', 'cpf'],
-      {
-        companyId: user.companyId,
-        role: { in: ['HR', 'SUPERVISOR', 'GUARD'] },
-      },
-    );
-
-    // Documentos de RH
-    can('manage', 'Document', { companyId: user.companyId });
-
-    // Notificações em massa
+    // Notificações
     can('create', 'Notification', { companyId: user.companyId });
     can('read', 'Notification', { companyId: user.companyId });
-
-    // Relatórios de RH
-    can('read', 'Report', { companyId: user.companyId, type: 'HR' });
-    can('export', 'Report', { companyId: user.companyId, type: 'HR' });
   },
 
   // SUPERVISOR - Supervisor de Vigilantes
-  SUPERVISOR(user, { can }) {
-    // Tudo que um Vigilante faz
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
+  SUPERVISOR(user, { can, cannot }) {
+    // Leitura geral da empresa
+    can('read', 'all', { companyId: user.companyId });
+
+    // Restrições de usuários
+    cannot('read', 'User', {
+      companyId: user.companyId,
+      role: {
+        in: ['ADMIN', 'SYSTEM_ADMIN', 'HR', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+      },
+    });
+
+    // Perfil próprio
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Gestão operacional
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+    can('manage', 'Occurrence', { companyId: user.companyId });
+    can('manage', 'MotorizedService', { companyId: user.companyId });
+    can('manage', 'Supply', { companyId: user.companyId });
+    can('manage', 'VehicleChecklist', { companyId: user.companyId });
   },
 
-  // GUARD - Operador de campo (com permissões específicas)
+  // GUARD - Vigilante de Segurança
   GUARD(user, { can }) {
-    // Verificar permissões específicas do guarda
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    can('read', 'Vehicle');
+
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+
+    // TODO: Implementar permissões específicas baseadas em PermissionType
     // const userWithPermissions = user as UserWithPermissions;
     // const hasDoormanPermission = userWithPermissions.permissions?.some(
     //   (p) => p.permissionType === 'DOORMAN' && p.granted,
@@ -148,85 +178,56 @@ const rolePermissionsMap: Record<Roles, DefinePermissions> = {
     // const hasPatrolPermission = userWithPermissions.permissions?.some(
     //   (p) => p.permissionType === 'PATROL' && p.granted,
     // );
-
-    // Rondas (apenas se tem permissão PATROL)
-    // if (hasPatrolPermission) {
-    //   can('create', 'Round', { userId: user.id });
-    //   can('read', 'Round', { userId: user.id });
-    //   can('update', 'Round', { userId: user.id });
-    // }
-    // Perfil próprio
-    can('read', 'Post');
-    can('read', 'Vehicle');
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
-
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'DoormanChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
   },
+  // ========================================
+  // ROLES ESPECÍFICOS DE POSTO
+  // ========================================
+
   // POST_SUPERVISOR - Supervisor de Posto
   POST_SUPERVISOR(user, { can }) {
     // Perfil próprio
     can('read', 'User', { id: user.id });
     can('update', 'User', ['name', 'profilePicture'], { id: user.id });
 
-    // Tudo que um Vigilante faz
+    // Gestão operacional do posto
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
   },
 
-  // POST_RESIDENT - Morador
+  // POST_RESIDENT - Morador/Residente
   POST_RESIDENT(user, { can }) {
-    // Botão de pânico
-    can('create', 'PanicEvent', { residentId: user.id });
-    can('read', 'PanicEvent', { residentId: user.id });
-
     // Perfil próprio
     can('read', 'User', { id: user.id });
     can('update', 'User', ['name', 'profilePicture'], { id: user.id });
 
-    // Visualiza avisos do posto
+    // Botão de pânico
+    can('create', 'PanicEvent', { residentId: user.id });
+    can('read', 'PanicEvent', { residentId: user.id });
+
+    // Notificações públicas
     can('read', 'Notification', { companyId: user.companyId, type: 'PUBLIC' });
   },
 
-  // @deprecated - Roles temporários, remover em breve
+  // ========================================
+  // ROLES DEPRECATED (REMOVER EM BREVE)
+  // ========================================
+
   EDITOR(user, { can }) {
     can('update', 'User', ['name', 'profilePicture']);
     can('create', 'Post');
     can('read', 'Post');
     can('update', 'Post');
   },
+
   WRITER(user, { can }) {
     can('update', 'User', ['name', 'profilePicture']);
     can('create', 'Post');
     can('read', 'Post', { authorId: user.id });
     can('update', 'Post', { authorId: user.id });
   },
+
   READER(user, { can }) {
     can('read', 'Post', { published: true });
   },

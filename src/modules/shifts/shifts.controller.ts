@@ -32,7 +32,7 @@ export class ShiftsController extends UniversalController<
     super(service);
   }
 
-  @RequiredRoles(Roles.GUARD, Roles.HR)
+  @RequiredRoles(Roles.GUARD, Roles.HR, Roles.ADMIN ,Roles.SYSTEM_ADMIN)
   @Get()
   buscarComPaginacao(
     @Query('page') page: number = 1,
@@ -40,10 +40,10 @@ export class ShiftsController extends UniversalController<
   ) {
     return super.buscarComPaginacao(page, limit);
   }
-  
+
   @RequiredRoles(Roles.GUARD, Roles.HR)
   @Get('current')
-  buscarEmAndamento() { 
+  buscarEmAndamento() {
     return this.service.buscarEmAndamento();
   }
 
@@ -55,7 +55,10 @@ export class ShiftsController extends UniversalController<
 
   @RequiredRoles(Roles.GUARD)
   @Patch('break-start-time/:id')
-  async inicioDoIntervalo(@Param('id') id: string, @Body() data: UpdateShiftDto) {
+  async inicioDoIntervalo(
+    @Param('id') id: string,
+    @Body() data: UpdateShiftDto,
+  ) {
     return this.service.inicioDoIntervalo(id, data);
   }
 

@@ -124,6 +124,27 @@ export class UserRepository {
     });
   }
 
+  async deletarPermissoesDoUsuario(userId: string) {
+    return await this.prisma.permission.deleteMany({
+      where: { userId },
+    });
+  }
+
+  async atualizarPermissoesDoUsuario(userId: string, permissions: PermissionType[]) {
+    // Primeiro deleta todas as permissões existentes
+    await this.deletarPermissoesDoUsuario(userId);
+    
+    // Depois cria as novas permissões
+    if (permissions && permissions.length > 0) {
+      return await this.criarPermissaoDeVigilante({
+        userId,
+        permissionType: permissions,
+      });
+    }
+    
+    return { count: 0 };
+  }
+
   async atualizar(
     where: Prisma.UserWhereUniqueInput,
     data: Prisma.UserUpdateInput,

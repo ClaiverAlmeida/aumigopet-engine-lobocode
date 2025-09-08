@@ -56,16 +56,26 @@ export class ShiftsService extends UniversalService<
         user: true,
         VehicleChecklist: true,
       },
+      transform: {
+        custom: (data: any) => {
+          if (data?.user) data.userName = data.user.name;
+          return data;
+        },
+      },
     };
   }
 
   buscarEmAndamento() {
-    return super.buscarPorCampo('status', { not: ShiftStatus.COMPLETED });
+    const userId = this.obterUsuarioLogadoId();
+    return super.buscarPorCampos({
+      status: { not: ShiftStatus.COMPLETED },
+      userId,
+    });
   }
 
   async inicioDoTurno(data: CreateShiftDto) {
     const shift = await this.buscarEmAndamento();
-    if (shift.data) {
+    if (shift.data && shift.data?.length > 0) {
       throw new ConflictError('Já existe um turno em andamento');
     }
 
@@ -118,5 +128,4 @@ export class ShiftsService extends UniversalService<
     data.userId = userId;
     data.status = ShiftStatus.IN_PROGRESS;
   }
- 
 }

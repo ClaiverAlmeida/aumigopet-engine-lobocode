@@ -134,7 +134,7 @@ export class SecurityService {
         ipAddress,
         eventType: 'password_reset_abuse',
         severity: 'medium',
-        details: { resetAttempts, timeWindow: '60min' },
+        details: { resetAttempts, timeWindow: '7d' },
         timestamp: new Date(),
       });
     }

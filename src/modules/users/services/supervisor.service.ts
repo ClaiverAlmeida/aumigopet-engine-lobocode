@@ -28,7 +28,7 @@ export class SupervisorService extends BaseUserService {
     );
   }
 
-    //  Funcionalidades específicas de supervisores
+  //  Funcionalidades específicas de supervisores
   async criarNovoSupervisor(dto: CreateSupervisorDto) {
     // ✅ Validação de role hierárquico RESTAURADA
     this.userPermissionService.validarCriacaoDeUserComRole(Roles.SUPERVISOR);
@@ -39,6 +39,14 @@ export class SupervisorService extends BaseUserService {
     // Criação do usuário
     const userData = this.userFactory.criarSupervisor(dto);
     const user = await this.userRepository.criar(userData);
+
+    // Permission
+    if (dto.permissions) {
+      await this.userRepository.criarPermissaoDeVigilante({
+        userId: user.id,
+        permissionType: dto.permissions,
+      });
+    }
 
     return user;
   }

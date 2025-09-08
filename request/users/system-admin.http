@@ -4,14 +4,14 @@
 
 @token = {{ platformAdminLogin.response.body.access_token }}
 
-### Login SYSTEM_ADMIN
+### Login SYSTEM_ADMIN 
 # @name platformAdminLogin
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
-{
-    # "login": "systemadmin@user.com",
-    "login": "bruna oliveira",
+{ 
+    "login": "systemadmin@user.com",
+    # "login": "bruna oliveira",
     "password": "SystemAdmin123@Senha"
 }
 
@@ -58,21 +58,22 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### Criar novo SYSTEM_ADMIN
-POST {{baseUrl}}/users/guard
+POST {{baseUrl}}/users/admin
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "213123",
-  "email": "testssse@tedte.com",
-  "login": "testeTAxss2@",
-  "password": "1231SssADASD@",
-  "role": "GUARD",
-  "phone": "(12) 3123-2313",
-  "address": "asdasd",
-  "rg": "123123123123",
-  "cpf": "735.582.210-10",
-  "registration": "123123123"
+  "name": "Admin Ifraseg",
+  "email": "admin.ifraseg@user.com",
+  "login": "admin.ifraseg",
+  "password": "SystemAdmin123@Senha",
+  "role": "ADMIN",
+  "phone": "(12) 998987987",
+  "address": "Rua fake",
+  "rg": "3256458456",
+  "cpf": "590.404.490-90",
+  "registration": "1221",
+  "companyId": "{{companyId}}"
 }
 
 ### Criar ADMIN em empresa específica
