@@ -7,7 +7,7 @@ Este documento estabelece os padrões de nomenclatura e convenções de código 
 ## 🇧🇷🇺🇸 Convenções de Idioma
 
 ### ✅ **MANTER EM INGLÊS:**
-- **Entidades/Modelos**: `User`, `Company`, `Post`, `Role`, `Shift`, `Round`
+- **Entidades/Modelos**: `User`, `Company`, `Post`, `Role`, `Shift`, `Patrol`
 - **Propriedades**: `id`, `name`, `email`, `companyId`, `postId`
 - **Tipos/Interfaces**: `Roles`, `Prisma.UserWhereInput`, `UpdateUserDto`
 - **Decorators**: `@Injectable()`, `@Controller()`, `@UseGuards()`

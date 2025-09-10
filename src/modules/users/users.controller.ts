@@ -51,7 +51,7 @@ export class UsersController {
 
   @Get()
   @CaslRead('User')
-  @RequiredRoles(Roles.ADMIN, Roles.HR)
+  @RequiredRoles(Roles.ADMIN, Roles.HR, Roles.SUPERVISOR)
   buscarTodos(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '20',

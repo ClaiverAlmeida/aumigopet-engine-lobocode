@@ -166,7 +166,7 @@ Criar um sistema universal de permissões e queries baseado na estrutura atual d
 1. **Posts** - Estrutura similar a Companies
 2. **Vehicles** - Gestão de frota
 3. **Shifts** - Gestão de turnos
-4. **Rounds** - Rondas de segurança
+4. **Patrols** - Rondas de segurança
 5. **Occurrences** - Ocorrências reportadas
 
 ---

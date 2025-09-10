@@ -10,7 +10,7 @@ Este documento complementa o `CODING_STANDARDS.md` com foco específico em conve
 
 ```typescript
 // ✅ Correto
-User, Company, Post, Role, Shift, Round, EventLog, PanicEvent
+User, Company, Post, Role, Shift, Patrol, EventLog, PanicEvent
 
 // ❌ Incorreto
 Usuario, Empresa, Posto, Papel, Turno, Ronda, LogEvento, EventoPanico

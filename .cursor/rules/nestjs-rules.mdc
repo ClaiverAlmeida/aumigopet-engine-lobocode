@@ -62,7 +62,7 @@ src/modules/[nome]/
 - **UPPERCASE** para variáveis de ambiente (`DATABASE_URL`, `JWT_SECRET`)
 
 #### 🎯 Regras Específicas do Projeto
-- **Entidades SEMPRE em inglês**: `User`, `Company`, `Post`, `Role`, `Shift`, `Round`, `EventLog`, `PanicEvent`
+- **Entidades SEMPRE em inglês**: `User`, `Company`, `Post`, `Role`, `Shift`, `Patrol`, `EventLog`, `PanicEvent`
 - **Métodos SEMPRE em português literal**: `buscarUserPorId()`, `validarSeUserExiste()`, `criarNovoAdmin()`
 - **Propriedades SEMPRE em inglês**: `id`, `name`, `email`, `companyId`, `postId`, `role`, `active`, `deletedAt`
 - **Endpoints SEMPRE em português**: `obterTodosOsUsers()`, `criarNovoAdmin()`, `updateDadosDoUser()`

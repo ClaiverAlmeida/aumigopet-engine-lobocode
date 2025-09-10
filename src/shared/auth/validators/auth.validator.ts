@@ -21,7 +21,7 @@ export class AuthValidator {
     // Busca usuário por email ou login
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: login }, { login: login }],
+        OR: [{ email: login.toLowerCase() }, { login: login.toLowerCase() }],
       },
       include: {
         permissions: true,

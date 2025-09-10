@@ -80,7 +80,7 @@ export class PostController {
 import { PermissionContextService } from 'src/shared/casl/services/permission-context.service';
 
 @Injectable()
-export class RoundService {
+export class PatrolService {
   constructor(private permissionContext: PermissionContextService) {}
 
   async iniciarRonda(user: User, postId: string) {
@@ -107,7 +107,7 @@ export class RoundService {
     const context = this.permissionContext.criarContexto(user, {
       roundId,
       isOnShift: true,
-      isOnRound: true,
+      isOnPatrol: true,
     });
 
     // ✅ Validação específica para checkpoint
@@ -115,10 +115,10 @@ export class RoundService {
       context,
       {
         action: 'create',
-        subject: 'RoundPoint',
+        subject: 'PatrolPoint',
         shiftRestrictions: {
           requiresActiveShift: true,
-          requiresActiveRound: true,
+          requiresActivePatrol: true,
         },
       }
     );

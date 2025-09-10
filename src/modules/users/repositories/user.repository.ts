@@ -64,7 +64,7 @@ export class UserRepository {
   // Includes para validação de relacionamentos
   private get validationInclude() {
     return {
-      rounds: true,
+      patrols: true,
       shifts: true,
       eventLogs: true,
       panicEvents: true,

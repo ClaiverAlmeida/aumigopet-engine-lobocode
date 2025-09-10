@@ -16,6 +16,7 @@ import { UsersModule } from './modules/users/users.module';
 import { CompaniesModule } from './modules/companies/companies.module';
 import { ShiftsModule } from './modules/shifts/shifts.module';
 import { PostsModule } from './modules/posts/posts.module';
+import { PatrolsModule } from './modules/patrols/patrols.module';
 import { ReportsModule } from './modules/reports/reports.module';
 
 import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
@@ -67,6 +68,7 @@ import { FilesModule } from './shared/files/files.module';
     CompaniesModule,
     ShiftsModule,
     PostsModule,
+    PatrolsModule,
     ReportsModule,
     ServiceBusModule,
     FilesModule,

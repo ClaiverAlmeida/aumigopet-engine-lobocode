@@ -70,7 +70,7 @@ getErrorMessage(category: keyof typeof ERROR_MESSAGES, key: string, context?: Me
         notFound: 'Posto não encontrado',
         alreadyExists: 'Posto já existe',
       },
-      round: {
+      patrol: {
         created: 'Ronda criada com sucesso',
         updated: 'Ronda atualizada com sucesso',
         deleted: 'Ronda deletada com sucesso',

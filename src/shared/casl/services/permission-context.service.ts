@@ -9,10 +9,10 @@ export interface PermissionContext {
   companyId?: string;
   postId?: string;
   shiftId?: string;
-  roundId?: string;
+  patrolId?: string;
   timeOfDay?: 'day' | 'night';
   isOnShift?: boolean;
-  isOnRound?: boolean;
+  isOnPatrol?: boolean;
 }
 
 export interface DynamicPermission {
@@ -25,7 +25,7 @@ export interface DynamicPermission {
   };
   shiftRestrictions?: {
     requiresActiveShift?: boolean;
-    requiresActiveRound?: boolean;
+    requiresActivePatrol?: boolean;
   };
 }
 
@@ -83,10 +83,10 @@ export class PermissionContextService {
   validarPermissaoRonda(context: PermissionContext, action: CrudAction): boolean {
     const permission: DynamicPermission = {
       action,
-      subject: 'Round',
+      subject: 'Patrol',
       shiftRestrictions: {
         requiresActiveShift: true,
-        requiresActiveRound: true,
+        requiresActivePatrol: true,
       },
     };
 
@@ -178,7 +178,7 @@ export class PermissionContextService {
       return false;
     }
 
-    if (permission.shiftRestrictions.requiresActiveRound && !context.isOnRound) {
+    if (permission.shiftRestrictions.requiresActivePatrol && !context.isOnPatrol) {
       return false;
     }
 

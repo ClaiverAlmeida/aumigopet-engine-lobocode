@@ -11,6 +11,8 @@ import { OccurrencesDispatchesController } from './occurrence-dispatch/occurrenc
 import { OccurrencesDispatchesService } from './occurrence-dispatch/occurrences-dispatches.service';
 import { DoormanChecklistsController } from './doorman-checklists/doorman-checklists.controller';
 import { DoormanChecklistsService } from './doorman-checklists/doorman-checklists.service';
+import { MotorcycleChecklistsController } from './motorcycle-checklists/motorcycle-checklists.controller';
+import { MotorcycleChecklistsService } from './motorcycle-checklists/motorcycle-checklists.service';
 
 @Module({
   controllers: [
@@ -20,6 +22,7 @@ import { DoormanChecklistsService } from './doorman-checklists/doorman-checklist
     MotorizedServicesController,
     OccurrencesDispatchesController,
     DoormanChecklistsController,
+    MotorcycleChecklistsController,
   ],
   providers: [
     OccurrencesService,
@@ -28,6 +31,7 @@ import { DoormanChecklistsService } from './doorman-checklists/doorman-checklist
     MotorizedServicesService,
     OccurrencesDispatchesService,
     DoormanChecklistsService,
+    MotorcycleChecklistsService,
   ],
   exports: [
     OccurrencesService,
@@ -36,6 +40,7 @@ import { DoormanChecklistsService } from './doorman-checklists/doorman-checklist
     MotorizedServicesService,
     OccurrencesDispatchesService,
     DoormanChecklistsService,
+    MotorcycleChecklistsService,
   ],
 })
 export class ReportsModule {}

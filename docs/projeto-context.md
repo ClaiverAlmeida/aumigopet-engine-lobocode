@@ -119,28 +119,28 @@ src/modules/rounds/
 
 // 2. Repository (acesso a dados)
 @Injectable()
-export class RoundRepository {
-  async buscarMuitos(where: Prisma.RoundWhereInput) { }
-  async buscarPrimeiro(where: Prisma.RoundWhereInput) { }
-  async criar(data: Prisma.RoundCreateInput) { }
-  async atualizar(where: Prisma.RoundWhereUniqueInput, data: Prisma.RoundUpdateInput) { }
+export class PatrolRepository {
+  async buscarMuitos(where: Prisma.PatrolWhereInput) { }
+  async buscarPrimeiro(where: Prisma.PatrolWhereInput) { }
+  async criar(data: Prisma.PatrolCreateInput) { }
+  async atualizar(where: Prisma.PatrolWhereUniqueInput, data: Prisma.PatrolUpdateInput) { }
 }
 
 // 3. Validator (validações de negócio)
 @Injectable()
-export class RoundValidator {
-  async validarSeRoundExiste(id: string) { }
+export class PatrolValidator {
+  async validarSePatrolExiste(id: string) { }
   async validarSePostPertenceACompany(postId: string, companyId: string) { }
   async validarSeHorarioEhValido(horario: Date) { }
 }
 
 // 4. Service (lógica de negócio)
 @Injectable()
-export class RoundService {
+export class PatrolService {
   async buscarTodos(page = 1, limit = 20) { }
   async buscarPorId(id: string) { }
-  async criar(dto: CreateRoundDto) { }
-  async atualizar(id: string, dto: UpdateRoundDto) { }
+  async criar(dto: CreatePatrolDto) { }
+  async atualizar(id: string, dto: UpdatePatrolDto) { }
   async desativar(id: string) { }
   async iniciarRonda(guardId: string, postId: string) { }
   async finalizarRonda(roundId: string) { }
@@ -149,7 +149,7 @@ export class RoundService {
 // 5. Controller (endpoints)
 @Controller('rounds')
 @UseGuards(AuthGuard, RoleGuard)
-export class RoundController {
+export class PatrolController {
   @Get()
   @RequiredRoles(Roles.ADMIN, Roles.SUPERVISOR)
   buscarTodos(@Query('page') page: string, @Query('limit') limit: string) {
@@ -198,9 +198,9 @@ export class CreateShiftDto {
 
 ### **Criar Filtro Específico**
 ```typescript
-@Catch(RoundNotFoundError)
-export class RoundNotFoundErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
-  catch(exception: RoundNotFoundError, host: ArgumentsHost) {
+@Catch(PatrolNotFoundError)
+export class PatrolNotFoundErrorFilter extends BaseExceptionFilter implements ExceptionFilter {
+  catch(exception: PatrolNotFoundError, host: ArgumentsHost) {
     this.sendErrorResponse(
       exception,
       host,

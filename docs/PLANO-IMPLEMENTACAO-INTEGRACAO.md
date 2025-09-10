@@ -44,7 +44,7 @@
 - User (com sistema de roles)
 - Company (multi-tenancy)
 - Post (postos de segurança)
-- Round (rondas básicas)
+- Patrol (rondas básicas)
 - Checkpoint (pontos de verificação)
 - Shift (turnos básicos)
 - EventLog (logs de eventos)
@@ -72,7 +72,7 @@ model Shift {
   user              User        @relation(fields: [userId], references: [id])
   company           Company     @relation(fields: [companyId], references: [id])
   post              Post        @relation(fields: [postId], references: [id])
-  rounds            Round[]     // Adicionar relacionamento
+  rounds            Patrol[]     // Adicionar relacionamento
   occurrences       Occurrence[] // Adicionar relacionamento
   
   // Auditoria
@@ -100,10 +100,10 @@ enum ShiftStatus {
 }
 ```
 
-#### **2. Atualizar Modelo Round**
+#### **2. Atualizar Modelo Patrol**
 ```prisma
 // Expandir modelo existente
-model Round {
+model Patrol {
   id                  String            @id @default(cuid())
   userId              String            // Renomear de guardId
   companyId           String            // Adicionar
@@ -111,16 +111,16 @@ model Round {
   shiftId             String            // Adicionar relacionamento
   startTime           DateTime          // Renomear de start
   endTime             DateTime?         // Renomear de end
-  status              RoundStatus       @default(IDLE) // Expandir
+  status              PatrolStatus       @default(IDLE) // Expandir
   description         String?           // Adicionar
   supervisorApproval  Boolean?          // Adicionar
   
   // Relacionamentos
-  user                User              @relation("UserRounds", fields: [userId], references: [id])
+  user                User              @relation("UserPatrols", fields: [userId], references: [id])
   company             Company           @relation(fields: [companyId], references: [id])
   post                Post              @relation(fields: [postId], references: [id])
   shift               Shift             @relation(fields: [shiftId], references: [id])
-  checkpoints         RoundCheckpoint[] // Renomear de roundPoints
+  checkpoints         PatrolCheckpoint[] // Renomear de roundPoints
   
   // Auditoria
   createdAt           DateTime          @default(now())
@@ -132,7 +132,7 @@ model Round {
   @@map("rounds")
 }
 
-enum RoundStatus {
+enum PatrolStatus {
   IDLE        // Aguardando
   STARTED     // Em andamento
   PAUSED      // Pausada
@@ -141,10 +141,10 @@ enum RoundStatus {
 }
 ```
 
-#### **3. Atualizar Modelo RoundCheckpoint**
+#### **3. Atualizar Modelo PatrolCheckpoint**
 ```prisma
-// Renomear e expandir RoundPoint
-model RoundCheckpoint {
+// Renomear e expandir PatrolPoint
+model PatrolCheckpoint {
   id              String               @id @default(cuid())
   roundId         String
   checkpointId    String
@@ -155,7 +155,7 @@ model RoundCheckpoint {
   notes           String?              // Adicionar
   
   // Relacionamentos
-  round           Round                @relation(fields: [roundId], references: [id])
+  round           Patrol                @relation(fields: [roundId], references: [id])
   checkpoint      Checkpoint           @relation(fields: [checkpointId], references: [id])
   
   // Auditoria
@@ -191,7 +191,7 @@ model Checkpoint {
   // Relacionamentos
   company             Company              @relation(fields: [companyId], references: [id])
   post                Post                 @relation(fields: [postId], references: [id])
-  roundCheckpoints    RoundCheckpoint[]    // Renomear de roundPoints
+  roundCheckpoints    PatrolCheckpoint[]    // Renomear de roundPoints
   
   // Auditoria
   createdAt           DateTime             @default(now())
@@ -408,7 +408,7 @@ model MotorizedService {
 model Company {
   // ... campos existentes
   shifts            Shift[]
-  rounds            Round[]
+  rounds            Patrol[]
   occurrences       Occurrence[]
   vehicles          Vehicle[]
   vehicleChecklists VehicleChecklist[]
@@ -585,7 +585,7 @@ GET    /motorized-services/vehicle/:vehicleId // buscarPorVeiculo()
 
 ### **🔄 Fase 1 - Módulos Core**
 - [ ] **Shifts**: Implementar CRUD completo
-- [ ] **Rounds**: Sistema de rondas com GPS
+- [ ] **Patrols**: Sistema de rondas com GPS
 - [ ] **Occurrences**: Relatórios com numeração automática
 - [ ] **Testes**: Unitários e integração
 
@@ -622,7 +622,7 @@ GET    /motorized-services/vehicle/:vehicleId // buscarPorVeiculo()
 - Controle de turnos crítico
 - Integração direta com frontend
 
-### **3. Implementar Módulo Rounds** ⚡
+### **3. Implementar Módulo Patrols** ⚡
 - Funcionalidade principal do sistema
 - GPS e checkpoints obrigatórios
 - Integração com sistema existente
@@ -655,7 +655,7 @@ GET    /motorized-services/vehicle/:vehicleId // buscarPorVeiculo()
 
 ### **1. Nomenclatura Consistente**
 - ✅ **Métodos**: `buscarTurnoPorId()`, `criarNovaRonda()`
-- ✅ **Entidades**: `Shift`, `Round`, `Occurrence`
+- ✅ **Entidades**: `Shift`, `Patrol`, `Occurrence`
 - ✅ **Endpoints**: `obterTodosOsTurnos()`, `atualizarDadosRonda()`
 
 ### **2. Arquitetura SOLID**
@@ -681,7 +681,7 @@ GET    /motorized-services/vehicle/:vehicleId // buscarPorVeiculo()
 
 | **Fase** | **Módulos** | **Tempo Estimado** | **Prioridade** |
 |----------|-------------|-------------------|----------------|
-| **Fase 1** | Shifts, Rounds, Occurrences | 5-7 dias | 🔥 Alta |
+| **Fase 1** | Shifts, Patrols, Occurrences | 5-7 dias | 🔥 Alta |
 | **Fase 2** | Vehicles, Supplies, Motorized | 3-5 dias | 🟡 Média |
 | **Fase 3** | Integração & Testes | 2-3 dias | 🔥 Alta |
 | **Fase 4** | Refinamento & Deploy | 1-2 dias | 🟡 Média |

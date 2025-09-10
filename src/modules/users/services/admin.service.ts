@@ -53,7 +53,7 @@ export class AdminService extends BaseUserService {
     return {
       totalUsers: 0,
       totalPosts: 0,
-      activeRounds: 0,
+      activePatrols: 0,
     };
   }
 }

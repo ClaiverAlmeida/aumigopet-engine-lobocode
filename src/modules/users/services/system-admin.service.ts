@@ -50,7 +50,7 @@ export class SystemAdminService extends BaseUserService {
       totalUsers: 0,
       totalCompanies: 0,
       totalPosts: 0,
-      activeRounds: 0,
+      activePatrols: 0,
     };
   }
 

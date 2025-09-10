@@ -61,10 +61,10 @@ export class UserValidator {
 
     if (
       userWithRelations &&
-      userWithRelations.rounds &&
-      userWithRelations.rounds.length > 0
+      userWithRelations.patrols &&
+      userWithRelations.patrols.length > 0
     ) {
-      throw new ValidationError('Cannot delete user with active rounds');
+      throw new ValidationError('Cannot delete user with active patrols');
     }
 
     if (

@@ -85,7 +85,7 @@ export class ShiftsService extends UniversalService<
       function: data.function,
       status: ShiftStatus.IN_PROGRESS,
     };
-
+ 
     return super.criar(shiftData);
   }
 

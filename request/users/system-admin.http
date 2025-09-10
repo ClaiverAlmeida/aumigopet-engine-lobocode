@@ -1,9 +1,10 @@
+# @baseUrl = http://appinfraseg.com.br/api/
 @baseUrl = http://localhost:3000
 @companyId = cmf03p4950000ltn8twe926jf
 
 
 @token = {{ platformAdminLogin.response.body.access_token }}
-
+ 
 ### Login SYSTEM_ADMIN 
 # @name platformAdminLogin
 POST {{baseUrl}}/auth/login
@@ -24,7 +25,7 @@ GET {{baseUrl}}/users
 Authorization: Bearer {{token}}
 
 ### Buscar usuário específico (qualquer empresa)
-GET {{baseUrl}}/users/cmco084n70001lt96th7lafk8
+GET {{baseUrl}}/users/cmco084n70001lt96th7lafk8     
 Authorization: Bearer {{token}}
 
 ### Atualizar usuário (qualquer empresa)
@@ -58,21 +59,21 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### Criar novo SYSTEM_ADMIN
-POST {{baseUrl}}/users/admin
+POST {{baseUrl}}/users/supervisor
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Admin Ifraseg",
-  "email": "admin.ifraseg@user.com",
-  "login": "admin.ifraseg",
+  "name": "Supervisor Infraseg",
+  "email": "supervisor.infraseg@user.com",
+  "login": "supervisor infraseg",
   "password": "SystemAdmin123@Senha",
-  "role": "ADMIN",
-  "phone": "(12) 998987987",
-  "address": "Rua fake",
-  "rg": "3256458456",
-  "cpf": "590.404.490-90",
-  "registration": "1221",
+  "role": "SUPERVISOR",
+  "phone": "(11) 99999-9997",
+  "address": "Rua Infraseg",
+  "rg": "Necessário atualizar e CPF",
+  "cpf": "094.011.130-68",
+  "registration": "02",
   "companyId": "{{companyId}}"
 }
 

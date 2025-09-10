@@ -32,7 +32,13 @@ export class ShiftsController extends UniversalController<
     super(service);
   }
 
-  @RequiredRoles(Roles.GUARD, Roles.HR, Roles.ADMIN ,Roles.SYSTEM_ADMIN)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.HR,
+    Roles.ADMIN,
+    Roles.SYSTEM_ADMIN,
+  )
   @Get()
   buscarComPaginacao(
     @Query('page') page: number = 1,
@@ -41,19 +47,25 @@ export class ShiftsController extends UniversalController<
     return super.buscarComPaginacao(page, limit);
   }
 
-  @RequiredRoles(Roles.GUARD, Roles.HR)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.HR,
+    Roles.ADMIN,
+    Roles.SYSTEM_ADMIN,
+  )
   @Get('current')
   buscarEmAndamento() {
     return this.service.buscarEmAndamento();
   }
 
-  @RequiredRoles(Roles.GUARD)
+  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
   @Post('start-time')
   async inicioDoTurno(@Body() data: CreateShiftDto) {
     return this.service.inicioDoTurno(data);
   }
 
-  @RequiredRoles(Roles.GUARD)
+  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
   @Patch('break-start-time/:id')
   async inicioDoIntervalo(
     @Param('id') id: string,
@@ -62,13 +74,13 @@ export class ShiftsController extends UniversalController<
     return this.service.inicioDoIntervalo(id, data);
   }
 
-  @RequiredRoles(Roles.GUARD)
+  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
   @Patch('break-end-time/:id')
   async fimDoIntervalo(@Param('id') id: string, @Body() data: UpdateShiftDto) {
     return this.service.fimDoIntervalo(id, data);
   }
 
-  @RequiredRoles(Roles.GUARD)
+  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
   @Patch('end-time/:id')
   async fimDoTurno(@Param('id') id: string, @Body() data: UpdateShiftDto) {
     return this.service.fimDoTurno(id, data);

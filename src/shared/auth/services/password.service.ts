@@ -3,13 +3,13 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PasswordService {
-  private readonly saltRounds = 12;
+  private readonly saltPatrols = 12;
 
   /**
    * Hash de senha
    */
   async hashPassword(password: string): Promise<string> {
-    return bcrypt.hash(password, this.saltRounds);
+    return bcrypt.hash(password, this.saltPatrols);
   }
 
   /**

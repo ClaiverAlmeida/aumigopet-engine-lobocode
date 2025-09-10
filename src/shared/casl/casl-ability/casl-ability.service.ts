@@ -30,7 +30,7 @@ export type PermissionResource =
       User: User;
       Post: Post;
       SecurityPost: any;
-      Round: any;
+      Patrol: any;
       Shift: any;
       EventLog: any;
       PanicEvent: any;
@@ -75,6 +75,7 @@ const rolePermissionsMap = {
         in: ['ADMIN', 'SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
       },
     });
+    can('manage', 'Patrol', { companyId: user.companyId }); 
 
     // Gestão de recursos da empresa
     can('manage', 'Post', { companyId: user.companyId });
@@ -140,12 +141,16 @@ const rolePermissionsMap = {
     // Perfil próprio
     can('update', 'User', ['profilePicture'], { id: user.id });
 
-    // Gestão operacional
+    // Gestão operacional 
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { companyId: user.companyId });
-    can('manage', 'MotorizedService', { companyId: user.companyId });
-    can('manage', 'Supply', { companyId: user.companyId });
-    can('manage', 'VehicleChecklist', { companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
   },
 
   // GUARD - Vigilante de Segurança
@@ -165,7 +170,9 @@ const rolePermissionsMap = {
     can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
     can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
     can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
     can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
 
     // TODO: Implementar permissões específicas baseadas em PermissionType
     // const userWithPermissions = user as UserWithPermissions;
@@ -194,6 +201,7 @@ const rolePermissionsMap = {
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
     can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
     can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
   },
 
   // POST_RESIDENT - Morador/Residente

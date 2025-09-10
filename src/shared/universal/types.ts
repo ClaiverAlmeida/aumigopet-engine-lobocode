@@ -6,27 +6,30 @@ export type EntityNameModel =
   | 'user'
   | 'company'
   | 'post'
+  | 'patrol'
   | 'vehicle'
-  | 'shift'
-  | 'round'
+  | 'shift' 
   | 'occurrence'
   | 'supply'
   | 'motorizedService'
   | 'vehicleChecklist'
+  | 'motorcycleChecklist'
   | 'occurrenceDispatch'
   | 'doormanChecklist';
 export type EntityNameCasl =
   | 'User'
   | 'Company'
   | 'Post'
+  | 'Patrol'
   | 'Vehicle'
   | 'Shift'
-  | 'Round'
+  | 'Patrol'
   | 'Occurrence'
   | 'VehicleChecklist'
   | 'Supply'
   | 'MotorizedService'
   | 'VehicleChecklist'
+  | 'MotorcycleChecklist'
   | 'OccurrenceDispatch'
   | 'DoormanChecklist';
 
@@ -42,14 +45,15 @@ export const ENTITY_MAPPING = {
   user: 'User',
   company: 'Company',
   post: 'Post',
+  patrol: 'Patrol',
   // Operational entities
   vehicle: 'Vehicle',
   shift: 'Shift',
-  round: 'Round',
   occurrence: 'Occurrence',
   motorizedService: 'MotorizedService',
   supply: 'Supply',
   vehicleChecklist: 'VehicleChecklist',
+  motorcycleChecklist: 'MotorcycleChecklist',
   occurrenceDispatch: 'OccurrenceDispatch',
   doormanChecklist: 'DoormanChecklist',
 } as const;
@@ -63,11 +67,12 @@ export const CASL_TO_MODEL_MAPPING = {
   Post: 'post',
   Vehicle: 'vehicle',
   Shift: 'shift',
-  Round: 'round',
+  Patrol: 'patrol',
   Occurrence: 'occurrence',
   MotorizedService: 'motorizedService',
   Supply: 'supply',
   VehicleChecklist: 'vehicleChecklist',
+  MotorcycleChecklist: 'motorcycleChecklist',
   OccurrenceDispatch: 'occurrenceDispatch',
   DoormanChecklist: 'doormanChecklist',
 } as const;
@@ -130,10 +135,12 @@ export function createEntityConfig(modelName: EntityNameModel) {
 // ============================================================================
 
 export interface IncludeConfig {
-  [key: string]: boolean | {
-    select?: Record<string, boolean>;
-    include?: IncludeConfig;
-  };
+  [key: string]:
+    | boolean
+    | {
+        select?: Record<string, boolean>;
+        include?: IncludeConfig;
+      };
 }
 
 export interface TransformConfig {
