@@ -20,10 +20,6 @@ fi
 
 # Verificar se infraestrutura está rodando
 echo "🔍 Verificando infraestrutura..."
-if ! docker ps | grep -q "infraseg-nginx"; then
-    echo "⚠️ Nginx não está rodando. Execute: ./scripts/deploy-infrastructure.sh"
-    exit 1
-fi
 
 if ! docker ps | grep -q "infraseg-db"; then
     echo "⚠️ Database não está rodando. Execute: ./scripts/start-database.sh"
@@ -49,11 +45,11 @@ docker compose -f docker/docker-compose.prod.yml ps backend
 # Testar health check
 echo "🏥 Testando health check..."
 sleep 5
-curl -k -f https://localhost/health && echo "✅ Backend OK" || echo "❌ Backend falhou"
+curl -k -f https://appinfraseg.com.br/api/health && echo "✅ Backend OK" || echo "❌ Backend falhou"
 
 echo ""
 echo "✅ Deploy do backend concluído!"
-echo "🌐 API disponível em: https://localhost"
+echo "🌐 API disponível em: https://appinfraseg.com.br/api/"
 echo ""
 echo "📋 Comandos úteis:"
 echo "  - Logs: docker compose -f docker/docker-compose.prod.yml logs -f backend"

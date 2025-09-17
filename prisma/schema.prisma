@@ -38,6 +38,10 @@ enum Roles {
   MAINTENANCE_ASSISTANT // Auxiliar de Manutenção
   MONITORING_OPERATOR // Operador de Monitoramento
   ADMINISTRATIVE_ASSISTANT // Assistente Administrativo
+  
+  EDITOR
+  WRITER
+  READER
 }
 
 enum UserStatus {
@@ -53,6 +57,7 @@ enum UserStatus {
 enum PermissionType {
   SUPPORT // Apoio  
   PATROL // Rota
+  DOORMAN
 }
 
 // ===============================================

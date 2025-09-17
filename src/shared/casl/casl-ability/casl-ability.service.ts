@@ -27,19 +27,19 @@ export type PermActions =
 
 export type PermissionResource =
   | Subjects<{
-      User: User;
-      Post: Post;
-      SecurityPost: any;
-      Patrol: any;
-      Shift: any;
-      EventLog: any;
-      PanicEvent: any;
-      Checkpoint: any;
-      Report: any;
-      Checklist: any;
-      Notification: any;
-      Document: any;
-    }>
+    User: User;
+    Post: Post;
+    SecurityPost: any;
+    Patrol: any;
+    Shift: any;
+    EventLog: any;
+    PanicEvent: any;
+    Checkpoint: any;
+    Report: any;
+    Checklist: any;
+    Notification: any;
+    Document: any;
+  }>
   | 'all';
 
 export type AppAbility = PureAbility<
@@ -69,24 +69,12 @@ const rolePermissionsMap = {
     can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
 
     // Restrições de usuários
-    can('manage', 'User', {
-      companyId: user.companyId,
-      role: {
-        in: [
-          'ADMIN',
-          'SUPERVISOR',
-          'GUARD',
-          'HR',
-          'POST_SUPERVISOR',
-          'POST_RESIDENT',
-          'DOORMAN',
-          'JARDINER',
-          'MAINTENANCE_ASSISTANT',
-          'MONITORING_OPERATOR',
-          'ADMINISTRATIVE_ASSISTANT',
-        ],
-      },
-    });
+    // cannot('read', 'User', {
+    //   companyId: user.companyId,
+    //   role: {
+    //     in: ['SYSTEM_ADMIN'],
+    //   },
+    // });
 
     can('manage', 'Patrol', { companyId: user.companyId });
 
@@ -119,23 +107,12 @@ const rolePermissionsMap = {
       companyId: user.companyId,
     });
     // Restrições de usuários
-    can('manage', 'User', {
-      companyId: user.companyId,
-      role: {
-        in: [
-          'HR',
-          'SUPERVISOR',
-          'GUARD',
-          'POST_SUPERVISOR',
-          'POST_RESIDENT',
-          'DOORMAN',
-          'JARDINER',
-          'MAINTENANCE_ASSISTANT',
-          'MONITORING_OPERATOR',
-          'ADMINISTRATIVE_ASSISTANT',
-        ],
-      },
-    });
+    // cannot('read', 'User', {
+    //   companyId: user.companyId,
+    //   role: {
+    //     in: ['ADMIN', 'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+    //   },
+    // });
 
     can(
       'update',
@@ -160,7 +137,7 @@ const rolePermissionsMap = {
     cannot('read', 'User', {
       companyId: user.companyId,
       role: {
-        in: ['ADMIN', 'SYSTEM_ADMIN', 'HR', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+        in: ['ADMIN', 'SYSTEM_ADMIN'],
       },
     });
 
