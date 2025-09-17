@@ -66,7 +66,7 @@ export class MotorcycleChecklistsService extends UniversalService<
           },
         },
         motorcycle: {
-          select: {
+          select: { 
             model: true,
           },
         },
@@ -75,8 +75,7 @@ export class MotorcycleChecklistsService extends UniversalService<
         flatten: {
           post: { field: 'name', target: 'postName' },
           motorcycle: { field: 'model', target: 'motorcycleModel' },
-        },
-        exclude: ['post', 'motorcycle'],
+        }, 
       },
     };
   }

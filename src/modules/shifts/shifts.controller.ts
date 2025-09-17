@@ -38,6 +38,11 @@ export class ShiftsController extends UniversalController<
     Roles.HR,
     Roles.ADMIN,
     Roles.SYSTEM_ADMIN,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
   )
   @Get()
   buscarComPaginacao(
@@ -53,19 +58,40 @@ export class ShiftsController extends UniversalController<
     Roles.HR,
     Roles.ADMIN,
     Roles.SYSTEM_ADMIN,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
   )
   @Get('current')
   buscarEmAndamento() {
     return this.service.buscarEmAndamento();
   }
 
-  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+  )
   @Post('start-time')
   async inicioDoTurno(@Body() data: CreateShiftDto) {
     return this.service.inicioDoTurno(data);
   }
 
-  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+  )
   @Patch('break-start-time/:id')
   async inicioDoIntervalo(
     @Param('id') id: string,
@@ -74,13 +100,29 @@ export class ShiftsController extends UniversalController<
     return this.service.inicioDoIntervalo(id, data);
   }
 
-  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+  )
   @Patch('break-end-time/:id')
   async fimDoIntervalo(@Param('id') id: string, @Body() data: UpdateShiftDto) {
     return this.service.fimDoIntervalo(id, data);
   }
 
-  @RequiredRoles(Roles.SUPERVISOR, Roles.GUARD)
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+  )
   @Patch('end-time/:id')
   async fimDoTurno(@Param('id') id: string, @Body() data: UpdateShiftDto) {
     return this.service.fimDoTurno(id, data);

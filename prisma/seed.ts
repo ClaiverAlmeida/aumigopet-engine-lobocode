@@ -139,8 +139,7 @@ async function seedUser(companyId: string) {
       data: {
         ...userGuardData,
         permissions: {
-          create: [
-            { permissionType: PermissionType.DOORMAN },
+          create: [ 
             { permissionType: PermissionType.PATROL },
             { permissionType: PermissionType.SUPPORT },
           ],

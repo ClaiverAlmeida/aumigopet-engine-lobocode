@@ -43,7 +43,7 @@ export class CreateMotorcycleChecklistDto {
   status: ReportStatus;
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
-  vehicleId: string;
+  motorcycleId: string;
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
   shiftId: string;

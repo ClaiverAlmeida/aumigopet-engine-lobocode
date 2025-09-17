@@ -23,7 +23,7 @@ export class RateLimitGuard implements CanActivate {
 
     // Configurações específicas por endpoint
     const config = this.getRateLimitConfig(endpoint);
-    
+
     if (!config) {
       return true; // Sem rate limit para este endpoint
     }
@@ -36,7 +36,7 @@ export class RateLimitGuard implements CanActivate {
 
     // Verifica rate limit
     const entry = this.rateLimitStore.get(key);
-    
+
     if (!entry || now > entry.resetTime) {
       // Primeira requisição ou janela expirada
       this.rateLimitStore.set(key, {
@@ -60,11 +60,12 @@ export class RateLimitGuard implements CanActivate {
    */
   private getClientId(request: Request): string {
     // Prioriza IP real (considerando proxy)
-    const ip = request.ip || 
-               request.connection.remoteAddress || 
-               request.socket.remoteAddress ||
-               'unknown';
-    
+    const ip =
+      request.ip ||
+      request.connection.remoteAddress ||
+      request.socket.remoteAddress ||
+      'unknown';
+
     return ip.toString();
   }
 
@@ -89,12 +90,12 @@ export class RateLimitGuard implements CanActivate {
         windowMs: AUTH_CONSTANTS.RATE_LIMIT.REFRESH_WINDOW_MS,
       },
       'POST:/auth/forgot-password': {
-        maxAttempts: 3,
+        maxAttempts: 20, 
         windowMs: 15 * 60 * 1000, // 15 minutos
       },
       'POST:/auth/reset-password': {
-        maxAttempts: 5,
-        windowMs: 60 * 60 * 1000, // 1 hora
+        maxAttempts: 20,
+        windowMs: 15 * 60 * 1000, // 15 minutos
       },
     };
 
@@ -106,22 +107,22 @@ export class RateLimitGuard implements CanActivate {
    */
   private cleanupExpiredEntries(): void {
     const now = Date.now();
-    
-    for (const [key, entry] of this.rateLimitStore.entries()) {
+
+    this.rateLimitStore.forEach((entry, key) => {
       if (now > entry.resetTime) {
         this.rateLimitStore.delete(key);
       }
-    }
+    });
   }
 
   /**
    * Reseta rate limit para um cliente específico (útil para testes)
    */
   resetClient(clientId: string): void {
-    for (const [key] of this.rateLimitStore.entries()) {
+    this.rateLimitStore.forEach((entry, key) => {
       if (key.startsWith(clientId)) {
         this.rateLimitStore.delete(key);
       }
-    }
+    });
   }
-} 
+}

@@ -4,10 +4,11 @@ import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service';
 import { UserPermissionService } from './user-permission.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { Roles } from '@prisma/client';
+import { Prisma, Roles } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 import { NotFoundError } from '../../../shared/common/errors';
 import { SUCCESS_MESSAGES } from '../../../shared/common/messages';
+import { CreateOthersDto } from '../dto/create-others.dto'; 
 
 @Injectable()
 export class BaseUserService {
@@ -16,7 +17,7 @@ export class BaseUserService {
     protected readonly userValidator: UserValidator,
     protected readonly userQueryService: UserQueryService,
     protected readonly userPermissionService: UserPermissionService,
-    protected targetRole?: Roles,
+    protected targetRole?: Roles,  
   ) {}
 
   // ============================================================================
@@ -36,9 +37,9 @@ export class BaseUserService {
 
     const { totalPages, hasNextPage, hasPreviousPage } =
       this.calcularInformacoesDePaginacao(page, limit, total);
-   
+
     const transformedData = this.transformData(users);
-    
+
     return {
       data: transformedData,
       pagination: {
@@ -91,7 +92,7 @@ export class BaseUserService {
 
     return { data: users };
   }
-
+  
   /**
    * Atualiza usuário
    */
@@ -309,9 +310,11 @@ export class BaseUserService {
    * Transforma os dados dos usuários para o formato esperado pelo frontend
    */
   private transformData(users: any[]): any[] {
-    return users.map(user => ({
+    return users.map((user) => ({
       ...user,
-      permissions: user.permissions?.map((permission: any) => permission.permissionType) || []
+      permissions:
+        user.permissions?.map((permission: any) => permission.permissionType) ||
+        [],
     }));
   }
 }

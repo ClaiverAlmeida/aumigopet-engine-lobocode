@@ -17,7 +17,7 @@ import { UniversalPermissionService } from 'src/shared/universal/services/permis
 // ✨ Importar helper de mapeamento automático
 import { createEntityConfig } from '../../shared/universal/types';
 import { PostsService } from '../posts/posts.service';
-import { ShiftStatus } from '@prisma/client';
+import { Roles, ShiftStatus } from '@prisma/client';
 
 @Injectable({ scope: Scope.REQUEST })
 export class ShiftsService extends UniversalService<
@@ -59,6 +59,7 @@ export class ShiftsService extends UniversalService<
       transform: {
         custom: (data: any) => {
           if (data?.user) data.userName = data.user.name;
+          if (data?.post) data.postName = data.post.name;
           return data;
         },
       },
@@ -85,7 +86,7 @@ export class ShiftsService extends UniversalService<
       function: data.function,
       status: ShiftStatus.IN_PROGRESS,
     };
- 
+
     return super.criar(shiftData);
   }
 
@@ -118,14 +119,18 @@ export class ShiftsService extends UniversalService<
   ): Promise<void> {
     if (!data.startTime) throw new RequiredFieldError('startTime');
 
-    if (data.postId) await this.postsService.validarExistencia(data.postId);
-    else throw new RequiredFieldError('postId');
+    const user = this.obterUsuarioLogado();
+    if (!user)
+      throw new NotFoundError('Usuário', 'não está autenticado', 'user');
 
-    const userId = this.obterUsuarioLogadoId();
-    if (!userId)
-      throw new NotFoundError('Usuário', 'não está autenticado', 'userId');
+    if (user.role === Roles.SUPERVISOR) {
+      delete data.postId;
+    } else {
+      if (data.postId) await this.postsService.validarExistencia(data.postId);
+      else throw new RequiredFieldError('postId');
+    }
 
-    data.userId = userId;
+    data.userId = user.id;
     data.status = ShiftStatus.IN_PROGRESS;
   }
 }

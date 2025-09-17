@@ -34,6 +34,7 @@ import {
   CaslFields,
 } from 'src/shared/casl/decorators/casl.decorator';
 import { CaslInterceptor } from 'src/shared/casl/interceptors/casl.interceptor';
+import { CreateOthersDto } from './dto/create-others.dto';
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(TenantInterceptor, CaslInterceptor) // ✅ Adicionado CaslInterceptor
@@ -42,6 +43,15 @@ import { CaslInterceptor } from 'src/shared/casl/interceptors/casl.interceptor';
 export class UsersController {
   constructor(private readonly service: UsersService) {}
 
+  
+
+  @Post('')
+  @CaslCreate('User')
+  @RequiredRoles(Roles.ADMIN, Roles.HR)
+  criarNovoOthers(@Body() dto: CreateOthersDto) {
+    return this.service.criarNovoOthers(dto);
+  }
+  
   @Get('all')
   @CaslRead('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)

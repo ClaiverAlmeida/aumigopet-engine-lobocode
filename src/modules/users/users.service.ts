@@ -20,6 +20,9 @@ import {
   PostResidentService,
   UserPermissionService,
 } from './services';
+import { CreateOthersDto } from './dto/create-others.dto';
+import { Prisma } from '@prisma/client';
+import { UserFactory } from './factories/user.factory';
 
 @Injectable()
 export class UsersService extends BaseUserService {
@@ -35,6 +38,7 @@ export class UsersService extends BaseUserService {
     private hrService: HRService,
     private postSupervisorService: PostSupervisorService,
     private postResidentService: PostResidentService,
+    private userFactory: UserFactory,
   ) {
     super(
       userRepository,
@@ -51,6 +55,26 @@ export class UsersService extends BaseUserService {
 
   async criarNovoAdmin(dto: CreateAdminDto) {
     return this.adminService.criarNovoAdmin(dto);
+  }
+
+  /**
+   * Cria usuário
+   */
+  //  Funcionalidades específicas de RH
+  async criarNovoOthers(dto: CreateOthersDto) {
+    // ✅ Validação de role hierárquico RESTAURADA
+    this.userPermissionService.validarCriacaoDeUserComRole(dto.role);
+
+    // Validações comuns
+    await this.validarSeEmailEhUnico(dto.email);
+
+    // Criação do usuário
+    const userData = this.userFactory.criarOthers(dto);
+    const user = await this.userRepository.criar(
+      userData as Prisma.UserCreateInput,
+    );
+
+    return user;
   }
 
   async criarNovoHR(dto: CreateHRDto) {

@@ -3,9 +3,7 @@ import { DoormanChecklistsService } from './doorman-checklists.service';
 import { CreateDoormanChecklistDto } from './dto/create-doorman-checklist.dto';
 import { UpdateDoormanChecklistDto } from './dto/update-doorman-checklist.dto';
 import { AuthGuard } from 'src/shared/auth/guards/auth.guard';
-import { RequiredRoles } from 'src/shared/auth/required-roles.decorator';
 import { Roles } from '@prisma/client';
-import { RoleGuard } from 'src/shared/auth/guards/role.guard';
 import { RoleByMethodGuard } from 'src/shared/auth/guards/role-by-method.guard';
 import { RoleByMethod } from 'src/shared/auth/role-by-method.decorator';
 import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
@@ -20,9 +18,10 @@ import { UniversalController } from 'src/shared/universal';
     Roles.HR,
     Roles.SUPERVISOR,
     Roles.GUARD,
+    Roles.DOORMAN,
   ],
-  POST: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.GUARD, Roles.SUPERVISOR],
-  PATCH: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.GUARD, Roles.SUPERVISOR],
+  POST: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.GUARD, Roles.SUPERVISOR, Roles.DOORMAN],
+  PATCH: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.GUARD, Roles.SUPERVISOR, Roles.DOORMAN],
   DELETE: [Roles.SYSTEM_ADMIN, Roles.ADMIN],
 })
 @Controller('doorman-checklists')

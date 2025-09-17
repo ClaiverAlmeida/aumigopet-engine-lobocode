@@ -9,9 +9,9 @@ export class CreateShiftDto {
   @IsOptional()
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
   companyId?: string;
- 
-  @IsNotEmpty({ message: VALIDATION_MESSAGES.REQUIRED.FIELD })
-  postId: string;
+
+  @IsOptional() 
+  postId?: string;
 
   @IsDate({ message: VALIDATION_MESSAGES.FORMAT.DATE_INVALID })
   startTime: Date;

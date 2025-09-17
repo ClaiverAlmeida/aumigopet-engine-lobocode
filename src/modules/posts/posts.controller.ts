@@ -20,7 +20,7 @@ export class PostsController extends UniversalController<
     super(service);
   }
 
-  @RequiredRoles(Roles.GUARD, Roles.SUPERVISOR)
+  @RequiredRoles(Roles.GUARD, Roles.SUPERVISOR, Roles.DOORMAN, Roles.JARDINER, Roles.MAINTENANCE_ASSISTANT, Roles.MONITORING_OPERATOR, Roles.ADMINISTRATIVE_ASSISTANT)
   @Get('all')
   async buscarTodos() {
     return this.service.buscarTodos();

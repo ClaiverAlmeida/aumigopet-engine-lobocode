@@ -32,12 +32,12 @@ enum Roles {
   SUPERVISOR // Supervisor
   GUARD // Vigilante de segurança
   POST_SUPERVISOR // Supervisor de posto
-  POST_RESIDENT // Morador/residente
-
-  // temporário, irei remover
-  EDITOR
-  WRITER
-  READER
+  POST_RESIDENT // Morador/residente 
+  DOORMAN // Porteiro/Controlador de Acesso
+  JARDINER // Jardineiro
+  MAINTENANCE_ASSISTANT // Auxiliar de Manutenção
+  MONITORING_OPERATOR // Operador de Monitoramento
+  ADMINISTRATIVE_ASSISTANT // Assistente Administrativo
 }
 
 enum UserStatus {
@@ -51,7 +51,6 @@ enum UserStatus {
 }
 
 enum PermissionType {
-  DOORMAN // Porteiro
   SUPPORT // Apoio  
   PATROL // Rota
 }
@@ -67,8 +66,20 @@ enum WorkShift {
 
 enum ShiftFunction {
   PATROL // Rota
-  SUPPORT // Apoio
-  DOORMAN // Portaria
+  SUPPORT // Apoio 
+
+  SYSTEM_ADMIN
+  ADMIN
+  HR
+  SUPERVISOR
+  GUARD
+  POST_SUPERVISOR
+  POST_RESIDENT
+  DOORMAN
+  JARDINER
+  MAINTENANCE_ASSISTANT
+  MONITORING_OPERATOR
+  ADMINISTRATIVE_ASSISTANT
 }
 
 enum ShiftStatus {
@@ -213,9 +224,9 @@ model Company {
   // ===============================================
   // 📊 AUDITORIA E ÍNDICES
   // ===============================================
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  deletedAt           DateTime? 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([cnpj])
   @@index([name])
@@ -401,9 +412,9 @@ model Post {
   // ===============================================
   // 📊 AUDITORIA E ÍNDICES
   // ===============================================
-  createdAt           DateTime              @default(now())
-  updatedAt           DateTime              @updatedAt
-  deletedAt           DateTime? 
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
 
   @@index([companyId])
   @@index([name])
@@ -442,8 +453,8 @@ model Shift {
   company   Company @relation("CompanyShifts", fields: [companyId], references: [id])
   companyId String
 
-  post   Post   @relation("PostShifts", fields: [postId], references: [id])
-  postId String
+  post   Post?   @relation("PostShifts", fields: [postId], references: [id])
+  postId String?
 
   user   User   @relation("UserShifts", fields: [userId], references: [id])
   userId String

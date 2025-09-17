@@ -9,6 +9,7 @@ import { CreateHRDto } from '../dto/create-hr.dto';
 import { CreatePostResidentDto } from '../dto/create-post-resident.dto';
 import { CreatePostSupervisorDto } from '../dto/create-post-supervisor.dto';
 import { CreateSupervisorDto } from '../dto/create-supervisor.dto';
+import { CreateOthersDto } from '../dto/create-others.dto';
 
 @Injectable()
 export class UserFactory {
@@ -38,6 +39,10 @@ export class UserFactory {
 
   criarSystemAdmin(dto: CreateSystemAdminDto): Prisma.UserCreateInput {
     return this.criarUsuarioBase(dto, Roles.SYSTEM_ADMIN);
+  }
+
+  criarOthers(dto: CreateOthersDto): Prisma.UserCreateInput {
+    return this.criarUsuarioBase(dto, dto.role);
   }
 
   criarAdmin(dto: CreateAdminDto): Prisma.UserCreateInput {

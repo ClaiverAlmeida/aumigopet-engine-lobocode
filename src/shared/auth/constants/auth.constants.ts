@@ -13,11 +13,11 @@ export const AUTH_CONSTANTS = {
 
   // Configurações de rate limiting
   RATE_LIMIT: {
-    LOGIN_MAX_ATTEMPTS: 5,
+    LOGIN_MAX_ATTEMPTS: 20,
     LOGIN_WINDOW_MS: 15 * 60 * 1000, // 15 minutos
-    REFRESH_MAX_ATTEMPTS: 10,
-    REFRESH_WINDOW_MS: 60 * 60 * 1000, // 1 hora
-  },
+    REFRESH_MAX_ATTEMPTS: 20,
+    REFRESH_WINDOW_MS: 15 * 60 * 1000, // 15 minutos
+  },  
 
   // Configurações de segurança
   SECURITY: {

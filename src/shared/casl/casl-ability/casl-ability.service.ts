@@ -63,19 +63,32 @@ const rolePermissionsMap = {
   },
 
   // ADMIN - Administrador da empresa
-  ADMIN(user, { can }) {
+  ADMIN(user, { can, cannot }) {
     // Permissões gerais da empresa
     can('read', 'all', { companyId: user.companyId });
     can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
 
-    // Gestão de usuários (exceto SYSTEM_ADMIN)
-    can(['create', 'update', 'delete'], 'User', {
+    // Restrições de usuários
+    can('manage', 'User', {
       companyId: user.companyId,
       role: {
-        in: ['ADMIN', 'SUPERVISOR', 'HR', 'GUARD', 'POST_SUPERVISOR', 'POST_RESIDENT'],
+        in: [
+          'ADMIN',
+          'SUPERVISOR',
+          'GUARD',
+          'HR',
+          'POST_SUPERVISOR',
+          'POST_RESIDENT',
+          'DOORMAN',
+          'JARDINER',
+          'MAINTENANCE_ASSISTANT',
+          'MONITORING_OPERATOR',
+          'ADMINISTRATIVE_ASSISTANT',
+        ],
       },
     });
-    can('manage', 'Patrol', { companyId: user.companyId }); 
+
+    can('manage', 'Patrol', { companyId: user.companyId });
 
     // Gestão de recursos da empresa
     can('manage', 'Post', { companyId: user.companyId });
@@ -101,24 +114,37 @@ const rolePermissionsMap = {
   HR(user, { can, cannot }) {
     // Leitura geral da empresa
     can('read', 'all', { companyId: user.companyId });
-
-    // Restrições de usuários
-    cannot('read', 'User', {
-      companyId: user.companyId,
-      role: {
-        in: ['ADMIN',  'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
-      },
-    });
-
     // Gestão de usuários permitidos
     can('manage', 'User', {
       companyId: user.companyId,
-      role: { in: ['HR', 'SUPERVISOR', 'GUARD'] },
     });
-    can('update', 'User', ['name', 'email', 'phone', 'address', 'status', 'cpf'], {
+    // Restrições de usuários
+    can('manage', 'User', {
       companyId: user.companyId,
-      role: { in: ['HR', 'SUPERVISOR', 'GUARD'] },
+      role: {
+        in: [
+          'HR',
+          'SUPERVISOR',
+          'GUARD',
+          'POST_SUPERVISOR',
+          'POST_RESIDENT',
+          'DOORMAN',
+          'JARDINER',
+          'MAINTENANCE_ASSISTANT',
+          'MONITORING_OPERATOR',
+          'ADMINISTRATIVE_ASSISTANT',
+        ],
+      },
     });
+
+    can(
+      'update',
+      'User',
+      ['name', 'email', 'phone', 'address', 'status', 'cpf'],
+      {
+        companyId: user.companyId,
+      },
+    );
 
     // Notificações
     can('create', 'Notification', { companyId: user.companyId });
@@ -141,15 +167,30 @@ const rolePermissionsMap = {
     // Perfil próprio
     can('update', 'User', ['profilePicture'], { id: user.id });
 
-    // Gestão operacional 
+    // Gestão operacional
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
     can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
-    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'MotorcycleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'DoormanChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
     can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
   },
 
@@ -166,12 +207,27 @@ const rolePermissionsMap = {
     // Gestão de turnos e relatórios
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
     can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
-    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'MotorcycleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'DoormanChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
     can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
 
     // TODO: Implementar permissões específicas baseadas em PermissionType
@@ -186,6 +242,90 @@ const rolePermissionsMap = {
     //   (p) => p.permissionType === 'PATROL' && p.granted,
     // );
   },
+  DOORMAN(user, { can }) {
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    can('read', 'Vehicle');
+
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+
+    can('manage', 'DoormanChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
+  },
+
+  ADMINISTRATIVE_ASSISTANT(user, { can }) {
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+  },
+  JARDINER(user, { can }) {
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+  },
+  MAINTENANCE_ASSISTANT(user, { can }) {
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+  },
+  MONITORING_OPERATOR(user, { can }) {
+    // Perfil próprio
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
+
+    // Recursos básicos
+    can('read', 'Post');
+    // Gestão de turnos e relatórios
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+  },
   // ========================================
   // ROLES ESPECÍFICOS DE POSTO
   // ========================================
@@ -199,9 +339,18 @@ const rolePermissionsMap = {
     // Gestão operacional do posto
     can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
     can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorizedService', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'VehicleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'MotorcycleChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
   },
 
   // POST_RESIDENT - Morador/Residente
@@ -216,28 +365,6 @@ const rolePermissionsMap = {
 
     // Notificações públicas
     can('read', 'Notification', { companyId: user.companyId, type: 'PUBLIC' });
-  },
-
-  // ========================================
-  // ROLES DEPRECATED (REMOVER EM BREVE)
-  // ========================================
-
-  EDITOR(user, { can }) {
-    can('update', 'User', ['name', 'profilePicture']);
-    can('create', 'Post');
-    can('read', 'Post');
-    can('update', 'Post');
-  },
-
-  WRITER(user, { can }) {
-    can('update', 'User', ['name', 'profilePicture']);
-    can('create', 'Post');
-    can('read', 'Post', { authorId: user.id });
-    can('update', 'Post', { authorId: user.id });
-  },
-
-  READER(user, { can }) {
-    can('read', 'Post', { published: true });
   },
 };
 
