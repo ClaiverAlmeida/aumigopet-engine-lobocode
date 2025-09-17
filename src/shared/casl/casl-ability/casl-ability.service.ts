@@ -27,19 +27,19 @@ export type PermActions =
 
 export type PermissionResource =
   | Subjects<{
-    User: User;
-    Post: Post;
-    SecurityPost: any;
-    Patrol: any;
-    Shift: any;
-    EventLog: any;
-    PanicEvent: any;
-    Checkpoint: any;
-    Report: any;
-    Checklist: any;
-    Notification: any;
-    Document: any;
-  }>
+      User: User;
+      Post: Post;
+      SecurityPost: any;
+      Patrol: any;
+      Shift: any;
+      EventLog: any;
+      PanicEvent: any;
+      Checkpoint: any;
+      Report: any;
+      Checklist: any;
+      Notification: any;
+      Document: any;
+    }>
   | 'all';
 
 export type AppAbility = PureAbility<
@@ -69,12 +69,24 @@ const rolePermissionsMap = {
     can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
 
     // Restrições de usuários
-    // cannot('read', 'User', {
-    //   companyId: user.companyId,
-    //   role: {
-    //     in: ['SYSTEM_ADMIN'],
-    //   },
-    // });
+    can(['create', 'update', 'delete'], 'User', {
+      companyId: user.companyId,
+      role: {
+        in: [
+          Roles.ADMIN,
+          Roles.SUPERVISOR,
+          Roles.HR,
+          Roles.GUARD,
+          Roles.POST_SUPERVISOR,
+          Roles.POST_RESIDENT,
+          Roles.DOORMAN,
+          Roles.JARDINER,
+          Roles.MAINTENANCE_ASSISTANT,
+          Roles.MONITORING_OPERATOR,
+          Roles.ADMINISTRATIVE_ASSISTANT,
+        ],
+      },
+    });
 
     can('manage', 'Patrol', { companyId: user.companyId });
 
@@ -107,12 +119,24 @@ const rolePermissionsMap = {
       companyId: user.companyId,
     });
     // Restrições de usuários
-    // cannot('read', 'User', {
-    //   companyId: user.companyId,
-    //   role: {
-    //     in: ['ADMIN', 'SYSTEM_ADMIN', 'POST_SUPERVISOR', 'POST_RESIDENT'],
-    //   },
-    // });
+    // Gestão de usuários (exceto SYSTEM_ADMIN)
+    can(['create', 'update', 'delete'], 'User', {
+      companyId: user.companyId,
+      role: {
+        in: [
+          Roles.SUPERVISOR,
+          Roles.HR,
+          Roles.GUARD,
+          Roles.POST_SUPERVISOR,
+          Roles.POST_RESIDENT,
+          Roles.DOORMAN,
+          Roles.JARDINER,
+          Roles.MAINTENANCE_ASSISTANT,
+          Roles.MONITORING_OPERATOR,
+          Roles.ADMINISTRATIVE_ASSISTANT,
+        ],
+      },
+    });
 
     can(
       'update',
@@ -132,15 +156,12 @@ const rolePermissionsMap = {
   SUPERVISOR(user, { can, cannot }) {
     // Leitura geral da empresa
     can('read', 'all', { companyId: user.companyId });
-
-    // Restrições de usuários
     cannot('read', 'User', {
       companyId: user.companyId,
       role: {
         in: ['ADMIN', 'SYSTEM_ADMIN'],
       },
     });
-
     // Perfil próprio
     can('update', 'User', ['profilePicture'], { id: user.id });
 

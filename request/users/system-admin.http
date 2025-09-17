@@ -1,6 +1,6 @@
-# @baseUrl = http://appinfraseg.com.br/api/
-@baseUrl = http://localhost:3000
-@companyId = cmf03p4950000ltn8twe926jf
+@baseUrl = http://appinfraseg.com.br/api/
+# @baseUrl = http://localhost:3000
+@companyId = cmeugkss50000ltt6ewnxidgy
 
 
 @token = {{ platformAdminLogin.response.body.access_token }}
@@ -59,21 +59,22 @@ Authorization: Bearer {{token}}
 ### ========================================
 
 ### Criar novo SYSTEM_ADMIN
-POST {{baseUrl}}/users/supervisor
+POST {{baseUrl}}/users/guard
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "name": "Supervisor Infraseg",
-  "email": "supervisor.infraseg@user.com",
-  "login": "supervisor infraseg",
-  "password": "SystemAdmin123@Senha",
-  "role": "SUPERVISOR",
-  "phone": "(11) 99999-9997",
-  "address": "Rua Infraseg",
-  "rg": "Necessário atualizar e CPF",
-  "cpf": "094.011.130-68",
-  "registration": "02",
+  "name": "Elaine Silva de Oliveira",
+  "email": "elaine.silva771@yahoo.com",
+  "login": "elaine silva",
+  "password": "Q6v4I@32KOxmp",
+  "role": "GUARD",
+  "permissions": ["SUPPORT"],
+#   "phone": "(11) 99999-9990",
+  "address": "AV. PEDRO PAULINO 83 - CAHAB",
+  "rg": "63.745.904-0",
+  "cpf": "070.784.305-73",
+  "registration": "03",
   "companyId": "{{companyId}}"
 }
 

@@ -14,6 +14,7 @@ export class UpdateUserDto extends PartialType(BaseUserDto) {
   })
   permissions?: PermissionType[];
 
+  @IsOptional()
   @IsEnum(Roles, { message: VALIDATION_MESSAGES.REQUIRED.ROLE })
-  role: Roles; // Deve ser Roles.HR
+  role?: Roles; // Deve ser Roles.HR
 }
