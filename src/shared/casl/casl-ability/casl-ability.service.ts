@@ -52,317 +52,249 @@ export type DefinePermissions = (
   builder: AbilityBuilder<AppAbility>,
 ) => void;
 
-const rolePermissionsMap = {
-  // ========================================
-  // ROLES ADMINISTRATIVOS
-  // ========================================
+// ========================================
+// PERMISSÕES CENTRALIZADAS
+// ========================================
 
-  // SYSTEM_ADMIN - Super usuário do sistema
-  SYSTEM_ADMIN(user, { can }) {
-    can('manage', 'all');
+// Permissões básicas de perfil
+const profilePermissions = {
+  ownProfile: (user: User, { can }: any) => {
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['profilePicture'], { id: user.id });
   },
+  
+  ownProfileExtended: (user: User, { can }: any) => {
+    can('read', 'User', { id: user.id });
+    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
+  }
+};
 
-  // ADMIN - Administrador da empresa
-  ADMIN(user, { can, cannot }) {
-    // Permissões gerais da empresa
+// Permissões de recursos básicos
+const basicResourcePermissions = {
+  readPosts: (user: User, { can }: any) => {
+    can('read', 'Post');
+  },
+  
+  readVehicles: (user: User, { can }: any) => {
+    can('read', 'Vehicle');
+  }
+};
+
+// Permissões operacionais comuns
+const operationalPermissions = {
+  shiftManagement: (user: User, { can }: any) => {
+    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
+  },
+  
+  occurrenceManagement: (user: User, { can }: any) => {
+    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
+    can('manage', 'OccurrenceDispatch', { userId: user.id, companyId: user.companyId });
+  },
+  
+  motorizedServiceManagement: (user: User, { can }: any) => {
+    can('manage', 'MotorizedService', { userId: user.id, companyId: user.companyId });
+  },
+  
+  supplyManagement: (user: User, { can }: any) => {
+    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+  },
+  
+  checklistManagement: (user: User, { can }: any) => {
+    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+  },
+  
+  patrolManagement: (user: User, { can }: any) => {
+    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
+  }
+};
+
+// Permissões administrativas
+const administrativePermissions = {
+  companyRead: (user: User, { can }: any) => {
     can('read', 'all', { companyId: user.companyId });
+  },
+  
+  companyManage: (user: User, { can }: any) => {
     can(['create', 'update', 'delete'], 'all', { companyId: user.companyId });
-
-    // Restrições de usuários
+  },
+  
+  userManagement: (user: User, { can }: any, allowedRoles: Roles[]) => {
     can(['create', 'update', 'delete'], 'User', {
       companyId: user.companyId,
-      role: {
-        in: [
-          Roles.ADMIN,
-          Roles.SUPERVISOR,
-          Roles.HR,
-          Roles.GUARD,
-          Roles.POST_SUPERVISOR,
-          Roles.POST_RESIDENT,
-          Roles.DOORMAN,
-          Roles.JARDINER,
-          Roles.MAINTENANCE_ASSISTANT,
-          Roles.MONITORING_OPERATOR,
-          Roles.ADMINISTRATIVE_ASSISTANT,
-        ],
-      },
+      role: { in: allowedRoles }
     });
-
-    can('manage', 'Patrol', { companyId: user.companyId });
-
-    // Gestão de recursos da empresa
+  },
+  
+  resourceManagement: (user: User, { can }: any) => {
     can('manage', 'Post', { companyId: user.companyId });
     can('manage', 'Shift', { companyId: user.companyId });
     can('manage', 'MotorizedService', { companyId: user.companyId });
-
-    // Relatórios e monitoramento
+  },
+  
+  reporting: (user: User, { can }: any) => {
     can('read', 'Report', { companyId: user.companyId });
     can('export', 'Report', { companyId: user.companyId });
     can('read', 'EventLog', { companyId: user.companyId });
     can('read', 'Checklist', { companyId: user.companyId });
+  }
+};
 
-    // Funcionalidades específicas
+// Permissões específicas
+const specificPermissions = {
+  panicEvents: (user: User, { can }: any) => {
     can('create', 'PanicEvent', { companyId: user.companyId });
-    can('create', 'Notification', { companyId: user.companyId });
   },
-
-  // ========================================
-  // ROLES OPERACIONAIS
-  // ========================================
-
-  // HR - Recursos Humanos
-  HR(user, { can, cannot }) {
-    // Leitura geral da empresa
-    can('read', 'all', { companyId: user.companyId });
-    // Gestão de usuários permitidos
-    can('manage', 'User', {
-      companyId: user.companyId,
-    });
-    // Restrições de usuários
-    // Gestão de usuários (exceto SYSTEM_ADMIN)
-    can(['create', 'update', 'delete'], 'User', {
-      companyId: user.companyId,
-      role: {
-        in: [
-          Roles.SUPERVISOR,
-          Roles.HR,
-          Roles.GUARD,
-          Roles.POST_SUPERVISOR,
-          Roles.POST_RESIDENT,
-          Roles.DOORMAN,
-          Roles.JARDINER,
-          Roles.MAINTENANCE_ASSISTANT,
-          Roles.MONITORING_OPERATOR,
-          Roles.ADMINISTRATIVE_ASSISTANT,
-        ],
-      },
-    });
-
-    can(
-      'update',
-      'User',
-      ['name', 'email', 'phone', 'address', 'status', 'cpf'],
-      {
-        companyId: user.companyId,
-      },
-    );
-
-    // Notificações
+  
+  panicEventsOwn: (user: User, { can }: any) => {
+    can('create', 'PanicEvent', { residentId: user.id });
+    can('read', 'PanicEvent', { residentId: user.id });
+  },
+  
+  notifications: (user: User, { can }: any) => {
     can('create', 'Notification', { companyId: user.companyId });
     can('read', 'Notification', { companyId: user.companyId });
   },
+  
+  publicNotifications: (user: User, { can }: any) => {
+    can('read', 'Notification', { companyId: user.companyId, type: 'PUBLIC' });
+  }
+};
 
-  // SUPERVISOR - Supervisor de Vigilantes
-  SUPERVISOR(user, { can, cannot }) {
-    // Leitura geral da empresa
-    can('read', 'all', { companyId: user.companyId });
+// ========================================
+// MAPEAMENTO DE ROLES
+// ========================================
+
+const rolePermissionsMap = {
+  // ROLES ADMINISTRATIVOS
+  SYSTEM_ADMIN: (user: User, { can }: any) => {
+    can('manage', 'all');
+  },
+
+  ADMIN: (user: User, { can }: any) => {
+    administrativePermissions.companyRead(user, { can });
+    administrativePermissions.companyManage(user, { can });
+    administrativePermissions.userManagement(user, { can }, [
+      Roles.ADMIN,
+      Roles.SUPERVISOR,
+      Roles.HR,
+      Roles.GUARD,
+      Roles.POST_SUPERVISOR,
+      Roles.POST_RESIDENT,
+      Roles.DOORMAN,
+      Roles.JARDINER,
+      Roles.MAINTENANCE_ASSISTANT,
+      Roles.MONITORING_OPERATOR,
+      Roles.ADMINISTRATIVE_ASSISTANT,
+    ]);
+    administrativePermissions.resourceManagement(user, { can });
+    administrativePermissions.reporting(user, { can });
+    specificPermissions.panicEvents(user, { can });
+    specificPermissions.notifications(user, { can });
+  },
+
+  HR: (user: User, { can }: any) => {
+    administrativePermissions.companyRead(user, { can });
+    can('manage', 'User', { companyId: user.companyId });
+    administrativePermissions.userManagement(user, { can }, [
+      Roles.SUPERVISOR,
+      Roles.HR,
+      Roles.GUARD,
+      Roles.POST_SUPERVISOR,
+      Roles.POST_RESIDENT,
+      Roles.DOORMAN,
+      Roles.JARDINER,
+      Roles.MAINTENANCE_ASSISTANT,
+      Roles.MONITORING_OPERATOR,
+      Roles.ADMINISTRATIVE_ASSISTANT,
+    ]);
+    can('update', 'User', ['name', 'email', 'phone', 'address', 'status', 'cpf'], {
+      companyId: user.companyId,
+    });
+    specificPermissions.notifications(user, { can });
+  },
+
+  // ROLES OPERACIONAIS
+  SUPERVISOR: (user: User, { can, cannot }: any) => {
+    administrativePermissions.companyRead(user, { can });
     cannot('read', 'User', {
       companyId: user.companyId,
-      role: {
-        in: ['ADMIN', 'SYSTEM_ADMIN'],
-      },
+      role: { in: [Roles.ADMIN, Roles.SYSTEM_ADMIN] },
     });
-    // Perfil próprio
-    can('update', 'User', ['profilePicture'], { id: user.id });
-
-    // Gestão operacional
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorcycleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'DoormanChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
+    profilePermissions.ownProfile(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
+    operationalPermissions.motorizedServiceManagement(user, { can });
+    operationalPermissions.supplyManagement(user, { can });
+    operationalPermissions.checklistManagement(user, { can });
+    operationalPermissions.patrolManagement(user, { can });
   },
 
-  // GUARD - Vigilante de Segurança
-  GUARD(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
-
-    // Recursos básicos
-    can('read', 'Post');
-    can('read', 'Vehicle');
-
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorcycleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'DoormanChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
-
-    // TODO: Implementar permissões específicas baseadas em PermissionType
-    // const userWithPermissions = user as UserWithPermissions;
-    // const hasDoormanPermission = userWithPermissions.permissions?.some(
-    //   (p) => p.permissionType === 'DOORMAN' && p.granted,
-    // );
-    // const hasSupportPermission = userWithPermissions.permissions?.some(
-    //   (p) => p.permissionType === 'SUPPORT' && p.granted,
-    // );
-    // const hasPatrolPermission = userWithPermissions.permissions?.some(
-    //   (p) => p.permissionType === 'PATROL' && p.granted,
-    // );
-  },
-  DOORMAN(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
-
-    // Recursos básicos
-    can('read', 'Post');
-    can('read', 'Vehicle');
-
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-
-    can('manage', 'DoormanChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'Patrol', { userId: user.id, companyId: user.companyId });
+  GUARD: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    basicResourcePermissions.readVehicles(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
+    operationalPermissions.motorizedServiceManagement(user, { can });
+    operationalPermissions.supplyManagement(user, { can });
+    operationalPermissions.checklistManagement(user, { can });
+    operationalPermissions.patrolManagement(user, { can });
   },
 
-  ADMINISTRATIVE_ASSISTANT(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
-
-    // Recursos básicos
-    can('read', 'Post');
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+  DOORMAN: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    basicResourcePermissions.readVehicles(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
+    can('manage', 'DoormanChecklist', { userId: user.id, companyId: user.companyId });
+    operationalPermissions.patrolManagement(user, { can });
   },
-  JARDINER(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
 
-    // Recursos básicos
-    can('read', 'Post');
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+  ADMINISTRATIVE_ASSISTANT: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
   },
-  MAINTENANCE_ASSISTANT(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
 
-    // Recursos básicos
-    can('read', 'Post');
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+  JARDINER: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
   },
-  MONITORING_OPERATOR(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['profilePicture'], { id: user.id });
 
-    // Recursos básicos
-    can('read', 'Post');
-    // Gestão de turnos e relatórios
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'OccurrenceDispatch', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+  MAINTENANCE_ASSISTANT: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
   },
-  // ========================================
+
+  MONITORING_OPERATOR: (user: User, { can }: any) => {
+    profilePermissions.ownProfile(user, { can });
+    basicResourcePermissions.readPosts(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
+  },
+
   // ROLES ESPECÍFICOS DE POSTO
-  // ========================================
-
-  // POST_SUPERVISOR - Supervisor de Posto
-  POST_SUPERVISOR(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
-
-    // Gestão operacional do posto
-    can('manage', 'Shift', { userId: user.id, companyId: user.companyId });
-    can('manage', 'Occurrence', { userId: user.id, companyId: user.companyId });
-    can('manage', 'MotorizedService', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'VehicleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
-    can('manage', 'MotorcycleChecklist', {
-      userId: user.id,
-      companyId: user.companyId,
-    });
+  POST_SUPERVISOR: (user: User, { can }: any) => {
+    profilePermissions.ownProfileExtended(user, { can });
+    operationalPermissions.shiftManagement(user, { can });
+    operationalPermissions.occurrenceManagement(user, { can });
+    operationalPermissions.motorizedServiceManagement(user, { can });
+    can('manage', 'VehicleChecklist', { userId: user.id, companyId: user.companyId });
+    can('manage', 'MotorcycleChecklist', { userId: user.id, companyId: user.companyId });
   },
 
-  // POST_RESIDENT - Morador/Residente
-  POST_RESIDENT(user, { can }) {
-    // Perfil próprio
-    can('read', 'User', { id: user.id });
-    can('update', 'User', ['name', 'profilePicture'], { id: user.id });
-
-    // Botão de pânico
-    can('create', 'PanicEvent', { residentId: user.id });
-    can('read', 'PanicEvent', { residentId: user.id });
-
-    // Notificações públicas
-    can('read', 'Notification', { companyId: user.companyId, type: 'PUBLIC' });
+  POST_RESIDENT: (user: User, { can }: any) => {
+    profilePermissions.ownProfileExtended(user, { can });
+    specificPermissions.panicEventsOwn(user, { can });
+    specificPermissions.publicNotifications(user, { can });
   },
 };
 

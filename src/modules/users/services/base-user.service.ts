@@ -8,7 +8,8 @@ import { Prisma, Roles } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 import { NotFoundError } from '../../../shared/common/errors';
 import { SUCCESS_MESSAGES } from '../../../shared/common/messages';
-import { CreateOthersDto } from '../dto/create-others.dto'; 
+import { CreateOthersDto } from '../dto/create-others.dto';
+import bcrypt from 'bcrypt';
 
 @Injectable()
 export class BaseUserService {
@@ -17,7 +18,7 @@ export class BaseUserService {
     protected readonly userValidator: UserValidator,
     protected readonly userQueryService: UserQueryService,
     protected readonly userPermissionService: UserPermissionService,
-    protected targetRole?: Roles,  
+    protected targetRole?: Roles,
   ) {}
 
   // ============================================================================
@@ -92,7 +93,7 @@ export class BaseUserService {
 
     return { data: users };
   }
-  
+
   /**
    * Atualiza usuário
    */
@@ -106,6 +107,10 @@ export class BaseUserService {
     // Prepara dados para atualização (sem permissões)
     const { permissions, ...userData } = updateUserDto;
     const updateData = this.prepararDadosParaUpdate(userData);
+
+    if (updateUserDto.password) {
+      updateData.password = bcrypt.hashSync(updateUserDto.password, 10);
+    }
 
     // Atualiza o usuário
     const updatedUser = await this.userRepository.atualizar({ id }, updateData);
