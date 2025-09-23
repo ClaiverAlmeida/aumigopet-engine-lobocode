@@ -198,7 +198,7 @@ docker network ls
 # Logs específicos
 docker logs infraseg-nginx
 docker logs infraseg-backend
-docker logs infraseg-frontend
+docker logs frontend
 ```
 
 ---
