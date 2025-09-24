@@ -20,8 +20,8 @@ export class UserFactory {
   private criarUsuarioBase(dto: any, role: Roles): Prisma.UserCreateInput {
     return {
       name: dto.name,
-      login: dto.login.toLowerCase(),
-      email: dto.email.toLowerCase(),
+      login: dto.login.trim().toLowerCase(),
+      email: dto.email.trim().toLowerCase(),
       registration: dto?.registration,
       cpf: dto?.cpf,
       rg: dto?.rg,

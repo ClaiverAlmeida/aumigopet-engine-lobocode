@@ -108,10 +108,6 @@ export class BaseUserService {
     const { permissions, ...userData } = updateUserDto;
     const updateData = this.prepararDadosParaUpdate(userData);
 
-    if (updateUserDto.password) {
-      updateData.password = bcrypt.hashSync(updateUserDto.password, 10);
-    }
-
     // Atualiza o usuário
     const updatedUser = await this.userRepository.atualizar({ id }, updateData);
 
@@ -277,6 +273,15 @@ export class BaseUserService {
         updateData[key] = value;
       }
     });
+
+    if (updateData.password)
+      updateData.password = bcrypt.hashSync(updateData.password, 10);
+
+    if (updateData.login)
+      updateData.login = updateData.login.trim().toLowerCase();
+
+    if (updateData.email)
+      updateData.email = updateData.email.trim().toLowerCase();
 
     return updateData;
   }

@@ -21,7 +21,10 @@ export class AuthValidator {
     // Busca usuário por email ou login
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [{ email: login.toLowerCase() }, { login: login.toLowerCase() }],
+        OR: [
+          { email: login.trim().toLowerCase() },
+          { login: login.trim().toLowerCase() },
+        ],
       },
       include: {
         permissions: true,
@@ -30,7 +33,14 @@ export class AuthValidator {
 
     if (!user) {
       throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('AUTH', 'INVALID_CREDENTIALS')
+        this.messagesService.getErrorMessage('AUTH', 'INVALID_CREDENTIALS'),
+      );
+    }
+
+    // Verifica se o usuário está ativo
+    if (user.status !== 'ACTIVE') {
+      throw new UnauthorizedError(
+        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE'),
       );
     }
 
@@ -38,14 +48,7 @@ export class AuthValidator {
     const isPasswordValid = bcrypt.compareSync(password, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('AUTH', 'INVALID_CREDENTIALS')
-      );
-    }
-
-    // Verifica se o usuário está ativo
-    if (user.status !== 'ACTIVE') {
-      throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE')
+        this.messagesService.getErrorMessage('AUTH', 'INVALID_CREDENTIALS'),
       );
     }
 
@@ -58,18 +61,25 @@ export class AuthValidator {
   async validateUserExists(userId: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, email: true, name: true, status: true, role: true, permissions: true },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        status: true,
+        role: true,
+        permissions: true,
+      },
     });
 
     if (!user) {
       throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('AUTH', 'USER_NOT_FOUND')
+        this.messagesService.getErrorMessage('AUTH', 'USER_NOT_FOUND'),
       );
     }
 
     if (user.status !== 'ACTIVE') {
       throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE')
+        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE'),
       );
     }
 
@@ -92,10 +102,10 @@ export class AuthValidator {
 
     if (user.status !== 'ACTIVE') {
       throw new BadRequestException(
-        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE')
+        this.messagesService.getErrorMessage('RESOURCE', 'INACTIVE'),
       );
     }
 
     return user;
   }
-} 
+}
