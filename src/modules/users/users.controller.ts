@@ -43,15 +43,13 @@ import { CreateOthersDto } from './dto/create-others.dto';
 export class UsersController {
   constructor(private readonly service: UsersService) {}
 
-  
-
   @Post('')
   @CaslCreate('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   criarNovoOthers(@Body() dto: CreateOthersDto) {
     return this.service.criarNovoOthers(dto);
   }
-  
+
   @Get('all')
   @CaslRead('User')
   @RequiredRoles(Roles.ADMIN, Roles.HR)
@@ -74,6 +72,24 @@ export class UsersController {
   @RequiredRoles(Roles.ADMIN, Roles.HR)
   buscarPorId(@Param('id') id: string) {
     return this.service.buscarPorId(id);
+  }
+
+  @Get('active-guards-on-shift-post/:postId')
+  @CaslRead('User')
+  @RequiredRoles(
+    Roles.ADMIN,
+    Roles.HR,
+    Roles.SUPERVISOR,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+    Roles.POST_SUPERVISOR,
+    Roles.GUARD,
+  )
+  buscarVigilantesAtivosEmTurnoNoPosto(@Param('postId') postId: string) {
+    return this.service.buscarVigilantesAtivosEmTurnoNoPosto(postId);
   }
 
   @Post('system-admin')

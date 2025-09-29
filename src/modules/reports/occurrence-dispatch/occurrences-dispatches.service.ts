@@ -50,11 +50,17 @@ export class OccurrencesDispatchesService extends UniversalService<
             name: true,
           },
         },
+        guard: {
+          select: {
+            name: true,
+          },
+        },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
-        },
+          guard: { field: 'name', target: 'guardName' },
+          },
         exclude: ['post'],
       },
     };

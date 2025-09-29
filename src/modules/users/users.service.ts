@@ -21,7 +21,7 @@ import {
   UserPermissionService,
 } from './services';
 import { CreateOthersDto } from './dto/create-others.dto';
-import { Prisma } from '@prisma/client';
+import { Prisma, ShiftStatus, UserStatus } from '@prisma/client';
 import { UserFactory } from './factories/user.factory';
 
 @Injectable()
@@ -95,5 +95,34 @@ export class UsersService extends BaseUserService {
 
   async criarNovoPostResident(dto: CreatePostResidentDto) {
     return this.postResidentService.criarNovoPostResident(dto);
+  }
+
+  /**
+   * Busca vigilantes ativos em turno no posto específico
+   */
+  async buscarVigilantesAtivosEmTurnoNoPosto(postId: string) {
+    // Busca usuários com turno ativo no posto específico
+    const whereClause = this.userQueryService.construirWhereClauseParaRead({
+      role: { in: ['GUARD', 'SUPERVISOR', 'DOORMAN'] },
+      status: UserStatus.ACTIVE,
+      shifts: {
+        some: {
+          postId: postId,
+          status: {
+            in: [ShiftStatus.IN_PROGRESS, ShiftStatus.BREAK], // Turnos ativos (em andamento ou em intervalo)
+          },
+        },
+      },
+    });
+
+    const users = await this.userRepository.buscarMuitos(whereClause);
+
+    // Transforma os dados dos usuários para o formato esperado pelo frontend
+    return users.map((user) => ({
+      ...user,
+      permissions:
+        user.permissions?.map((permission: any) => permission.permissionType) ||
+        [],
+    }));
   }
 }
