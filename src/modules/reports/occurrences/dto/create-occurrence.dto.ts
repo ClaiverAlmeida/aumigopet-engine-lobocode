@@ -46,4 +46,7 @@ export class CreateOccurrenceDto {
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
   companyId?: string;
+
+  @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
+  occurrenceDispatchId?: string;
 }

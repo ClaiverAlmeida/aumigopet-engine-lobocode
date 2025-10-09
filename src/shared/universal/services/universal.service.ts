@@ -105,7 +105,17 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
     const whereClause = this.queryService.construirWhereClauseParaRead(
       this.entityNameCasl,
     );
-    return this.repository.buscarMuitos(this.entityName, whereClause);
+
+    // Usa includes da configuração se não for fornecido
+    const includeConfig = this.getIncludeConfig();
+    const entities = await this.repository.buscarMuitos(
+      this.entityName,
+      whereClause,
+      {},
+      includeConfig,
+    );
+    const transformedData = this.transformData(entities);
+    return transformedData;
   }
 
   /**
@@ -293,7 +303,7 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
         Date.now() - startTime,
       );
 
-      await this.depoisDeCriar(data);
+      await this.depoisDeCriar(entity);
 
       // Aplica transformações se configurado
       return this.transformData(entity);
@@ -548,7 +558,7 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
    * Hook executado após a criação
    * Sobrescreva para ações pós-criação
    */
-  protected async depoisDeCriar(data: DtoCreate): Promise<void> {}
+  protected async depoisDeCriar(data: any): Promise<void> {}
 
   /**
    * Hook executado antes da atualização
@@ -563,10 +573,7 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
    * Hook executado após a atualização
    * Sobrescreva para ações pós-atualização
    */
-  protected async depoisDeAtualizar(
-    id: string,
-    data: DtoUpdate,
-  ): Promise<void> {}
+  protected async depoisDeAtualizar(id: string, data: any): Promise<void> {}
 
   /**
    * Hook executado antes da exclusão
@@ -652,6 +659,15 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
    */
   protected obterUsuarioLogadoId(): string | null {
     return this.request?.user?.id || null;
+  }
+
+  /**
+   * Obtém o companyId do contexto da requisição
+   */
+  protected obterCompanyId(): string | null {
+    return (
+      this.request?.user?.companyId || this.request?.query?.companyId || null
+    );
   }
 
   // ============================================================================

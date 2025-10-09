@@ -42,4 +42,10 @@ export class CreateOccurrenceDispatchDto {
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
   companyId?: string;
+
+  @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
+  applicant: string;
+
+  @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
+  nature: string;
 }

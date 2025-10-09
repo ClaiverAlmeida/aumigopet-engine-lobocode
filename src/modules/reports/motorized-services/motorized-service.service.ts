@@ -12,6 +12,8 @@ import {
   UniversalPermissionService,
   createEntityConfig,
 } from '../../../shared/universal/index';
+// notification imports
+import { NotificationHelper } from '../../notifications/notification.helper';
 
 @Injectable({ scope: Scope.REQUEST })
 export class MotorizedServicesService extends UniversalService<
@@ -29,6 +31,7 @@ export class MotorizedServicesService extends UniversalService<
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = MotorizedServicesService.entityConfig;
     super(
@@ -52,12 +55,27 @@ export class MotorizedServicesService extends UniversalService<
             name: true,
           },
         },
+        vehicle: {
+          select: {
+            plate: true,
+            model: true,
+          },
+        },
       },
+
       transform: {
         flatten: {
-          post: { field: 'name', target: 'postName' },
+          post: { field: 'name', target: 'postName' }, 
         },
-        exclude: ['post'],
+        custom: (data) => {
+          // Extrair placa do veículo se existir 
+          if (data.vehicle && data.vehicle.plate) {
+            data.vehiclePlate = data.vehicle.plate;
+            data.vehicleModel = data.vehicle.model;
+          }
+          return data;
+        },
+        exclude: ['post', 'vehicle'],
       },
     };
   }
@@ -67,5 +85,54 @@ export class MotorizedServicesService extends UniversalService<
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+  }
+
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      // Notificar criação de serviço motorizado
+      await this.notificationHelper.servicoMotorizadoCriado(
+        data.id,
+        data.userId,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao enviar notificação de serviço motorizado criado:',
+        error,
+      );
+      // Não falhar a operação principal por causa da notificação
+    }
+  }
+
+  protected async depoisDeAtualizar(
+    id: string,
+    data: UpdateMotorizedServiceDto,
+  ): Promise<void> {
+    try {
+      // Notificar atualização de serviço motorizado
+      const user = this.obterUsuarioLogado();
+      const companyId = this.obterCompanyId() || '';
+
+      // Verificar se foi finalizado
+      if (data.status === 'RESOLVED') {
+        await this.notificationHelper.servicoMotorizadoFinalizado(
+          id,
+          user.id,
+          companyId,
+        );
+      } else {
+        await this.notificationHelper.servicoMotorizadoAtualizado(
+          id,
+          user.id,
+          companyId,
+        );
+      }
+    } catch (error) {
+      console.error(
+        'Erro ao enviar notificação de serviço motorizado atualizado:',
+        error,
+      );
+      // Não falhar a operação principal por causa da notificação
+    }
   }
 }

@@ -20,7 +20,7 @@ export class VehiclesController extends UniversalController<
     super(service);
   }
 
-  @RequiredRoles(Roles.GUARD, Roles.SUPERVISOR)
+  @RequiredRoles(Roles.GUARD, Roles.SUPERVISOR, Roles.HR, Roles.ADMIN)
   @Get('all')
   async buscarTodos() {
     return this.service.buscarTodos();

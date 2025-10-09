@@ -46,6 +46,7 @@ import {
 import { VehiclesModule } from './modules/vehicle/vehicles.module';
 import { ServiceBusModule } from './modules/service-bus/service-bus.module';
 import { FilesModule } from './shared/files/files.module';
+import { NotificationModule } from './modules/notifications/notification.module';
 
 //javascript es7
 
@@ -72,6 +73,7 @@ import { FilesModule } from './shared/files/files.module';
     ReportsModule,
     ServiceBusModule,
     FilesModule,
+    NotificationModule,
   ],
   controllers: [AppController],
   providers: [

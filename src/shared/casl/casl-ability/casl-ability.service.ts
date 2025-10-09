@@ -112,7 +112,10 @@ const operationalPermissions = {
   },
 
   supplyManagement: (user: User, { can }: any) => {
-    can('manage', 'Supply', { userId: user.id, companyId: user.companyId });
+    can('manage', 'Supply', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
   },
 
   checklistManagement: (user: User, { can }: any) => {
@@ -241,13 +244,24 @@ const rolePermissionsMap = {
       companyId: user.companyId,
       role: { in: [Roles.ADMIN, Roles.SYSTEM_ADMIN] },
     });
+
     profilePermissions.ownProfile(user, { can });
     operationalPermissions.shiftManagement(user, { can });
+    // can('manage', 'Shift', { companyId: user.companyId });
     operationalPermissions.occurrenceManagement(user, { can });
     operationalPermissions.motorizedServiceManagement(user, { can });
     operationalPermissions.supplyManagement(user, { can });
     operationalPermissions.checklistManagement(user, { can });
     operationalPermissions.patrolManagement(user, { can });
+    //TODO  avaliar se supervisor pode gerenciar todos os recursos
+    // can('manage', 'Occurrence', { companyId: user.companyId });
+    // can('manage', 'OccurrenceDispatch', { companyId: user.companyId });
+    // can('manage', 'MotorizedService', { companyId: user.companyId });
+    // can('manage', 'Supply', { companyId: user.companyId });
+    // can('manage', 'VehicleChecklist', { companyId: user.companyId });
+    // can('manage', 'MotorcycleChecklist', { companyId: user.companyId });
+    // can('manage', 'DoormanChecklist', { companyId: user.companyId });
+    // can('manage', 'Patrol', { companyId: user.companyId });
   },
 
   GUARD: (user: User, { can, cannot }: any) => {

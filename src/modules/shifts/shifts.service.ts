@@ -17,10 +17,13 @@ import { UniversalPermissionService } from 'src/shared/universal/services/permis
 // ✨ Importar helper de mapeamento automático
 import { createEntityConfig } from '../../shared/universal/types';
 import { PostsService } from '../posts/posts.service';
-import { Roles, ShiftStatus } from '@prisma/client';
+import { Roles, ShiftStatus } from '@prisma/client'; 
+// notification imports
+import { NotificationHelper } from '../notifications/notification.helper';
+
 
 @Injectable({ scope: Scope.REQUEST })
-export class ShiftsService extends UniversalService<
+export class ShiftsService extends UniversalService<  
   CreateShiftDto,
   UpdateShiftDto
 > {
@@ -34,6 +37,7 @@ export class ShiftsService extends UniversalService<
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
     private postsService: PostsService,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = ShiftsService.entityConfig;
     super(
@@ -87,7 +91,23 @@ export class ShiftsService extends UniversalService<
       status: ShiftStatus.IN_PROGRESS,
     };
 
-    return super.criar(shiftData);
+    const result = await super.criar(shiftData);
+    
+    // Notificar início do turno
+    try {
+      // O result é um array, pegamos o primeiro item
+      const createdShift = Array.isArray(result) ? result[0] : result;
+      await this.notificationHelper.turnoIniciado(
+        createdShift.id,
+        this.obterUsuarioLogado().id,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de turno iniciado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+
+    return result;
   }
 
   async inicioDoIntervalo(id: string, data: UpdateShiftDto) {
@@ -95,7 +115,22 @@ export class ShiftsService extends UniversalService<
       breakStartTime: data.breakStartTime,
       status: ShiftStatus.BREAK,
     };
-    return super.atualizar(id, shiftData);
+    
+    const result = await super.atualizar(id, shiftData);
+    
+    // Notificar início do intervalo
+    try {
+      await this.notificationHelper.turnoEmIntervalo(
+        id,
+        this.obterUsuarioLogado().id,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de turno em intervalo:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+
+    return result;
   }
 
   async fimDoIntervalo(id: string, data: UpdateShiftDto) {
@@ -103,7 +138,22 @@ export class ShiftsService extends UniversalService<
       breakEndTime: data.breakEndTime,
       status: ShiftStatus.IN_PROGRESS,
     };
-    return super.atualizar(id, shiftData);
+    
+    const result = await super.atualizar(id, shiftData);
+    
+    // Notificar fim do intervalo
+    try {
+      await this.notificationHelper.intervaloFinalizado(
+        id,
+        this.obterUsuarioLogado().id,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de intervalo finalizado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+
+    return result;
   }
 
   async fimDoTurno(id: string, data: UpdateShiftDto) {
@@ -111,7 +161,22 @@ export class ShiftsService extends UniversalService<
       endTime: data.endTime,
       status: ShiftStatus.COMPLETED,
     };
-    return super.atualizar(id, shiftData);
+    
+    const result = await super.atualizar(id, shiftData);
+    
+    // Notificar fim do turno
+    try {
+      await this.notificationHelper.turnoFinalizado(
+        id,
+        this.obterUsuarioLogado().id,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de turno finalizado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+
+    return result;
   }
 
   protected async antesDeCriar(

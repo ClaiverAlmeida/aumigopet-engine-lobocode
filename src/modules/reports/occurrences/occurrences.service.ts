@@ -12,6 +12,8 @@ import {
   UniversalPermissionService,
   createEntityConfig,
 } from '../../../shared/universal/index';
+// notification imports
+import { NotificationHelper } from '../../notifications/notification.helper';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OccurrencesService extends UniversalService<
@@ -26,6 +28,7 @@ export class OccurrencesService extends UniversalService<
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = OccurrencesService.entityConfig;
     super(
@@ -50,12 +53,27 @@ export class OccurrencesService extends UniversalService<
             name: true,
           },
         },
+        occurrenceDispatch: {
+          select: {
+            talaoNumber: true,
+            occurrenceAddress: true,
+            applicant: true,
+            id: true,
+          },
+        },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
         },
-        exclude: ['post'],
+        custom: (data) => {
+          if (data.occurrenceDispatch) {
+            data.occurrenceDispatchName = `#${data.occurrenceDispatch.talaoNumber} - ${data.occurrenceDispatch.applicant} - ${data.occurrenceDispatch.occurrenceAddress}`;
+            data.occurrenceDispatchId = data.occurrenceDispatch.id;
+          }
+          return data;
+        },
+        exclude: ['post', 'occurrenceDispatch'],
       },
     };
   }
@@ -65,5 +83,51 @@ export class OccurrencesService extends UniversalService<
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+  }
+
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      // Notificar criação de ocorrência
+      await this.notificationHelper.ocorrenciaCriada(
+        data.id,
+        data.userId,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de ocorrência criada:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+  }
+
+  protected async depoisDeAtualizar(
+    id: string,
+    data: UpdateOccurrenceDto,
+  ): Promise<void> {
+    try {
+      // Notificar atualização de ocorrência
+      const user = this.obterUsuarioLogado();
+      const companyId = this.obterCompanyId() || '';
+
+      // Verificar se foi resolvida
+      if (data.status === 'RESOLVED') {
+        await this.notificationHelper.ocorrenciaResolvida(
+          id,
+          user.id,
+          companyId,
+        );
+      } else {
+        await this.notificationHelper.ocorrenciaAtualizada(
+          id,
+          user.id,
+          companyId,
+        );
+      }
+    } catch (error) {
+      console.error(
+        'Erro ao enviar notificação de ocorrência atualizada:',
+        error,
+      );
+      // Não falhar a operação principal por causa da notificação
+    }
   }
 }

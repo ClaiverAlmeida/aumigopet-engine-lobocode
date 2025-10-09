@@ -21,6 +21,8 @@ import {
 } from '../../shared/universal/index';
 import { PostsService } from '../posts/posts.service';
 import { ShiftsService } from '../shifts/shifts.service';
+// notification imports
+import { PatrolNotificationHelper } from '../notifications/entities/patrol';
 
 @Injectable({ scope: Scope.REQUEST })
 export class PatrolsService extends UniversalService<
@@ -37,6 +39,7 @@ export class PatrolsService extends UniversalService<
     @Optional() @Inject(REQUEST) request: any,
     private postsService: PostsService,
     private shiftsService: ShiftsService,
+    private patrolNotificationHelper: PatrolNotificationHelper,
   ) {
     const { model, casl } = PatrolsService.entityConfig;
     super(
@@ -291,5 +294,46 @@ export class PatrolsService extends UniversalService<
       throw new NotFoundError('Usuário', 'não está autenticado', 'userId');
 
     data.userId = userId;
+  }
+
+  /**
+   * 🚶 PATROL CRIADA - Notificação após criação
+   */
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      const companyId = this.obterCompanyId();
+      const userId = this.obterUsuarioLogadoId();
+      if (!companyId || !userId) return;
+
+      await this.patrolNotificationHelper.patrolIniciada(
+        data.id,
+        userId,
+        companyId,
+      );
+    } catch (error) {
+      console.error('Erro ao criar notificação de patrol iniciada:', error);
+    }
+  }
+
+  /**
+   * 🚶 PATROL ATUALIZADA - Notificação após atualização
+   */
+  protected async depoisDeAtualizar(id: string, data: any): Promise<void> {
+    try {
+      const companyId = this.obterCompanyId();
+      const userId = this.obterUsuarioLogadoId();
+      if (!companyId || !userId) return;
+
+      // Verificar se a Ronda foi concluída
+      if (data.status === PatrolStatus.COMPLETED) {
+        await this.patrolNotificationHelper.patrolConcluida(
+          id,
+          userId,
+          companyId,
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao criar notificação de patrol atualizada:', error);
+    }
   }
 }

@@ -21,7 +21,7 @@ import { UniversalController } from 'src/shared/universal';
 
 @UseGuards(AuthGuard, RoleGuard)
 @UseInterceptors(TenantInterceptor)
-@RequiredRoles(Roles.SYSTEM_ADMIN, Roles.ADMIN)
+@RequiredRoles(Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.SUPERVISOR, Roles.HR)
 @Controller('shifts')
 export class ShiftsController extends UniversalController<
   CreateShiftDto,

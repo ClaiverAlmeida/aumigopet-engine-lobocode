@@ -27,7 +27,7 @@ export class RoleGuard implements CanActivate {
 
     if (isUnauthorized) {
       throw new ForbiddenError(
-        'You do not have permission to access this resource.'
+        'Você não tem permissão para acessar este recurso.'
       );
     }
     return true;

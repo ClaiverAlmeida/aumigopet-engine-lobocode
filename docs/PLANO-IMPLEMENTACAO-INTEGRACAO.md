@@ -380,7 +380,7 @@ model MotorizedService {
   timeFinal           String      // Hora final (HH:MM)
   fuel                String      // Combustível
   shift               String      // Turno
-  streetPatrol        String      // Patrulhamento nas ruas
+  streetPatrol        String      // Rondamento nas ruas
   occurrence          String      // Ocorrência
   vehicleInspection   String      // Vistoria do veículo
   

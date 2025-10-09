@@ -11,6 +11,8 @@ import {
   UniversalPermissionService,
   createEntityConfig,
 } from '../../../shared/universal/index';
+// notification imports
+import { NotificationHelper } from '../../notifications/notification.helper';
 
 /**
  * Exemplo de uso do sistema de includes e transformações do UniversalService
@@ -41,6 +43,7 @@ export class MotorcycleChecklistsService extends UniversalService<
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = MotorcycleChecklistsService.entityConfig;
     super(
@@ -66,16 +69,26 @@ export class MotorcycleChecklistsService extends UniversalService<
           },
         },
         motorcycle: {
-          select: { 
+          select: {
+            plate: true,
             model: true,
           },
         },
       },
+
       transform: {
         flatten: {
-          post: { field: 'name', target: 'postName' },
-          motorcycle: { field: 'model', target: 'motorcycleModel' },
-        }, 
+          post: { field: 'name', target: 'postName' }, 
+        },
+        custom: (data) => {
+          // Extrair placa do veículo se existir 
+          if (data.motorcycle && data.motorcycle.plate) {
+            data.motorcyclePlate = data.motorcycle.plate;
+            data.motorcycleModel = data.motorcycle.model;
+          }
+          return data;
+        },
+        exclude: ['post', 'motorcycle'],
       },
     };
   }
@@ -85,5 +98,40 @@ export class MotorcycleChecklistsService extends UniversalService<
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+  }
+
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      // Notificar criação de checklist de motocicleta
+      await this.notificationHelper.checklistMotocicletaCriado(
+        data.id,
+        data.userId,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de checklist de motocicleta criado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+  }
+
+  protected async depoisDeAtualizar(
+    id: string,
+    data: UpdateMotorcycleChecklistDto,
+  ): Promise<void> {
+    try {
+      // Notificar atualização de checklist de motocicleta
+      const user = this.obterUsuarioLogado();
+      const companyId = this.obterCompanyId() || '';
+
+      // Verificar se foi finalizado
+      if (data.status === 'RESOLVED') {
+        await this.notificationHelper.checklistMotocicletaFinalizado(id, user.id, companyId);
+      } else {
+        await this.notificationHelper.checklistMotocicletaAtualizado(id, user.id, companyId);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar notificação de checklist de motocicleta atualizado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
   }
 }

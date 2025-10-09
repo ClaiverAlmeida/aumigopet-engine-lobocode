@@ -12,20 +12,27 @@ import {
   UniversalPermissionService,
   createEntityConfig,
 } from '../../../shared/universal/index';
+// notification imports
+import { NotificationHelper } from '../../notifications/notification.helper';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OccurrencesDispatchesService extends UniversalService<
   CreateOccurrenceDispatchDto,
   UpdateOccurrenceDispatchDto
 > {
-  private static readonly entityConfig = createEntityConfig('occurrenceDispatch');
+  private static readonly entityConfig =
+    createEntityConfig('occurrenceDispatch');
 
   constructor(
-    repository: UniversalRepository<CreateOccurrenceDispatchDto, UpdateOccurrenceDispatchDto>,
+    repository: UniversalRepository<
+      CreateOccurrenceDispatchDto,
+      UpdateOccurrenceDispatchDto
+    >,
     queryService: UniversalQueryService,
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = OccurrencesDispatchesService.entityConfig;
     super(
@@ -55,13 +62,25 @@ export class OccurrencesDispatchesService extends UniversalService<
             name: true,
           },
         },
+        occurrence: {
+          select: {
+            talaoNumber: true,
+            id: true,
+          },
+        },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
           guard: { field: 'name', target: 'guardName' },
-          },
-        exclude: ['post'],
+        },
+        custom: (data) => {
+          data.name = `#${data.talaoNumber} - ${data.applicant} - ${data.occurrenceAddress}`;
+
+          
+          return data;
+        },
+        exclude: ['post', 'guard'],
       },
     };
   }
@@ -71,5 +90,54 @@ export class OccurrencesDispatchesService extends UniversalService<
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+  }
+
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      // Notificar criação de despacho de ocorrência
+      await this.notificationHelper.despachoOcorrenciaCriado(
+        data.id,
+        data.userId,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error(
+        'Erro ao enviar notificação de despacho de ocorrência criado:',
+        error,
+      );
+      // Não falhar a operação principal por causa da notificação
+    }
+  }
+
+  protected async depoisDeAtualizar(
+    id: string,
+    data: UpdateOccurrenceDispatchDto,
+  ): Promise<void> {
+    try {
+      // Notificar atualização de despacho de ocorrência
+      const user = this.obterUsuarioLogado();
+      const companyId = this.obterCompanyId() || '';
+
+      // Verificar se foi finalizado
+      if (data.status === 'RESOLVED') {
+        await this.notificationHelper.despachoOcorrenciaFinalizado(
+          id,
+          user.id,
+          companyId,
+        );
+      } else {
+        await this.notificationHelper.despachoOcorrenciaAtualizado(
+          id,
+          user.id,
+          companyId,
+        );
+      }
+    } catch (error) {
+      console.error(
+        'Erro ao enviar notificação de despacho de ocorrência atualizado:',
+        error,
+      );
+      // Não falhar a operação principal por causa da notificação
+    }
   }
 }

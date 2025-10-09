@@ -11,6 +11,8 @@ import {
   UniversalPermissionService,
   createEntityConfig,
 } from '../../../shared/universal/index';
+// notification imports
+import { NotificationHelper } from '../../notifications/notification.helper';
 
 /**
  * Serviço para gerenciamento de checklists de porteiro
@@ -32,6 +34,7 @@ export class DoormanChecklistsService extends UniversalService<
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
+    private notificationHelper: NotificationHelper,
   ) {
     const { model, casl } = DoormanChecklistsService.entityConfig;
     super(
@@ -77,5 +80,40 @@ export class DoormanChecklistsService extends UniversalService<
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+  }
+
+  protected async depoisDeCriar(data: any): Promise<void> {
+    try {
+      // Notificar criação de checklist de porteiro
+      await this.notificationHelper.checklistPorteiroCriado(
+        data.id,
+        data.userId,
+        this.obterCompanyId() || '',
+      );
+    } catch (error) {
+      console.error('Erro ao enviar notificação de checklist de porteiro criado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
+  }
+
+  protected async depoisDeAtualizar(
+    id: string,
+    data: UpdateDoormanChecklistDto,
+  ): Promise<void> {
+    try {
+      // Notificar atualização de checklist de porteiro
+      const user = this.obterUsuarioLogado();
+      const companyId = this.obterCompanyId() || '';
+
+      // Verificar se foi finalizado
+      if (data.status === 'RESOLVED') {
+        await this.notificationHelper.checklistPorteiroFinalizado(id, user.id, companyId);
+      } else {
+        await this.notificationHelper.checklistPorteiroAtualizado(id, user.id, companyId);
+      }
+    } catch (error) {
+      console.error('Erro ao enviar notificação de checklist de porteiro atualizado:', error);
+      // Não falhar a operação principal por causa da notificação
+    }
   }
 }
