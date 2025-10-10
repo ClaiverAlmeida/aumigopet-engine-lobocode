@@ -22,11 +22,15 @@ import { AuthGuard } from '../../shared/auth/guards/auth.guard';
 
 @Injectable()
 @WebSocketGateway({
+  namespace: '/',
+  path: '/socket.io',
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
-    credentials: true,
+    origin: [
+      'https://appinfraseg.com.br',
+      'http://31.97.166.94',           // Nginx proxy
+      'http://localhost:4200',          // Para desenvolvimento local
+    ], credentials: true,
   },
-  // Removendo namespace - usando gateway raiz que funciona
 })
 export class NotificationGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
