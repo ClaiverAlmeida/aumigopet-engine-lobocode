@@ -62,7 +62,7 @@ export class OccurrencesDispatchesService extends UniversalService<
             name: true,
           },
         },
-        occurrence: {
+        occurrences: {
           select: {
             talaoNumber: true,
             id: true,
