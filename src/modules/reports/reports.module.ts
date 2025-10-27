@@ -11,8 +11,11 @@ import { OccurrencesDispatchesController } from './occurrence-dispatch/occurrenc
 import { OccurrencesDispatchesService } from './occurrence-dispatch/occurrences-dispatches.service';
 import { DoormanChecklistsController } from './doorman-checklists/doorman-checklists.controller';
 import { DoormanChecklistsService } from './doorman-checklists/doorman-checklists.service';
+import { ArmamentChecklistsController } from './armament-checklists/armament-checklists.controller';
+import { ArmamentChecklistsService } from './armament-checklists/armament-checklists.service';
 import { MotorcycleChecklistsController } from './motorcycle-checklists/motorcycle-checklists.controller';
 import { MotorcycleChecklistsService } from './motorcycle-checklists/motorcycle-checklists.service';
+import { TalaoNumberService } from './services/talao-number.service'; 
 
 @Module({
   controllers: [
@@ -22,6 +25,7 @@ import { MotorcycleChecklistsService } from './motorcycle-checklists/motorcycle-
     MotorizedServicesController,
     OccurrencesDispatchesController,
     DoormanChecklistsController,
+    ArmamentChecklistsController,
     MotorcycleChecklistsController,
   ],
   providers: [
@@ -31,7 +35,9 @@ import { MotorcycleChecklistsService } from './motorcycle-checklists/motorcycle-
     MotorizedServicesService,
     OccurrencesDispatchesService,
     DoormanChecklistsService,
+    ArmamentChecklistsService,
     MotorcycleChecklistsService,
+    TalaoNumberService, 
   ],
   exports: [
     OccurrencesService,
@@ -40,7 +46,9 @@ import { MotorcycleChecklistsService } from './motorcycle-checklists/motorcycle-
     MotorizedServicesService,
     OccurrencesDispatchesService,
     DoormanChecklistsService,
+    ArmamentChecklistsService,
     MotorcycleChecklistsService,
+    TalaoNumberService, 
   ],
 })
 export class ReportsModule {}

@@ -13,6 +13,8 @@ import {
 } from '../../../shared/universal/index';
 // notification imports
 import { NotificationHelper } from '../../notifications/notification.helper';
+// talao service
+import { TalaoNumberService } from '../services/talao-number.service';
 
 /**
  * Serviço para gerenciamento de checklists de porteiro
@@ -35,6 +37,7 @@ export class DoormanChecklistsService extends UniversalService<
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
     private notificationHelper: NotificationHelper,
+    private talaoNumberService: TalaoNumberService,
   ) {
     const { model, casl } = DoormanChecklistsService.entityConfig;
     super(
@@ -76,10 +79,13 @@ export class DoormanChecklistsService extends UniversalService<
   }
 
   protected async antesDeCriar(
-    data: CreateDoormanChecklistDto & { userId: string },
+    data: CreateDoormanChecklistDto & { userId: string; talaoNumber: number },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+    
+    // Gerar número do talão baseado na data atual (reset diário à meia-noite)
+    data.talaoNumber = await this.talaoNumberService.gerarNumeroTalaoDiario(this.entityName);
   }
 
   protected async depoisDeCriar(data: any): Promise<void> {

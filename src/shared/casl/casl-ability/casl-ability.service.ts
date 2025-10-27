@@ -1,3 +1,4 @@
+
 import { Injectable, Scope } from '@nestjs/common';
 import { AbilityBuilder, PureAbility } from '@casl/ability';
 import { createPrismaAbility, PrismaQuery, Subjects } from '@casl/prisma';
@@ -128,6 +129,10 @@ const operationalPermissions = {
       companyId: user.companyId,
     });
     can('manage', 'DoormanChecklist', {
+      userId: user.id,
+      companyId: user.companyId,
+    });
+    can('manage', 'ArmamentChecklist', {
       userId: user.id,
       companyId: user.companyId,
     });

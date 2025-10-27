@@ -63,8 +63,23 @@ export class UsersController {
   buscarTodos(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '20',
+    @Query('orderBy') orderBy: string = 'name',
+    @Query('orderDirection') orderDirection: 'asc' | 'desc' = 'asc',
   ) {
-    return this.service.buscarTodos(Number(page), Number(limit));
+    return this.service.buscarTodos(Number(page), Number(limit), orderBy, orderDirection);
+  }
+
+  @Get('search')
+  @CaslRead('User')
+  @RequiredRoles(Roles.ADMIN, Roles.HR, Roles.SUPERVISOR)
+  buscarUsuarios(
+    @Query('q') query: string = '',
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '20',
+    @Query('orderBy') orderBy: string = 'name',
+    @Query('orderDirection') orderDirection: 'asc' | 'desc' = 'asc',
+  ) {
+    return this.service.buscarUsuarios(query, Number(page), Number(limit), orderBy, orderDirection);
   }
 
   @Get(':id')

@@ -17,6 +17,7 @@ import { OccurrenceNotificationHelper } from './entities/occurrence';
 import { VehicleChecklistNotificationHelper } from './entities/vehicle-checklist';
 import { UserNotificationHelper } from './entities/user';
 import { DoormanChecklistNotificationHelper } from './entities/doorman-checklist';
+import { ArmamentChecklistNotificationHelper } from './entities/armament-checklist';
 import { MotorcycleChecklistNotificationHelper } from './entities/motorcycle-checklist';
 import { MotorizedServiceNotificationHelper } from './entities/motorized-service';
 import { OccurrenceDispatchNotificationHelper } from './entities/occurrence-dispatch';
@@ -32,6 +33,7 @@ export class NotificationHelper {
     private vehicleChecklistHelper: VehicleChecklistNotificationHelper,
     private userHelper: UserNotificationHelper,
     private doormanChecklistHelper: DoormanChecklistNotificationHelper,
+    private armamentChecklistHelper: ArmamentChecklistNotificationHelper,
     private motorcycleChecklistHelper: MotorcycleChecklistNotificationHelper,
     private motorizedServiceHelper: MotorizedServiceNotificationHelper,
     private occurrenceDispatchHelper: OccurrenceDispatchNotificationHelper
@@ -213,6 +215,33 @@ export class NotificationHelper {
     companyId: string,
   ) {
     return this.doormanChecklistHelper.doormanChecklistFinalizado(checklistId, criadoPorUserId, companyId);
+  }
+
+  /**
+   * 🔫 ARMAMENT CHECKLISTS - Delega para ArmamentChecklistNotificationHelper
+   */
+  async checklistArmamentoCriado(
+    checklistId: string,
+    criadoPorUserId: string,
+    companyId: string,
+  ) {
+    return this.armamentChecklistHelper.armamentChecklistCriado(checklistId, criadoPorUserId, companyId);
+  }
+
+  async checklistArmamentoAtualizado(
+    checklistId: string,
+    criadoPorUserId: string,
+    companyId: string,
+  ) {
+    return this.armamentChecklistHelper.armamentChecklistAtualizado(checklistId, criadoPorUserId, companyId);
+  }
+
+  async checklistArmamentoFinalizado(
+    checklistId: string,
+    criadoPorUserId: string,
+    companyId: string,
+  ) {
+    return this.armamentChecklistHelper.armamentChecklistFinalizado(checklistId, criadoPorUserId, companyId);
   }
 
   /**

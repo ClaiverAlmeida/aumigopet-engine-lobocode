@@ -14,6 +14,8 @@ import {
 } from '../../../shared/universal/index';
 // notification imports
 import { NotificationHelper } from '../../notifications/notification.helper';
+// talao service
+import { TalaoNumberService } from '../services/talao-number.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class MotorizedServicesService extends UniversalService<
@@ -32,6 +34,7 @@ export class MotorizedServicesService extends UniversalService<
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
     private notificationHelper: NotificationHelper,
+    private talaoNumberService: TalaoNumberService,
   ) {
     const { model, casl } = MotorizedServicesService.entityConfig;
     super(
@@ -81,10 +84,13 @@ export class MotorizedServicesService extends UniversalService<
   }
 
   protected async antesDeCriar(
-    data: CreateMotorizedServiceDto & { userId: string },
+    data: CreateMotorizedServiceDto & { userId: string; talaoNumber: number },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+    
+    // Gerar número do talão baseado na data atual (reset diário à meia-noite)
+    data.talaoNumber = await this.talaoNumberService.gerarNumeroTalaoDiario(this.entityName);
   }
 
   protected async depoisDeCriar(data: any): Promise<void> {
@@ -135,4 +141,5 @@ export class MotorizedServicesService extends UniversalService<
       // Não falhar a operação principal por causa da notificação
     }
   }
+
 }

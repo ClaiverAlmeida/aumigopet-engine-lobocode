@@ -31,6 +31,7 @@ export class ShiftsController extends UniversalController<
   constructor(service: ShiftsService) {
     super(service);
   }
+  
 
   @RequiredRoles(
     Roles.SUPERVISOR,
@@ -83,6 +84,24 @@ export class ShiftsController extends UniversalController<
     return this.service.inicioDoTurno(data);
   }
 
+  
+  @RequiredRoles(
+    Roles.SUPERVISOR,
+    Roles.GUARD,
+    Roles.HR,
+    Roles.ADMIN,
+    Roles.SYSTEM_ADMIN,
+    Roles.DOORMAN,
+    Roles.JARDINER,
+    Roles.MAINTENANCE_ASSISTANT,
+    Roles.MONITORING_OPERATOR,
+    Roles.ADMINISTRATIVE_ASSISTANT,
+  )
+  @Get(':id')
+  buscarPorId(@Param('id') id: string) {
+    return super.buscarPorId(id);
+  } 
+  
   @RequiredRoles(
     Roles.SUPERVISOR,
     Roles.GUARD,

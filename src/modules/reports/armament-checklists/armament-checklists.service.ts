@@ -1,8 +1,7 @@
 import { Injectable, Inject, Optional, Scope } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-// dto imports
-import { CreateOccurrenceDto } from './dto/create-occurrence.dto';
-import { UpdateOccurrenceDto } from './dto/update-occurrence.dto';
+import { CreateArmamentChecklistDto } from './dto/create-armament-checklist.dto';
+import { UpdateArmamentChecklistDto } from './dto/update-armament-checklist.dto';
 // universal imports
 import {
   UniversalService,
@@ -17,15 +16,22 @@ import { NotificationHelper } from '../../notifications/notification.helper';
 // talao service
 import { TalaoNumberService } from '../services/talao-number.service';
 
+/**
+ * Serviço para gerenciamento de checklists de armamento
+ * Seguindo exatamente a mesma lógica dos outros serviços do sistema
+ */
 @Injectable({ scope: Scope.REQUEST })
-export class OccurrencesService extends UniversalService<
-  CreateOccurrenceDto,
-  UpdateOccurrenceDto
+export class ArmamentChecklistsService extends UniversalService<
+  CreateArmamentChecklistDto,
+  UpdateArmamentChecklistDto
 > {
-  private static readonly entityConfig = createEntityConfig('occurrence');
+  private static readonly entityConfig = createEntityConfig('armamentChecklist');
 
   constructor(
-    repository: UniversalRepository<CreateOccurrenceDto, UpdateOccurrenceDto>,
+    repository: UniversalRepository<
+      CreateArmamentChecklistDto,
+      UpdateArmamentChecklistDto
+    >,
     queryService: UniversalQueryService,
     permissionService: UniversalPermissionService,
     metricsService: UniversalMetricsService,
@@ -33,7 +39,7 @@ export class OccurrencesService extends UniversalService<
     private notificationHelper: NotificationHelper,
     private talaoNumberService: TalaoNumberService,
   ) {
-    const { model, casl } = OccurrencesService.entityConfig;
+    const { model, casl } = ArmamentChecklistsService.entityConfig;
     super(
       repository,
       queryService,
@@ -46,7 +52,7 @@ export class OccurrencesService extends UniversalService<
 
     this.setEntityConfig();
   }
-
+  
   setEntityConfig() {
     this.entityConfig = {
       ...this.entityConfig,
@@ -56,86 +62,63 @@ export class OccurrencesService extends UniversalService<
             name: true,
           },
         },
-        occurrenceDispatch: {
+        user: {
           select: {
-            talaoNumber: true,
-            occurrenceAddress: true,
-            applicant: true,
-            id: true,
+            name: true,
           },
         },
       },
       transform: {
         flatten: {
           post: { field: 'name', target: 'postName' },
+          user: { field: 'name', target: 'userName' },
         },
-        custom: (data) => {
-          if (data.occurrenceDispatch) {
-            data.occurrenceDispatchName = `#${data.occurrenceDispatch.talaoNumber} - ${data.occurrenceDispatch.applicant} - ${data.occurrenceDispatch.occurrenceAddress}`;
-            data.occurrenceDispatchId = data.occurrenceDispatch.id;
-          }
-          return data;
-        },
-        exclude: ['post', 'occurrenceDispatch'],
+        exclude: ['post', 'user'],
       },
     };
   }
 
   protected async antesDeCriar(
-    data: CreateOccurrenceDto & { userId: string },
+    data: CreateArmamentChecklistDto & { userId: string; talaoNumber: number },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
     
     // Gerar número do talão baseado na data atual (reset diário à meia-noite)
     data.talaoNumber = await this.talaoNumberService.gerarNumeroTalaoDiario(this.entityName);
-    
-    if (!data.occurrenceDispatchId) delete data.occurrenceDispatchId;
   }
 
   protected async depoisDeCriar(data: any): Promise<void> {
     try {
-      // Notificar criação de ocorrência
-      await this.notificationHelper.ocorrenciaCriada(
+      // Notificar criação de checklist de armamento
+      await this.notificationHelper.checklistArmamentoCriado(
         data.id,
         data.userId,
         this.obterCompanyId() || '',
       );
     } catch (error) {
-      console.error('Erro ao enviar notificação de ocorrência criada:', error);
+      console.error('Erro ao enviar notificação de checklist de armamento criado:', error);
       // Não falhar a operação principal por causa da notificação
     }
   }
 
-
   protected async depoisDeAtualizar(
     id: string,
-    data: UpdateOccurrenceDto,
+    data: UpdateArmamentChecklistDto,
   ): Promise<void> {
     try {
-      // Notificar atualização de ocorrência
+      // Notificar atualização de checklist de armamento
       const user = this.obterUsuarioLogado();
       const companyId = this.obterCompanyId() || '';
 
-      // Verificar se foi resolvida
+      // Verificar se foi finalizado
       if (data.status === 'RESOLVED') {
-        await this.notificationHelper.ocorrenciaResolvida(
-          id,
-          user.id,
-          companyId,
-        );
+        await this.notificationHelper.checklistArmamentoFinalizado(id, user.id, companyId);
       } else {
-        await this.notificationHelper.ocorrenciaAtualizada(
-          id,
-          user.id,
-          companyId,
-        );
+        await this.notificationHelper.checklistArmamentoAtualizado(id, user.id, companyId);
       }
     } catch (error) {
-      console.error(
-        'Erro ao enviar notificação de ocorrência atualizada:',
-        error,
-      );
+      console.error('Erro ao enviar notificação de checklist de armamento atualizado:', error);
       // Não falhar a operação principal por causa da notificação
     }
   }

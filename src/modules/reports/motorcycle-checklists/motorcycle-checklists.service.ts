@@ -13,6 +13,8 @@ import {
 } from '../../../shared/universal/index';
 // notification imports
 import { NotificationHelper } from '../../notifications/notification.helper';
+// talao service
+import { TalaoNumberService } from '../services/talao-number.service';
 
 /**
  * Exemplo de uso do sistema de includes e transformações do UniversalService
@@ -44,6 +46,7 @@ export class MotorcycleChecklistsService extends UniversalService<
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
     private notificationHelper: NotificationHelper,
+    private talaoNumberService: TalaoNumberService,
   ) {
     const { model, casl } = MotorcycleChecklistsService.entityConfig;
     super(
@@ -94,10 +97,13 @@ export class MotorcycleChecklistsService extends UniversalService<
   }
 
   protected async antesDeCriar(
-    data: CreateMotorcycleChecklistDto & { userId: string },
+    data: CreateMotorcycleChecklistDto & { userId: string; talaoNumber: number },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+    
+    // Gerar número do talão baseado na data atual (reset diário à meia-noite)
+    data.talaoNumber = await this.talaoNumberService.gerarNumeroTalaoDiario(this.entityName);
   }
 
   protected async depoisDeCriar(data: any): Promise<void> {

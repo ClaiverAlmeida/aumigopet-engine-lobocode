@@ -73,13 +73,14 @@ export class UserRepository {
 
   async buscarMuitos(
     where: Prisma.UserWhereInput,
-    options?: { skip?: number; take?: number },
+    options?: { skip?: number; take?: number; orderBy?: Prisma.UserOrderByWithRelationInput },
     include?: Prisma.UserInclude,
   ) {
     return this.prisma.user.findMany({
       where,
       skip: options?.skip,
       take: options?.take,
+      orderBy: options?.orderBy,
       include: include || this.defaultInclude,
     });
   }

@@ -1,4 +1,4 @@
-import { IsString, MinLength, IsDate, IsEnum } from 'class-validator';
+import { IsString, MinLength, IsDate, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { ReportStatus } from '@prisma/client';
 import { VALIDATION_MESSAGES } from '../../../../shared/common/messages';
 import { IsCUID } from 'src/shared/validators';
@@ -49,4 +49,8 @@ export class CreateOccurrenceDto {
 
   @IsCUID({ message: VALIDATION_MESSAGES.FORMAT.UUID_INVALID })
   occurrenceDispatchId?: string;
+
+  @IsOptional()
+  @IsNumber({}, { message: VALIDATION_MESSAGES.FORMAT.NUMBER_INVALID })
+  talaoNumber?: number;
 }

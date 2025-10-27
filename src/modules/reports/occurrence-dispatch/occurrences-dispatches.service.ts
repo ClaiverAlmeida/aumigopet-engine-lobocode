@@ -14,6 +14,8 @@ import {
 } from '../../../shared/universal/index';
 // notification imports
 import { NotificationHelper } from '../../notifications/notification.helper';
+// talao service
+import { TalaoNumberService } from '../services/talao-number.service';
 
 @Injectable({ scope: Scope.REQUEST })
 export class OccurrencesDispatchesService extends UniversalService<
@@ -33,6 +35,7 @@ export class OccurrencesDispatchesService extends UniversalService<
     metricsService: UniversalMetricsService,
     @Optional() @Inject(REQUEST) request: any,
     private notificationHelper: NotificationHelper,
+    private talaoNumberService: TalaoNumberService,
   ) {
     const { model, casl } = OccurrencesDispatchesService.entityConfig;
     super(
@@ -86,10 +89,13 @@ export class OccurrencesDispatchesService extends UniversalService<
   }
 
   protected async antesDeCriar(
-    data: CreateOccurrenceDispatchDto & { userId: string },
+    data: CreateOccurrenceDispatchDto & { userId: string; talaoNumber: number },
   ): Promise<void> {
     const user = this.obterUsuarioLogado();
     data.userId = user.id;
+    
+    // Gerar número do talão baseado na data atual (reset diário à meia-noite)
+    data.talaoNumber = await this.talaoNumberService.gerarNumeroTalaoDiario(this.entityName);
   }
 
   protected async depoisDeCriar(data: any): Promise<void> {

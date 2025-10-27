@@ -215,6 +215,7 @@ model Company {
   motorizedServices   MotorizedService[]    @relation("CompanyMotorizedServices")
   OccurrenceDispatch  OccurrenceDispatch[]  @relation("CompanyOccurrencesDispatches")
   DoormanChecklist    DoormanChecklist[]    @relation("CompanyDoormanChecklists")
+  ArmamentChecklist   ArmamentChecklist[]   @relation("CompanyArmamentChecklists")
   // ===============================================
   // 🔗 RELACIONAMENTOS DE EVENTOS
   // ===============================================
@@ -299,6 +300,7 @@ model User {
   OccurrenceDispatch          OccurrenceDispatch[]  @relation("UserOccurrencesDispatches")
   OccurrenceDispatchGuard     OccurrenceDispatch[]  @relation("GuardOccurrencesDispatches")
   DoormanChecklist            DoormanChecklist[]    @relation("UserDoormanChecklists")
+  ArmamentChecklist           ArmamentChecklist[]   @relation("UserArmamentChecklists")
 
   // Aprovações e validações
   supplyReviewedBy              Supply[]              @relation("SupplyReviewedBy")
@@ -308,6 +310,7 @@ model User {
   motorcycleChecklistReviewedBy MotorcycleChecklist[] @relation("MotorcycleChecklistReviewedBy")
   motorizedServiceReviewedBy    MotorizedService[]    @relation("MotorizedServiceReviewedBy")
   DoormanChecklistReviewedBy    DoormanChecklist[]    @relation("DoormanChecklistReviewedBy")
+  ArmamentChecklistReviewedBy   ArmamentChecklist[]   @relation("ArmamentChecklistReviewedBy")
 
   // Eventos e logs
   eventLogs   EventLog[]   @relation("UserEventLogs")
@@ -408,6 +411,7 @@ model Post {
   vehicleChecklists   VehicleChecklist[]    @relation("PostVehicleChecklists")
   MotorcycleChecklist MotorcycleChecklist[] @relation("PostMotorcycleChecklists")
   DoormanChecklist    DoormanChecklist[]    @relation("PostDoormanChecklists")
+  ArmamentChecklist   ArmamentChecklist[]   @relation("PostArmamentChecklists")
   // Checkpoints do posto
   checkpoints         Checkpoint[]          @relation("PostCheckpoints")
 
@@ -490,6 +494,7 @@ model Shift {
   occurrences         Occurrence[]          @relation("ShiftOccurrences")
   OccurrenceDispatch  OccurrenceDispatch[]  @relation("ShiftOccurrencesDispatches")
   DoormanChecklist    DoormanChecklist[]    @relation("ShiftDoormanChecklists")
+  ArmamentChecklist   ArmamentChecklist[]   @relation("ShiftArmamentChecklists")
   VehicleChecklist    VehicleChecklist[]    @relation("ShiftVehicleChecklists")
   MotorcycleChecklist MotorcycleChecklist[] @relation("ShiftMotorcycleChecklists")
   MotorizedService    MotorizedService[]    @relation("ShiftMotorizedServices")
@@ -1710,6 +1715,75 @@ model DoormanChecklist {
   supervisorReview Boolean? // Revisão do supervisor
   reviewedById     String? // ID do supervisor que revisou
   reviewedBy       User?     @relation("DoormanChecklistReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt       DateTime? // Data/hora da revisão
+  reviewNotes      String? // Notas da revisão  
+
+  // ========================================
+  // ÍNDICES PARA PERFORMANCE
+  // ========================================
+  // Índices para consultas rápidas 
+  @@index([date])
+  @@index([createdAt])
+}
+
+model ArmamentChecklist {
+  id String @id @default(cuid())
+
+  talaoNumber Int    @default(autoincrement()) // Formato: "001", "002", etc.
+  // Usuário responsável
+  user        User   @relation("UserArmamentChecklists", fields: [userId], references: [id])
+  userId      String // motorista 
+  userName    String // nome do motorista 
+
+  numberArmament       String? // número do armamento 
+  numberBallisticPlate String? // número do placar balístico 
+  cmvInDay             Boolean? // CMV em dia 
+  // Dados do checklist
+  date                 DateTime @default(now())
+  time                 String // Hora do checklist
+  generalObservation   String?
+
+  // Status do atendimento
+  status ReportStatus @default(PENDING)
+
+  // Multi-tenancy
+  company   Company @relation("CompanyArmamentChecklists", fields: [companyId], references: [id])
+  companyId String
+  // Relacionamento com turno 
+  shift     Shift   @relation("ShiftArmamentChecklists", fields: [shiftId], references: [id])
+  shiftId   String
+  // Posto onde ocorreu
+  post      Post    @relation("PostArmamentChecklists", fields: [postId], references: [id])
+  postId    String
+
+  // ========================================
+  // ITENS DO CHECKLIST - CAMPOS FIXOS
+  // ========================================
+
+  // Portão
+  RadioHTFuncionando Boolean @default(false)
+  RadioHTFalhando    Boolean @default(false)
+  RadioHTObservacao  String?
+
+  // Computador
+  armamentoFuncionando Boolean @default(false)
+  armamentoFalhando    Boolean @default(false)
+  armamentoObservacao  String?
+
+  // ===============================================
+  // 📊 AUDITORIA E CONTROLE
+  // ===============================================
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  createdBy String? // ID do usuário que criou
+  updatedBy String? // ID do usuário que atualizou
+
+  // Aprovações e validações
+  supervisorReview Boolean? // Revisão do supervisor
+  reviewedById     String? // ID do supervisor que revisou
+  reviewedBy       User?     @relation("ArmamentChecklistReviewedBy", fields: [reviewedById], references: [id])
   reviewedAt       DateTime? // Data/hora da revisão
   reviewNotes      String? // Notas da revisão  
 

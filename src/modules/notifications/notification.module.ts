@@ -14,6 +14,7 @@ import { OccurrenceNotificationHelper, OccurrenceContextBuilder } from './entiti
 import { VehicleChecklistNotificationHelper, VehicleChecklistContextBuilder } from './entities/vehicle-checklist';
 import { UserNotificationHelper, UserContextBuilder } from './entities/user';
 import { DoormanChecklistNotificationHelper, DoormanChecklistContextBuilder } from './entities/doorman-checklist';
+import { ArmamentChecklistNotificationHelper, ArmamentChecklistContextBuilder } from './entities/armament-checklist';
 import { MotorcycleChecklistNotificationHelper, MotorcycleChecklistContextBuilder } from './entities/motorcycle-checklist';
 import { MotorizedServiceNotificationHelper, MotorizedServiceContextBuilder } from './entities/motorized-service';
 import { OccurrenceDispatchNotificationHelper, OccurrenceDispatchContextBuilder } from './entities/occurrence-dispatch';
@@ -56,6 +57,8 @@ import { PatrolNotificationHelper, PatrolContextBuilder } from './entities/patro
     UserContextBuilder,
     DoormanChecklistNotificationHelper,
     DoormanChecklistContextBuilder,
+    ArmamentChecklistNotificationHelper,
+    ArmamentChecklistContextBuilder,
     MotorcycleChecklistNotificationHelper,
     MotorcycleChecklistContextBuilder,
     MotorizedServiceNotificationHelper,
@@ -83,6 +86,8 @@ import { PatrolNotificationHelper, PatrolContextBuilder } from './entities/patro
     UserContextBuilder,
     DoormanChecklistNotificationHelper,
     DoormanChecklistContextBuilder,
+    ArmamentChecklistNotificationHelper,
+    ArmamentChecklistContextBuilder,
     MotorcycleChecklistNotificationHelper,
     MotorcycleChecklistContextBuilder,
     MotorizedServiceNotificationHelper,
