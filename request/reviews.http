@@ -1,0 +1,276 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE REVIEWS
+### Sistema: AUMIGOPET Engine
+### Módulo: Reviews (Avaliações de Prestadores)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@reviewId = 
+@providerId = 
+@authorId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR AVALIAÇÕES (CREATE)
+### =============================================================================
+
+### 2.1 Criar avaliação 5 estrelas
+# @name create5StarReview
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "comment": "Excelente atendimento! Meu pet foi muito bem cuidado. Recomendo!",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.2 Criar avaliação 4 estrelas
+# @name create4StarReview
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 4,
+  "comment": "Muito bom! Apenas o tempo de espera foi um pouco longo.",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.3 Criar avaliação 3 estrelas
+# @name create3StarReview
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 3,
+  "comment": "Atendimento ok, mas pode melhorar.",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.4 Criar avaliação 2 estrelas
+# @name create2StarReview
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 2,
+  "comment": "Não gostei muito. Atendimento deixou a desejar.",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.5 Criar avaliação 1 estrela
+# @name create1StarReview
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 1,
+  "comment": "Péssima experiência. Não recomendo.",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.6 Criar avaliação sem comentário
+# @name createRatingOnly
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR AVALIAÇÕES (READ)
+### =============================================================================
+
+### 3.1 Buscar todas as avaliações
+GET {{baseUrl}}/reviews
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar avaliação por ID
+GET {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar avaliações com paginação
+GET {{baseUrl}}/reviews?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar avaliações de um prestador
+GET {{baseUrl}}/reviews?providerId={{providerId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar avaliações por autor
+GET {{baseUrl}}/reviews?authorId={{authorId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar avaliações por rating
+GET {{baseUrl}}/reviews?rating=5
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar avaliações 4 estrelas ou mais
+GET {{baseUrl}}/reviews?minRating=4
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar avaliações ordenadas por data (mais recentes)
+GET {{baseUrl}}/reviews?providerId={{providerId}}&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 3.9 Buscar avaliações ordenadas por rating (maiores)
+GET {{baseUrl}}/reviews?providerId={{providerId}}&sortBy=rating&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 3.10 Calcular média de avaliações de um prestador
+GET {{baseUrl}}/reviews?providerId={{providerId}}&average=true
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR AVALIAÇÕES (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar rating e comentário
+PATCH {{baseUrl}}/reviews/{{reviewId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "comment": "Comentário atualizado: Melhor clínica da região!"
+}
+
+### 4.2 Atualizar apenas o comentário
+PATCH {{baseUrl}}/reviews/{{reviewId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "comment": "Atualizando apenas o comentário da avaliação"
+}
+
+### 4.3 Atualizar apenas o rating
+PATCH {{baseUrl}}/reviews/{{reviewId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 4
+}
+
+### =============================================================================
+### 5. DELETAR AVALIAÇÕES (DELETE)
+### =============================================================================
+
+### 5.1 Deletar avaliação
+DELETE {{baseUrl}}/reviews/{{reviewId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar avaliação sem autenticação (401)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+
+{
+  "rating": 5,
+  "comment": "Teste sem auth",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.2 Criar avaliação sem rating (400)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "comment": "Avaliação sem rating",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.3 Criar avaliação com rating inválido (< 1) (400)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 0,
+  "comment": "Rating inválido",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.4 Criar avaliação com rating inválido (> 5) (400)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 6,
+  "comment": "Rating inválido",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.5 Criar avaliação sem providerId (400)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "comment": "Sem provider",
+  "authorId": "{{authorId}}"
+}
+
+### 6.6 Criar avaliação duplicada (mesmo autor e provider) (409 - Conflict)
+POST {{baseUrl}}/reviews
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "rating": 5,
+  "comment": "Avaliação duplicada",
+  "providerId": "{{providerId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.7 Buscar avaliação inexistente (404)
+GET {{baseUrl}}/reviews/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - REVIEWS
+### =============================================================================
+

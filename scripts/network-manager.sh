@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para gerenciar a rede app-net do INFRASEG
+# Script para gerenciar a rede app-net do AUMIGOPET
 # Uso: ./scripts/network-manager.sh [create|remove|status]
 
 NETWORK_NAME="app-net"
@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 
 # Função para exibir ajuda
 show_help() {
-    echo -e "${BLUE}📋 Gerenciador de Rede - INFRASEG${NC}"
+    echo -e "${BLUE}📋 Gerenciador de Rede - AUMIGOPET${NC}"
     echo ""
     echo "Uso: $0 [comando]"
     echo ""

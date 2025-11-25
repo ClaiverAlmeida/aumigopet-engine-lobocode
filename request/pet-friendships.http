@@ -1,0 +1,147 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE PET FRIENDSHIPS
+### Sistema: AUMIGOPET Engine
+### Módulo: Pet Friendships (Amizades entre Pets)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@friendshipId = 
+@userId = 
+@petId = 
+@friendUserId = 
+@friendPetId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR AMIZADES (CREATE)
+### =============================================================================
+
+### 2.1 Criar amizade entre pets
+# @name createFriendship
+POST {{baseUrl}}/pet-friendships
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}",
+  "petId": "{{petId}}",
+  "friendUserId": "{{friendUserId}}",
+  "friendPetId": "{{friendPetId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR AMIZADES (READ)
+### =============================================================================
+
+### 3.1 Buscar todas as amizades
+GET {{baseUrl}}/pet-friendships
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar amizade por ID
+GET {{baseUrl}}/pet-friendships/{{friendshipId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar amizades com paginação
+GET {{baseUrl}}/pet-friendships?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar amigos de um pet específico
+GET {{baseUrl}}/pet-friendships?petId={{petId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar amizades de um usuário
+GET {{baseUrl}}/pet-friendships?userId={{userId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar amizades mútuas entre dois pets
+GET {{baseUrl}}/pet-friendships?petId={{petId}}&friendPetId={{friendPetId}}
+Authorization: Bearer {{token}}
+
+### 3.7 Contar amigos de um pet
+GET {{baseUrl}}/pet-friendships?petId={{petId}}&count=true
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. DELETAR AMIZADES (DELETE)
+### =============================================================================
+
+### 4.1 Remover amizade entre pets
+DELETE {{baseUrl}}/pet-friendships/{{friendshipId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 5. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 5.1 Criar amizade sem autenticação (401)
+POST {{baseUrl}}/pet-friendships
+Content-Type: {{contentType}}
+
+{
+  "userId": "{{userId}}",
+  "petId": "{{petId}}",
+  "friendUserId": "{{friendUserId}}",
+  "friendPetId": "{{friendPetId}}"
+}
+
+### 5.2 Criar amizade sem campos obrigatórios (400)
+POST {{baseUrl}}/pet-friendships
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}",
+  "petId": "{{petId}}"
+}
+
+### 5.3 Criar amizade com pet inexistente (404)
+POST {{baseUrl}}/pet-friendships
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}",
+  "petId": "id-pet-inexistente",
+  "friendUserId": "{{friendUserId}}",
+  "friendPetId": "{{friendPetId}}"
+}
+
+### 5.4 Criar amizade duplicada (409 - Conflict)
+POST {{baseUrl}}/pet-friendships
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}",
+  "petId": "{{petId}}",
+  "friendUserId": "{{friendUserId}}",
+  "friendPetId": "{{friendPetId}}"
+}
+
+### 5.5 Buscar amizade inexistente (404)
+GET {{baseUrl}}/pet-friendships/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - PET FRIENDSHIPS
+### =============================================================================
+

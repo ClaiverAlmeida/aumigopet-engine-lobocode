@@ -14,44 +14,44 @@ The column `VehicleChecklist.pneusDianteiroFuncionando` does not exist in the cu
 
 ### **1. Primeiro, fazer backup do banco:**
 ```bash
-docker exec infraseg-db pg_dump -U postgres infraseg-engine > backup_$(date +%Y%m%d_%H%M%S).sql
+docker exec aumigopet-db pg_dump -U postgres aumigopet-engine > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 ### **2. Verificar se há migrações pendentes:**
 ```bash
-docker exec infraseg-backend npx prisma migrate status
+docker exec aumigopet-backend npx prisma migrate status
 ```
 ### **3. Aplicar migrações pendentes (SEGURO - não perde dados):**
 ```bash
-docker exec infraseg-backend npx prisma migrate deploy
+docker exec aumigopet-backend npx prisma migrate deploy
 ```
 ### **4. Se não tiver migrações, gerar baseado no schema atual:**
 ```bash
-docker exec infraseg-backend npx prisma db push
+docker exec aumigopet-backend npx prisma db push
 ```
 ## 💡 **Comandos para Executar:**
 
 ### **🔒 1. Backup primeiro (OBRIGATÓRIO):**
 ```bash
-docker exec infraseg-db pg_dump -U postgres infraseg-engine > backup_$(date +%Y%m%d_%H%M%S).sql
+docker exec aumigopet-db pg_dump -U postgres aumigopet-engine > backup_$(date +%Y%m%d_%H%M%S).sql
 ```
 
 ### **📋 2. Verificar migrações:**
 ```bash
-docker exec infraseg-backend npx prisma migrate status
+docker exec aumigopet-backend npx prisma migrate status
 ```
 
 ### **🚀 3. Aplicar migrações (SEGURO):**
 ```bash
 # Opção 1: Se existem migrações pendentes
-docker exec infraseg-backend npx prisma migrate deploy
+docker exec aumigopet-backend npx prisma migrate deploy
 
 # Opção 2: Se não há migrações, sincronizar schema
-docker exec infraseg-backend npx prisma db push
+docker exec aumigopet-backend npx prisma db push
 ```
 
 ### **✅ 4. Verificar se funcionou:**
 ```bash
-docker exec infraseg-backend npx prisma db pull
+docker exec aumigopet-backend npx prisma db pull
 ```
 
 ## 🎯 **Por que é SEGURO:**

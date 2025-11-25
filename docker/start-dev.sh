@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Iniciando ambiente de desenvolvimento Infraseg..."
+echo "🚀 Iniciando ambiente de desenvolvimento AuMigoPet..."
 
 # Verificar se o Docker está rodando
 if ! docker info > /dev/null 2>&1; then

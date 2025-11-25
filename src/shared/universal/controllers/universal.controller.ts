@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { RequiredRoles } from 'src/shared/auth/required-roles.decorator';
-import { Roles } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { UniversalService } from '../services/universal.service';
 import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
 import { CaslInterceptor } from 'src/shared/casl/interceptors/casl.interceptor';
@@ -32,7 +32,7 @@ export abstract class UniversalController<
   // ============================================================================
 
   @Get('metrics')
-  @RequiredRoles(Roles.SYSTEM_ADMIN, Roles.ADMIN)
+  @RequiredRoles(UserRole.SYSTEM_ADMIN, UserRole.ADMIN)
   async obterMetricas(
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,
@@ -133,32 +133,32 @@ export abstract class UniversalController<
     return {
       // Contador total de operações
       total_operations: {
-        query: `sum(infraseg_entity_operations_total{entity="${entity}"})`,
-        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(infraseg_entity_operations_total{entity="${entity}"})`,
+        query: `sum(aumigopet_entity_operations_total{entity="${entity}"})`,
+        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(aumigopet_entity_operations_total{entity="${entity}"})`,
       },
 
       // Taxa de operações por minuto
       operations_rate: {
-        query: `rate(infraseg_entity_operations_total{entity="${entity}"}${timeRange})`,
-        prometheus_url: `http://localhost:9090/api/v1/query?query=rate(infraseg_entity_operations_total{entity="${entity}"}${timeRange})`,
+        query: `rate(aumigopet_entity_operations_total{entity="${entity}"}${timeRange})`,
+        prometheus_url: `http://localhost:9090/api/v1/query?query=rate(aumigopet_entity_operations_total{entity="${entity}"}${timeRange})`,
       },
 
       // Duração média das operações
       avg_duration: {
-        query: `rate(infraseg_operation_duration_seconds_sum{entity="${entity}"}${timeRange}) / rate(infraseg_operation_duration_seconds_count{entity="${entity}"}${timeRange})`,
-        prometheus_url: `http://localhost:9090/api/v1/query?query=rate(infraseg_operation_duration_seconds_sum{entity="${entity}"}${timeRange})/rate(infraseg_operation_duration_seconds_count{entity="${entity}"}${timeRange})`,
+        query: `rate(aumigopet_operation_duration_seconds_sum{entity="${entity}"}${timeRange}) / rate(aumigopet_operation_duration_seconds_count{entity="${entity}"}${timeRange})`,
+        prometheus_url: `http://localhost:9090/api/v1/query?query=rate(aumigopet_operation_duration_seconds_sum{entity="${entity}"}${timeRange})/rate(aumigopet_operation_duration_seconds_count{entity="${entity}"}${timeRange})`,
       },
 
       // Operações por status
       by_status: {
-        query: `sum(infraseg_entity_operations_total{entity="${entity}"}) by (status)`,
-        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(infraseg_entity_operations_total{entity="${entity}"}) by (status)`,
+        query: `sum(aumigopet_entity_operations_total{entity="${entity}"}) by (status)`,
+        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(aumigopet_entity_operations_total{entity="${entity}"}) by (status)`,
       },
 
       // Operações por ação
       by_action: {
-        query: `sum(infraseg_entity_operations_total{entity="${entity}"}) by (action)`,
-        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(infraseg_entity_operations_total{entity="${entity}"}) by (action)`,
+        query: `sum(aumigopet_entity_operations_total{entity="${entity}"}) by (action)`,
+        prometheus_url: `http://localhost:9090/api/v1/query?query=sum(aumigopet_entity_operations_total{entity="${entity}"}) by (action)`,
       },
 
       info: {

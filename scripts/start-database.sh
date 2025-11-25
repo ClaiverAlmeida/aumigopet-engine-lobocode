@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🗄️ Iniciando Banco de Dados INFRASEG..."
+echo "🗄️ Iniciando Banco de Dados AUMIGOPET..."
 
 # Parar containers existentes
 echo "🛑 Parando containers existentes..."

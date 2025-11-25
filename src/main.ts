@@ -4,11 +4,11 @@ import { AppModule } from './app.module';
 import { CustomLoggerService } from './shared/common/logger/logger.service';
 import { MetricsInterceptor } from './shared/common/interceptors/metrics.interceptor';
 import { IoAdapter } from '@nestjs/platform-socket.io';
-// import { runSeed } from 'prisma/seed';
+import { runSeed } from 'prisma/seed';
 
 async function bootstrap() {
   try { 
-    // runSeed();
+    runSeed();
 
     const app = await NestFactory.create(AppModule, {
       // Importante: Habilitar CORS na criação do app para WebSockets
@@ -22,9 +22,9 @@ async function bootstrap() {
     // Configurar CORS detalhado para HTTP
     app.enableCors({
       origin: [
-        'https://appinfraseg.com',
+        'https://appaumigopet.com',
         'http://31.97.166.94',           // Nginx proxy
-        'http://localhost:4200',          // Para desenvolvimento local
+        'http://localhost:3005',          // Para desenvolvimento local
       ],
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization'],

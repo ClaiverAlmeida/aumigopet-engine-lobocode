@@ -3,7 +3,7 @@ import { CaslService } from '../../casl/casl.service';
 import { PermissionContextService } from '../../casl/services/permission-context.service';
 import { PermissionAuditService } from '../../casl/services/permission-audit.service';
 
-import { Roles, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 import { CrudAction } from '../../common/types';
 import { EntityNameCasl, getModelName } from '../types';
 
@@ -69,7 +69,7 @@ export class UniversalPermissionService {
    */
   validarCriacaoDeEntidadeComRole(
     entityName: EntityNameCasl,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.validarPermissaoDeRole(entityName, 'create', targetRole);
   }
@@ -79,7 +79,7 @@ export class UniversalPermissionService {
    */
   validarAtualizacaoDeEntidadeComRole(
     entityName: EntityNameCasl,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.validarPermissaoDeRole(entityName, 'update', targetRole);
   }
@@ -89,7 +89,7 @@ export class UniversalPermissionService {
    */
   validarDelecaoDeEntidadeComRole(
     entityName: EntityNameCasl,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.validarPermissaoDeRole(entityName, 'delete', targetRole);
   }
@@ -100,7 +100,7 @@ export class UniversalPermissionService {
   validarAcaoDeEntidadeComRole(
     entityName: EntityNameCasl,
     action: CrudAction,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.validarPermissaoDeRole(entityName, action, targetRole);
   }
@@ -231,7 +231,7 @@ export class UniversalPermissionService {
   private validarPermissaoDeRole(
     entityName: EntityNameCasl,
     action: CrudAction,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.caslService.validarPermissaoDeRole(
       action,

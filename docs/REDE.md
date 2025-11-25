@@ -1,8 +1,8 @@
-# 🌐 Rede App-Net - INFRASEG
+# 🌐 Rede App-Net - AUMIGOPET
 
 ## 📋 Visão Geral
 
-A rede `app-net` é uma rede Docker bridge personalizada que conecta todos os serviços do INFRASEG, garantindo comunicação segura e isolada entre os containers.
+A rede `app-net` é uma rede Docker bridge personalizada que conecta todos os serviços do AUMIGOPET, garantindo comunicação segura e isolada entre os containers.
 
 ## 🔧 Configuração
 
@@ -125,8 +125,8 @@ docker network inspect app-net --format='{{range .Containers}}{{.Name}} {{end}}'
 ### Conectividade
 ```bash
 # Testar conexão entre containers
-docker exec infraseg-backend ping infraseg-db
-docker exec infraseg-backend ping infraseg-redis
+docker exec aumigopet-backend ping aumigopet-db
+docker exec aumigopet-backend ping aumigopet-redis
 ```
 
 ## 🚨 Troubleshooting
@@ -139,8 +139,8 @@ docker exec infraseg-backend ping infraseg-redis
 ### Containers Não Conectam
 ```bash
 # Verificar se estão na mesma rede
-docker inspect infraseg-backend | grep -A 10 "Networks"
-docker inspect infraseg-db | grep -A 10 "Networks"
+docker inspect aumigopet-backend | grep -A 10 "Networks"
+docker inspect aumigopet-db | grep -A 10 "Networks"
 ```
 
 ### Limpeza Completa

@@ -1,4 +1,4 @@
-import { PermissionType } from '@prisma/client';
+// Removido import de PermissionType - não existe mais no schema
 
 export interface IAuthResponse {
   access_token: string;
@@ -35,4 +35,15 @@ export interface IForgotPasswordResponse {
 export interface IResetPasswordResponse {
   message: string;
   success: boolean;
+}
+
+export interface IRegisterResponse {
+  success: boolean;
+  message: string;
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  };
 }

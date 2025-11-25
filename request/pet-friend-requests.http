@@ -1,0 +1,206 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE PET FRIEND REQUESTS
+### Sistema: AUMIGOPET Engine
+### Módulo: Pet Friend Requests (Solicitações de Amizade entre Pets)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@requestId = 
+@requesterId = 
+@petId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR SOLICITAÇÕES (CREATE)
+### =============================================================================
+
+### 2.1 Enviar solicitação de amizade simples
+# @name sendRequest
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "PENDING",
+  "note": "Oi! Nossos pets se deram super bem no parque, vamos marcar um playdate?",
+  "requesterId": "{{requesterId}}",
+  "petId": "{{petId}}"
+}
+
+### 2.2 Enviar solicitação sem nota
+# @name sendRequestNoNote
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "requesterId": "{{requesterId}}",
+  "petId": "{{petId}}"
+}
+
+### 2.3 Enviar solicitação com mensagem personalizada
+# @name sendCustomRequest
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "note": "Olá! Vi que seu pet também gosta de correr. Podemos nos encontrar no parque?",
+  "requesterId": "{{requesterId}}",
+  "petId": "{{petId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR SOLICITAÇÕES (READ)
+### =============================================================================
+
+### 3.1 Buscar todas as solicitações
+GET {{baseUrl}}/pet-friend-requests
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar solicitação por ID
+GET {{baseUrl}}/pet-friend-requests/{{requestId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar solicitações com paginação
+GET {{baseUrl}}/pet-friend-requests?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar solicitações enviadas por um usuário
+GET {{baseUrl}}/pet-friend-requests?requesterId={{requesterId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar solicitações recebidas para um pet
+GET {{baseUrl}}/pet-friend-requests?petId={{petId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar solicitações pendentes
+GET {{baseUrl}}/pet-friend-requests?status=PENDING
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar solicitações aceitas
+GET {{baseUrl}}/pet-friend-requests?status=ACCEPTED
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar solicitações rejeitadas
+GET {{baseUrl}}/pet-friend-requests?status=REJECTED
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR SOLICITAÇÕES (UPDATE)
+### =============================================================================
+
+### 4.1 Aceitar solicitação de amizade
+PATCH {{baseUrl}}/pet-friend-requests/{{requestId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "ACCEPTED"
+}
+
+### 4.2 Rejeitar solicitação de amizade
+PATCH {{baseUrl}}/pet-friend-requests/{{requestId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "REJECTED"
+}
+
+### 4.3 Aceitar com nota
+PATCH {{baseUrl}}/pet-friend-requests/{{requestId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "ACCEPTED",
+  "note": "Aceito! Vamos marcar esse playdate sim!"
+}
+
+### 4.4 Rejeitar com nota
+PATCH {{baseUrl}}/pet-friend-requests/{{requestId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "REJECTED",
+  "note": "Desculpe, meu pet não está interagindo bem com outros cachorros no momento."
+}
+
+### =============================================================================
+### 5. DELETAR SOLICITAÇÕES (DELETE)
+### =============================================================================
+
+### 5.1 Cancelar/Deletar solicitação
+DELETE {{baseUrl}}/pet-friend-requests/{{requestId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Enviar solicitação sem autenticação (401)
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+
+{
+  "requesterId": "{{requesterId}}",
+  "petId": "{{petId}}"
+}
+
+### 6.2 Enviar solicitação sem petId (400)
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "requesterId": "{{requesterId}}"
+}
+
+### 6.3 Enviar solicitação para pet inexistente (404)
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "requesterId": "{{requesterId}}",
+  "petId": "id-pet-inexistente"
+}
+
+### 6.4 Enviar solicitação duplicada (409 - Conflict)
+POST {{baseUrl}}/pet-friend-requests
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "requesterId": "{{requesterId}}",
+  "petId": "{{petId}}"
+}
+
+### 6.5 Buscar solicitação inexistente (404)
+GET {{baseUrl}}/pet-friend-requests/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - PET FRIEND REQUESTS
+### =============================================================================
+

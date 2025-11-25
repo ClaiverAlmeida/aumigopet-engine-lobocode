@@ -1,11 +1,9 @@
-import { PermissionType, Roles } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 
 export interface ITokenPayload {
   name: string;
   email: string;
-  rg: string;
-  role: Roles;
+  role: UserRole;
   sub: string;
   permissions: (string | any)[];
-  userPermissions: PermissionType[];
 }

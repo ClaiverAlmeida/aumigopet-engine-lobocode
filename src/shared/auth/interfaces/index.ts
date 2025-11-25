@@ -4,5 +4,6 @@ export {
   IRefreshResponse, 
   ILogoutResponse, 
   IForgotPasswordResponse, 
-  IResetPasswordResponse 
+  IResetPasswordResponse,
+  IRegisterResponse
 } from './auth-response.interface'; 

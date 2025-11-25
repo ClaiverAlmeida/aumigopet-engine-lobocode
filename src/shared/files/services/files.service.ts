@@ -11,7 +11,6 @@ export interface FileInfo {
   size: number;
   mimeType: string;
   url: string;
-  companyId: string | null;
   uploadedBy: string | null;
   description: string | null;
   createdAt: Date;
@@ -23,7 +22,7 @@ export interface FileInfo {
 export class FilesService {
   private readonly logger = new Logger(FilesService.name);
   private readonly minioClient: Minio.Client;
-  private readonly bucketName = 'infraseg-files';
+  private readonly bucketName = 'aumigopet-files';
 
   constructor(
     private readonly prisma: PrismaService,
@@ -75,14 +74,13 @@ export class FilesService {
   async uploadFile(
     file: any,
     type: string,
-    companyId?: string,
     uploadedBy?: string,
     description?: string,
   ): Promise<FileInfo> {
     try {
       // Gerar nome único para o arquivo
       const fileName = `${Date.now()}-${file.originalname}`;
-      const folder = companyId ? `companies/${companyId}` : 'public';
+      const folder = 'files';
       const fullPath = `${folder}/${fileName}`;
 
       // Upload para MinIO
@@ -107,7 +105,6 @@ export class FilesService {
           size: file.size,
           mimeType: file.mimetype,
           url,
-          companyId,
           uploadedBy,
           description,
         },
@@ -121,19 +118,17 @@ export class FilesService {
     }
   }
 
-  async getAllFiles(page = 1, limit = 20, companyId?: string): Promise<{ files: FileInfo[]; total: number }> {
+  async getAllFiles(page = 1, limit = 20): Promise<{ files: FileInfo[]; total: number }> {
     try {
       const skip = (page - 1) * limit;
-      const where = companyId ? { companyId } : {};
 
       const [files, total] = await Promise.all([
         this.prisma.file.findMany({
-          where,
           skip,
           take: limit,
           orderBy: { createdAt: 'desc' },
         }),
-        this.prisma.file.count({ where }),
+        this.prisma.file.count(),
       ]);
 
       return { files, total };

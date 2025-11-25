@@ -142,7 +142,7 @@ curl -X POST http://localhost:3000/files/upload/profile-image \
 ## 📁 **Estrutura de Pastas no MinIO**
 
 ```
-infraseg-files/
+aumigopet-files/
 ├── public/                    # Arquivos públicos
 │   ├── profile-images/
 │   ├── documents/
@@ -232,7 +232,7 @@ infraseg-files/
 
 ## 🎯 **Resultado Final**
 
-O módulo de armazenamento de arquivos está **100% funcional** e integrado ao projeto Infraseg Engine, seguindo todos os padrões arquiteturais estabelecidos:
+O módulo de armazenamento de arquivos está **100% funcional** e integrado ao projeto AuMigoPet Engine, seguindo todos os padrões arquiteturais estabelecidos:
 
 - **Arquitetura modular** (Repository → Validator → Factory → Service → Controller)
 - **Multi-tenancy** por empresa

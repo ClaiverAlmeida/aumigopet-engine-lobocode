@@ -1,8 +1,8 @@
-# Sistema de Mensagens Centralizadas - Infraseg
+# Sistema de Mensagens Centralizadas - AuMigoPet
 
 ## 📋 Visão Geral
 
-Este módulo centraliza todas as mensagens do sistema Infraseg, incluindo validações, erros, sucessos, logs e notificações. O sistema oferece consistência, manutenibilidade e suporte a interpolação de variáveis.
+Este módulo centraliza todas as mensagens do sistema AuMigoPet, incluindo validações, erros, sucessos, logs e notificações. O sistema oferece consistência, manutenibilidade e suporte a interpolação de variáveis.
 
 ## 🎯 Características
 
@@ -130,7 +130,7 @@ LOG_MESSAGES.SECURITY.UNAUTHORIZED_ACCESS   // "Tentativa de acesso não autoriz
 
 ### **5. Notificação (NOTIFICATION_MESSAGES)**
 ```typescript
-NOTIFICATION_MESSAGES.USER.WELCOME          // "Bem-vindo ao Infraseg!"
+NOTIFICATION_MESSAGES.USER.WELCOME          // "Bem-vindo ao AuMigoPet!"
 NOTIFICATION_MESSAGES.BUSINESS.NEW_ROUND_ASSIGNED // "Nova ronda atribuída"
 ```
 

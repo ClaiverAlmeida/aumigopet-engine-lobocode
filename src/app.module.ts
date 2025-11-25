@@ -14,10 +14,20 @@ import { AppService } from './app.service';
 import { AuthModule } from './shared/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { CompaniesModule } from './modules/companies/companies.module';
-import { ShiftsModule } from './modules/shifts/shifts.module';
-import { PostsModule } from './modules/posts/posts.module';
-import { PatrolsModule } from './modules/patrols/patrols.module';
-import { ReportsModule } from './modules/reports/reports.module';
+import { PetsModule } from './modules/pets/pets.module';
+import { VaccineExamsModule } from './modules/vaccine-exams/vaccine-exams.module';
+import { RemindersModule } from './modules/reminders/reminders.module';
+import { WeightRecordsModule } from './modules/weight-records/weight-records.module';
+import { SocialPostsModule } from './modules/social-posts/social-posts.module';
+import { PostCommentsModule } from './modules/post-comments/post-comments.module';
+import { PostLikesModule } from './modules/post-likes/post-likes.module';
+import { FollowsModule } from './modules/follows/follows.module';
+import { PetFriendRequestsModule } from './modules/pet-friend-requests/pet-friend-requests.module';
+import { PetFriendshipsModule } from './modules/pet-friendships/pet-friendships.module';
+import { ServiceProvidersModule } from './modules/service-providers/service-providers.module';
+import { ServicesModule } from './modules/services/services.module';
+import { ReviewsModule } from './modules/reviews/reviews.module';
+import { FavoritesModule } from './modules/favorites/favorites.module';
 
 import { RateLimitMiddleware } from './shared/common/middleware/rate-limit.middleware';
 
@@ -43,7 +53,6 @@ import {
   RequiredFieldErrorFilter,
   PrismaErrorFilter,
 } from './shared/common/filters';
-import { VehiclesModule } from './modules/vehicle/vehicles.module';
 import { ServiceBusModule } from './modules/service-bus/service-bus.module';
 import { FilesModule } from './shared/files/files.module';
 import { NotificationModule } from './modules/notifications/notification.module';
@@ -54,7 +63,7 @@ import { NotificationModule } from './modules/notifications/notification.module'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env',
+      envFilePath: '.env', 
     }),
     LoggerModule,
     MessagesModule,
@@ -65,12 +74,21 @@ import { NotificationModule } from './modules/notifications/notification.module'
     PrometheusModule.register(),
     AuthModule,
     UsersModule,
-    VehiclesModule,
     CompaniesModule,
-    ShiftsModule,
-    PostsModule,
-    PatrolsModule,
-    ReportsModule,
+    PetsModule,
+    VaccineExamsModule,
+    RemindersModule,
+    WeightRecordsModule,
+    SocialPostsModule,
+    PostCommentsModule,
+    PostLikesModule,
+    FollowsModule,
+    PetFriendRequestsModule,
+    PetFriendshipsModule,
+    ServiceProvidersModule,
+    ServicesModule,
+    ReviewsModule,
+    FavoritesModule,
     ServiceBusModule,
     FilesModule,
     NotificationModule,

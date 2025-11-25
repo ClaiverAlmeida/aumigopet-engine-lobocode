@@ -1,38 +1,13 @@
 /**
- * 🏗️ ENTITIES NOTIFICATIONS - EXPORTS
+ * 📦 EXPORTS DE ENTIDADES DE NOTIFICAÇÃO
  * 
- * Exports centralizados para todas as entidades de notificação.
+ * Centraliza exports de helpers e context builders de cada entidade
  */
 
-// Supply
-export * from './supply';
-
-// Shift  
-export * from './shift';
-
-// Occurrence
-export * from './occurrence';
-
-// Vehicle Checklist
-export * from './vehicle-checklist';
-
-// User
+// User (único mantido do sistema antigo)
 export * from './user';
 
-// Doorman Checklist
-export * from './doorman-checklist';
-
-// Motorcycle Checklist
-export * from './motorcycle-checklist';
-
-// Motorized Service
-export * from './motorized-service';
-
-// Occurrence Dispatch
-export * from './occurrence-dispatch';
-
-// Patrol
-export * from './patrol';
-
-// Shared utilities
-export { DateFormatter } from '../shared/date-formatter';
+// TODO: Adicionar exports de novas entidades do AUMIGOPET conforme forem criadas
+// export * from './pet';
+// export * from './service-provider';
+// etc...

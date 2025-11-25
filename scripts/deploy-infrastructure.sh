@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🏗️ Deploy Infraestrutura - INFRASEG"
+echo "🏗️ Deploy Infraestrutura - AUMIGOPET"
 
 # Verificar se está no diretório correto
 if [ ! -f "docker/docker-compose.infrastructure.yml" ]; then
@@ -29,7 +29,7 @@ if [ ! -f "nginx/ssl/cert.pem" ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout nginx/ssl/key.pem \
         -out nginx/ssl/cert.pem \
-        -subj "/C=BR/ST=SP/L=SP/O=INFRASEG/CN=localhost"
+        -subj "/C=BR/ST=SP/L=SP/O=AUMIGOPET/CN=localhost"
 fi
 
 # Parar infraestrutura existente

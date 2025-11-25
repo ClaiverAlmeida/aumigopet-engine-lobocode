@@ -47,16 +47,16 @@ curl -s -o /dev/null -w "Status: %{http_code}\n" http://localhost:4200 || echo "
 
 echo ""
 echo "6. Verificando certificados SSL..."
-if [ -f "/etc/letsencrypt/live/appinfraseg.com.br/fullchain.pem" ]; then
-    echo "✅ Certificado SSL para appinfraseg.com.br encontrado"
+if [ -f "/etc/letsencrypt/live/appaumigopet.com.br/fullchain.pem" ]; then
+    echo "✅ Certificado SSL para appaumigopet.com.br encontrado"
 else
-    echo "❌ Certificado SSL para appinfraseg.com.br não encontrado"
+    echo "❌ Certificado SSL para appaumigopet.com.br não encontrado"
 fi
 
-if [ -f "/etc/letsencrypt/live/api.appinfraseg.com.br/fullchain.pem" ]; then
-    echo "✅ Certificado SSL para api.appinfraseg.com.br encontrado"
+if [ -f "/etc/letsencrypt/live/api.appaumigopet.com.br/fullchain.pem" ]; then
+    echo "✅ Certificado SSL para api.appaumigopet.com.br encontrado"
 else
-    echo "❌ Certificado SSL para api.appinfraseg.com.br não encontrado"
+    echo "❌ Certificado SSL para api.appaumigopet.com.br não encontrado"
 fi
 
 echo ""
@@ -64,5 +64,5 @@ echo "🎯 Próximos passos:"
 echo "1. Certifique-se de que o Angular está rodando na porta 4200"
 echo "2. Certifique-se de que o NestJS está rodando na porta 3000"
 echo "3. Reinicie o Nginx: sudo systemctl reload nginx"
-echo "4. Teste acessando: https://appinfraseg.com.br"
-echo "5. Teste a API: https://appinfraseg.com.br/api/health"
+echo "4. Teste acessando: https://appaumigopet.com.br"
+echo "5. Teste a API: https://appaumigopet.com.br/api/health"

@@ -1,4 +1,4 @@
-# 🚀 Configuração Nginx - Infraseg Engine
+# 🚀 Configuração Nginx - AuMigoPet Engine
 
 ## 📋 **Visão Geral**
 
@@ -27,7 +27,7 @@ Cliente → Nginx (443) → { /api/* → backend:3000 }
 - **Rate Limiting:** Proteção contra ataques
 
 ### **2. Arquivo Opcional: `api.conf`**
-- **Domínio separado:** `api.appinfraseg.com.br` (para produção)
+- **Domínio separado:** `api.appaumigopet.com.br` (para produção)
 - **Acesso direto:** Para chamadas externas à API
 - **Mesmo backend:** NestJS no container backend
 
@@ -154,7 +154,7 @@ rm nginx/ssl/*
 docker compose -f docker/docker-compose.unified.yml restart nginx
 
 # Verificar sintaxe
-docker exec infraseg-nginx nginx -t
+docker exec aumigopet-nginx nginx -t
 ```
 
 ### **Backup:**
@@ -196,8 +196,8 @@ docker ps
 docker network ls
 
 # Logs específicos
-docker logs infraseg-nginx
-docker logs infraseg-backend
+docker logs aumigopet-nginx
+docker logs aumigopet-backend
 docker logs frontend
 ```
 

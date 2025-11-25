@@ -1,0 +1,230 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE SOCIAL POSTS (REDE SOCIAL)
+### Sistema: AUMIGOPET Engine
+### Módulo: Social Posts
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@postId = 
+@authorId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+
+### =============================================================================
+### 2. CRIAR POSTS (CREATE)
+### =============================================================================
+
+### 2.1 Criar post normal
+# @name createNormalPost
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "NORMAL",
+  "content": "Meu cachorro Rex completou 2 anos hoje! 🎉🐶",
+  "media": ["https://example.com/rex-birthday.jpg"],
+  "status": "ACTIVE",
+  "visibility": "PUBLIC",
+  "authorId": "{{authorId}}"
+}
+
+### 2.2 Criar post de adoção
+# @name createAdoptionPost
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "ADOPTION",
+  "content": "Filhotes de golden retriever disponíveis para adoção responsável! 🐕",
+  "media": ["https://example.com/puppies1.jpg", "https://example.com/puppies2.jpg"],
+  "status": "ACTIVE",
+  "visibility": "PUBLIC",
+  "location": "São Paulo, SP",
+  "contactInfo": "(11) 98765-4321",
+  "adoptionBreed": "Golden Retriever",
+  "adoptionAge": "2 meses",
+  "adoptionGender": "Macho e Fêmea",
+  "authorId": "{{authorId}}"
+}
+
+### 2.3 Criar post de pet perdido
+# @name createMissingPost
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "MISSING",
+  "content": "URGENTE! Cachorro desaparecido na região. Se alguém viu, por favor entre em contato!",
+  "media": ["https://example.com/missing-dog.jpg"],
+  "status": "ACTIVE",
+  "visibility": "PUBLIC",
+  "location": "Rio de Janeiro, RJ",
+  "contactInfo": "(21) 99999-8888",
+  "missingLastSeen": "Parque da Cidade - 28/10/2025",
+  "missingReward": "R$ 500,00",
+  "missingBreed": "Labrador",
+  "missingColor": "Amarelo",
+  "missingLatitude": -22.9068,
+  "missingLongitude": -43.1729,
+  "authorId": "{{authorId}}"
+}
+
+### 2.4 Criar post patrocinado
+# @name createSponsoredPost
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "SPONSORED",
+  "content": "Ração premium com 30% de desconto! Cuide bem do seu melhor amigo 🦴",
+  "media": ["https://example.com/sponsored-food.jpg"],
+  "status": "ACTIVE",
+  "visibility": "PUBLIC",
+  "sponsoredLink": "https://example.com/promo",
+  "sponsoredCta": "Comprar Agora",
+  "authorId": "{{authorId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR POSTS (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os posts
+GET {{baseUrl}}/social-posts
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar post por ID
+GET {{baseUrl}}/social-posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar posts com paginação
+GET {{baseUrl}}/social-posts?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar posts por tipo
+GET {{baseUrl}}/social-posts?type=ADOPTION
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar posts por autor
+GET {{baseUrl}}/social-posts?authorId={{authorId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar posts ativos
+GET {{baseUrl}}/social-posts?status=ACTIVE
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar posts públicos
+GET {{baseUrl}}/social-posts?visibility=PUBLIC
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar posts de pets perdidos por localização
+GET {{baseUrl}}/social-posts?type=MISSING&location=São Paulo
+Authorization: Bearer {{token}}
+
+### 3.9 Feed ordenado por data (mais recentes primeiro)
+GET {{baseUrl}}/social-posts?sortBy=createdAt&sortOrder=desc&limit=50
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR POSTS (UPDATE)
+### =============================================================================
+
+### 4.1 Editar conteúdo do post
+PATCH {{baseUrl}}/social-posts/{{postId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Conteúdo editado: Obrigado a todos pelas mensagens! 🙏"
+}
+
+### 4.2 Atualizar status do post
+PATCH {{baseUrl}}/social-posts/{{postId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "ARCHIVED"
+}
+
+### 4.3 Marcar pet perdido como encontrado
+PATCH {{baseUrl}}/social-posts/{{postId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "ARCHIVED",
+  "content": "ATUALIZAÇÃO: Pet encontrado! Obrigado a todos que ajudaram! ❤️"
+}
+
+### 4.4 Alterar visibilidade do post
+PATCH {{baseUrl}}/social-posts/{{postId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "visibility": "FRIENDS"
+}
+
+### =============================================================================
+### 5. DELETAR POSTS (DELETE)
+### =============================================================================
+
+### 5.1 Deletar post
+DELETE {{baseUrl}}/social-posts/{{postId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar post sem autenticação (401)
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+
+{
+  "content": "Post sem auth",
+  "authorId": "{{authorId}}"
+}
+
+### 6.2 Criar post sem conteúdo (400)
+POST {{baseUrl}}/social-posts
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "NORMAL",
+  "authorId": "{{authorId}}"
+}
+
+### 6.3 Buscar post inexistente (404)
+GET {{baseUrl}}/social-posts/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - SOCIAL POSTS
+### =============================================================================
+

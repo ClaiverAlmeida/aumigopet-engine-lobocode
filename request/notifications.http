@@ -1,6 +1,6 @@
 ### =============================================================================
 ### ARQUIVO HTTP - TESTE DE NOTIFICAÇÕES
-### Sistema: INFRASEG Engine
+### Sistema: AUMIGOPET Engine
 ### Módulo: Notifications
 ### =============================================================================
 
@@ -30,14 +30,15 @@
 ### 1.1 Login - Autenticação com email/login
 
 
+  @accessToken = {{loginUser.response.body.access_token}}
 ### Login SYSTEM_ADMIN
-# @name systemAdminLogin
+# @name loginUser
 POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "System Admin Claiver",
-  "password": "SystemAdmin123@Senha"
+  "login": "user@aumigopet.com",
+  "password": "User123@" 
 }
 
 

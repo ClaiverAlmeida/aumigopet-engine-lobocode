@@ -1,4 +1,4 @@
-# 🏢 Contexto Completo do Projeto - INFRASEG Engine
+# 🏢 Contexto Completo do Projeto - AUMIGOPET Engine
 
 ## 📋 Informações Essenciais
 
@@ -20,7 +20,7 @@
 ### **Variáveis de Ambiente Obrigatórias**
 ```env
 # Database
-DATABASE_URL="postgresql://user:password@localhost:5432/infraseg"
+DATABASE_URL="postgresql://user:password@localhost:5432/aumigopet"
 
 # Auth
 JWT_SECRET="your-jwt-secret-key"
@@ -219,7 +219,7 @@ export class PatrolNotFoundErrorFilter extends BaseExceptionFilter implements Ex
 // SYSTEM_ADMIN
 {
   name: "Admin Sistema",
-  email: "admin@infraseg.com",
+  email: "admin@aumigopet.com",
   role: "SYSTEM_ADMIN",
   companyId: null // Global
 }

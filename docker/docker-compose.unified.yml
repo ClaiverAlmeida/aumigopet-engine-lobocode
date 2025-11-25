@@ -2,7 +2,7 @@ services:
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
-    container_name: infraseg-nginx
+    container_name: aumigopet-nginx
     ports:
       - '80:80'
       - '443:443'
@@ -28,7 +28,7 @@ services:
 
   # Frontend Angular
   frontend:
-    image: infraseg-app-lobocode-frontend
+    image: aumigopet-app-lobocode-frontend
     container_name: frontend
     ports:
       - '4200:80'
@@ -49,7 +49,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: infraseg-migration
+    container_name: aumigopet-migration
     env_file:
       - .env
     environment:
@@ -72,7 +72,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-    container_name: infraseg-backend
+    container_name: aumigopet-backend
     env_file:
       - .env
     ports:
@@ -104,7 +104,7 @@ services:
   # Database PostgreSQL
   db:
     image: postgres:16.8-alpine3.20
-    container_name: infraseg-db
+    container_name: aumigopet-db
     ports:
       - '5432:5432'  # Expor PostgreSQL externamente
     env_file:
@@ -114,7 +114,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
     volumes:
-      - infraseg-engine-lobocode_postgres_data:/var/lib/postgresql/data
+      - aumigopet-engine-lobocode_postgres_data:/var/lib/postgresql/data
       - ./backups:/backups
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
@@ -137,7 +137,7 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: infraseg-redis
+    container_name: aumigopet-redis
     volumes:
       - redis_data:/data
     restart: unless-stopped
@@ -155,7 +155,7 @@ services:
   # MinIO - Armazenamento de Arquivos
   minio:
     image: minio/minio:latest
-    container_name: infraseg-minio
+    container_name: aumigopet-minio
     env_file:
       - .env
     ports:
@@ -185,7 +185,7 @@ services:
       - app-net
 
 volumes:
-  infraseg-engine-lobocode_postgres_data:
+  aumigopet-engine-lobocode_postgres_data:
     external: true
   redis_data:
   minio_data:

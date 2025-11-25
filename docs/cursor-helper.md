@@ -1,7 +1,7 @@
-# 🤖 Cursor AI Helper - INFRASEG Engine
+# 🤖 Cursor AI Helper - AUMIGOPET Engine
 
 ## 📋 Contexto do Projeto
-- **Projeto**: INFRASEG Engine (Sistema de Segurança Patrimonial)
+- **Projeto**: AUMIGOPET Engine (Sistema de Segurança Patrimonial)
 - **Stack**: NestJS + TypeScript + Prisma + PostgreSQL
 - **Arquitetura**: Multi-tenant, Sistema de Roles, Modular
 

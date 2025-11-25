@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "📊 Iniciando Monitoramento INFRASEG..."
+echo "📊 Iniciando Monitoramento AUMIGOPET..."
 
 # Parar containers existentes
 echo "🛑 Parando containers existentes..."

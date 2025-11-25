@@ -3,35 +3,54 @@
 // ============================================================================
 
 export type EntityNameModel =
+  // Core entities
   | 'user'
   | 'company'
-  | 'post'
-  | 'patrol'
-  | 'vehicle'
-  | 'shift' 
-  | 'occurrence'
-  | 'supply'
-  | 'motorizedService'
-  | 'vehicleChecklist'
-  | 'motorcycleChecklist'
-  | 'occurrenceDispatch'
-  | 'doormanChecklist';
+  // Pet Management
+  | 'pet'
+  | 'vaccineExam'
+  | 'reminder'
+  | 'weightRecord'
+  // Social Network
+  | 'socialPost'
+  | 'postComment'
+  | 'postLike'
+  | 'follow'
+  | 'petFriendRequest'
+  | 'petFriendship'
+  // Service Providers
+  | 'serviceProvider'
+  | 'service'
+  | 'review'
+  | 'favorite'
+  // System
+  | 'file'
+  | 'notification';
+
 export type EntityNameCasl =
+  // Core entities
   | 'User'
   | 'Company'
-  | 'Post'
-  | 'Patrol'
-  | 'Vehicle'
-  | 'Shift'
-  | 'Patrol'
-  | 'Occurrence'
-  | 'VehicleChecklist'
-  | 'Supply'
-  | 'MotorizedService'
-  | 'VehicleChecklist'
-  | 'MotorcycleChecklist'
-  | 'OccurrenceDispatch'
-  | 'DoormanChecklist';
+  // Pet Management
+  | 'Pet'
+  | 'VaccineExam'
+  | 'Reminder'
+  | 'WeightRecord'
+  // Social Network
+  | 'SocialPost'
+  | 'PostComment'
+  | 'PostLike'
+  | 'Follow'
+  | 'PetFriendRequest'
+  | 'PetFriendship'
+  // Service Providers
+  | 'ServiceProvider'
+  | 'Service'
+  | 'Review'
+  | 'Favorite'
+  // System
+  | 'File'
+  | 'Notification';
 
 // ============================================================================
 // 🔄 MAPEAMENTO AUTOMÁTICO MODEL ↔ CASL
@@ -44,37 +63,55 @@ export const ENTITY_MAPPING = {
   // Core entities
   user: 'User',
   company: 'Company',
-  post: 'Post',
-  patrol: 'Patrol',
-  // Operational entities
-  vehicle: 'Vehicle',
-  shift: 'Shift',
-  occurrence: 'Occurrence',
-  motorizedService: 'MotorizedService',
-  supply: 'Supply',
-  vehicleChecklist: 'VehicleChecklist',
-  motorcycleChecklist: 'MotorcycleChecklist',
-  occurrenceDispatch: 'OccurrenceDispatch',
-  doormanChecklist: 'DoormanChecklist',
+  // Pet Management
+  pet: 'Pet',
+  vaccineExam: 'VaccineExam',
+  reminder: 'Reminder',
+  weightRecord: 'WeightRecord',
+  // Social Network
+  socialPost: 'SocialPost',
+  postComment: 'PostComment',
+  postLike: 'PostLike',
+  follow: 'Follow',
+  petFriendRequest: 'PetFriendRequest',
+  petFriendship: 'PetFriendship',
+  // Service Providers
+  serviceProvider: 'ServiceProvider',
+  service: 'Service',
+  review: 'Review',
+  favorite: 'Favorite',
+  // System
+  file: 'File',
+  notification: 'Notification',
 } as const;
 
 /**
  * Mapeamento reverso CASL → Model
  */
 export const CASL_TO_MODEL_MAPPING = {
+  // Core entities
   User: 'user',
   Company: 'company',
-  Post: 'post',
-  Vehicle: 'vehicle',
-  Shift: 'shift',
-  Patrol: 'patrol',
-  Occurrence: 'occurrence',
-  MotorizedService: 'motorizedService',
-  Supply: 'supply',
-  VehicleChecklist: 'vehicleChecklist',
-  MotorcycleChecklist: 'motorcycleChecklist',
-  OccurrenceDispatch: 'occurrenceDispatch',
-  DoormanChecklist: 'doormanChecklist',
+  // Pet Management
+  Pet: 'pet',
+  VaccineExam: 'vaccineExam',
+  Reminder: 'reminder',
+  WeightRecord: 'weightRecord',
+  // Social Network
+  SocialPost: 'socialPost',
+  PostComment: 'postComment',
+  PostLike: 'postLike',
+  Follow: 'follow',
+  PetFriendRequest: 'petFriendRequest',
+  PetFriendship: 'petFriendship',
+  // Service Providers
+  ServiceProvider: 'serviceProvider',
+  Service: 'service',
+  Review: 'review',
+  Favorite: 'favorite',
+  // System
+  File: 'file',
+  Notification: 'notification',
 } as const;
 
 // ============================================================================

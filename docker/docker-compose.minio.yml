@@ -2,7 +2,7 @@ services:
   # MinIO - Armazenamento de Arquivos
   minio:
     image: minio/minio:latest
-    container_name: infraseg-minio
+    container_name: aumigopet-minio
     env_file:
       - .env
     ports:

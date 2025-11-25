@@ -36,13 +36,11 @@ export class FilesController {
     @Query('description') description?: string,
     @CurrentUser() user?: any,
   ): Promise<FileInfo> {
-    const companyId = user?.companyId;
     const uploadedBy = user?.id;
 
     return this.filesService.uploadFile(
       file,
       type,
-      companyId,
       uploadedBy,
       description,
     );
@@ -52,10 +50,8 @@ export class FilesController {
   async getAllFiles(
     @Query('page') page = 1,
     @Query('limit') limit = 20,
-    @CurrentUser() user?: any,
   ): Promise<{ files: FileInfo[]; total: number }> {
-    const companyId = user?.companyId;  
-    return this.filesService.getAllFiles(+page, +limit, companyId);
+    return this.filesService.getAllFiles(+page, +limit);
   }
  
   @Get(':id')

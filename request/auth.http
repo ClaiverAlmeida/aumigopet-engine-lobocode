@@ -1,6 +1,6 @@
 ### =============================================================================
 ### ARQUIVO HTTP - TESTE DE AUTENTICAÇÃO COM RESPONSES PADRONIZADOS
-### Sistema: INFRASEG Engine
+### Sistema: AUMIGOPET Engine
 ### =============================================================================
 
 # Configuração de variáveis
@@ -11,17 +11,20 @@
 @accessToken = 
 @refreshToken = 
 
+@token = {{ loginAdmin.response.body.access_token }}
+ 
 ### =============================================================================
 ### 1. TESTE DE RESPONSES PADRONIZADOS - LOGIN
 ### =============================================================================
 
 ### 1.1 Login com sucesso (Response 200)
+  # @name loginAdmin
 POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "admin@infraseg.com",
-  "password": "Admin123!"
+  "login": "admin@aumigopet.com",
+  "password": "Admin123@"
 }
 
 ### 1.2 Login com credenciais inválidas (Response 401)
@@ -30,7 +33,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "usuario_inexistente",
+  "login": "usuario_inexistente@test.com",
   "password": "senha_errada"
 }
 
@@ -78,13 +81,13 @@ PATCH {{baseUrl}}/auth/login
 ### 4. TESTE DE RESPONSES PADRONIZADOS - VALIDAÇÃO
 ### =============================================================================
 
-### 4.1 Validação de email inválido (Response 400)
+### 4.1 Validação de login inválido (Response 400)
 # Deve retornar detalhes de validação
 POST {{baseUrl}}/auth/forgot-password
 Content-Type: {{contentType}}
 
 {
-  "email": "email_sem_formato"
+  "login": "login_sem_formato"
 }
 
 ### 4.2 Validação de senha fraca (Response 400)
@@ -109,7 +112,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "teste@infraseg.com",
+  "login": "teste@aumigopet.com",
   "password": "senha_errada"
 }
 
@@ -128,8 +131,8 @@ Content-Type: {{contentType}}
 #   "details": {
 #     "stack": [
 #       "UnauthorizedException: Token inválido",
-#       "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
-#       "    at AuthGuard.canActivate (/home/claiver/projetos/infraseg-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
+#       "    at AuthGuard.validateAndDecodeToken (/home/claiver/projetos/aumigopet-engine/src/shared/auth/guards/auth.guard.ts:64:15)",
+#       "    at AuthGuard.canActivate (/home/claiver/projetos/aumigopet-engine/src/shared/auth/guards/auth.guard.ts:28:28)"
 #     ]
 #   }
 # }
@@ -149,7 +152,7 @@ POST {{baseUrl}}/auth/login
 Content-Type: {{contentType}}
 
 {
-  "login": "admin@infraseg.com",
+  "email": "admin@aumigopet.com",
   "password": "Admin123!"
 }
 

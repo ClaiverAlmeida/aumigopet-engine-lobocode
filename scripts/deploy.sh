@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script principal de deploy do INFRASEG
+# Script principal de deploy do AUMIGOPET
 # Uso: ./scripts/deploy.sh [comando]
 
 # Cores para output
@@ -12,7 +12,7 @@ NC='\033[0m' # No Color
 
 # Função para exibir ajuda
 show_help() {
-    echo -e "${BLUE}🚀 Script Principal de Deploy - INFRASEG${NC}"
+    echo -e "${BLUE}🚀 Script Principal de Deploy - AUMIGOPET${NC}"
     echo ""
     echo "Uso: $0 [comando]"
     echo ""
@@ -52,25 +52,25 @@ manage_network() {
 
 # Função para deploy de infraestrutura
 deploy_infra() {
-    echo -e "${BLUE}🏗️ Deploy Infraestrutura - INFRASEG${NC}"
+    echo -e "${BLUE}🏗️ Deploy Infraestrutura - AUMIGOPET${NC}"
     ./scripts/deploy-infrastructure.sh
 }
 
 # Função para deploy do backend
 deploy_backend() {
-    echo -e "${BLUE}🚀 Deploy Backend - INFRASEG${NC}"
+    echo -e "${BLUE}🚀 Deploy Backend - AUMIGOPET${NC}"
     ./scripts/deploy-backend-only.sh
 }
 
 # Função para deploy unificado
 deploy_unified() {
-    echo -e "${BLUE}🚀 Deploy Unificado - INFRASEG${NC}"
+    echo -e "${BLUE}🚀 Deploy Unificado - AUMIGOPET${NC}"
     ./scripts/deploy-unified.sh
 }
 
 # Função para iniciar database
 start_database() {
-    echo -e "${BLUE}🗄️ Iniciando Database - INFRASEG${NC}"
+    echo -e "${BLUE}🗄️ Iniciando Database - AUMIGOPET${NC}"
     
     # Criar rede se não existir
     if ! docker network ls | grep -q "app-net"; then
@@ -84,7 +84,7 @@ start_database() {
 
 # Função para iniciar monitoramento
 start_monitoring() {
-    echo -e "${BLUE}📊 Iniciando Monitoramento - INFRASEG${NC}"
+    echo -e "${BLUE}📊 Iniciando Monitoramento - AUMIGOPET${NC}"
     
     # Criar rede se não existir
     if ! docker network ls | grep -q "app-net"; then
@@ -98,7 +98,7 @@ start_monitoring() {
 
 # Função para iniciar MinIO
 start_minio() {
-    echo -e "${BLUE}📁 Iniciando MinIO - INFRASEG${NC}"
+    echo -e "${BLUE}📁 Iniciando MinIO - AUMIGOPET${NC}"
     
     # Criar rede se não existir
     if ! docker network ls | grep -q "app-net"; then
@@ -112,7 +112,7 @@ start_minio() {
 
 # Função para verificar status
 check_status() {
-    echo -e "${BLUE}📊 Status dos Serviços - INFRASEG${NC}"
+    echo -e "${BLUE}📊 Status dos Serviços - AUMIGOPET${NC}"
     echo ""
     
     # Status da rede
@@ -122,12 +122,12 @@ check_status() {
     
     # Status dos containers
     echo "🐳 Status dos containers:"
-    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep infraseg
+    docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}" | grep aumigopet
 }
 
 # Função para ver logs
 show_logs() {
-    echo -e "${BLUE}📋 Logs dos Serviços - INFRASEG${NC}"
+    echo -e "${BLUE}📋 Logs dos Serviços - AUMIGOPET${NC}"
     echo ""
     echo "Escolha o serviço para ver logs:"
     echo "  1. Backend"
@@ -174,7 +174,7 @@ show_logs() {
 
 # Função para parar todos os serviços
 stop_all() {
-    echo -e "${BLUE}🛑 Parando todos os serviços - INFRASEG${NC}"
+    echo -e "${BLUE}🛑 Parando todos os serviços - AUMIGOPET${NC}"
     
     docker compose -f docker/docker-compose.unified.yml down
     docker compose -f docker/docker-compose.prod.yml down
@@ -188,7 +188,7 @@ stop_all() {
 
 # Função para limpeza
 cleanup() {
-    echo -e "${BLUE}🧹 Limpeza de recursos - INFRASEG${NC}"
+    echo -e "${BLUE}🧹 Limpeza de recursos - AUMIGOPET${NC}"
     
     # Parar containers órfãos
     docker compose -f docker/docker-compose.unified.yml down --remove-orphans

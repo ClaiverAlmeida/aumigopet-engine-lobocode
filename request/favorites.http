@@ -1,0 +1,144 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE FAVORITES
+### Sistema: AUMIGOPET Engine
+### Módulo: Favorites (Favoritos dos Usuários)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@favoriteId = 
+@providerId = 
+@userId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+
+### =============================================================================
+### 2. CRIAR FAVORITOS (CREATE)
+### =============================================================================
+
+### 2.1 Favoritar um prestador de serviço
+# @name favoriteProvider
+POST {{baseUrl}}/favorites
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "providerId": "{{providerId}}",
+  "userId": "{{userId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR FAVORITOS (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os favoritos
+GET {{baseUrl}}/favorites
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar favorito por ID
+GET {{baseUrl}}/favorites/{{favoriteId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar favoritos com paginação
+GET {{baseUrl}}/favorites?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar favoritos de um usuário
+GET {{baseUrl}}/favorites?userId={{userId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar quem favoritou um prestador
+GET {{baseUrl}}/favorites?providerId={{providerId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Verificar se usuário favoritou um prestador específico
+GET {{baseUrl}}/favorites?userId={{userId}}&providerId={{providerId}}
+Authorization: Bearer {{token}}
+
+### 3.7 Contar favoritos de um usuário
+GET {{baseUrl}}/favorites?userId={{userId}}&count=true
+Authorization: Bearer {{token}}
+
+### 3.8 Contar quantos usuários favoritaram um prestador
+GET {{baseUrl}}/favorites?providerId={{providerId}}&count=true
+Authorization: Bearer {{token}}
+
+### 3.9 Buscar favoritos ordenados por data (mais recentes)
+GET {{baseUrl}}/favorites?userId={{userId}}&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. DELETAR FAVORITOS (DELETE / DESFAVORITAR)
+### =============================================================================
+
+### 4.1 Remover prestador dos favoritos
+DELETE {{baseUrl}}/favorites/{{favoriteId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 5. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 5.1 Favoritar sem autenticação (401)
+POST {{baseUrl}}/favorites
+Content-Type: {{contentType}}
+
+{
+  "providerId": "{{providerId}}",
+  "userId": "{{userId}}"
+}
+
+### 5.2 Favoritar sem providerId (400)
+POST {{baseUrl}}/favorites
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}"
+}
+
+### 5.3 Favoritar prestador inexistente (404)
+POST {{baseUrl}}/favorites
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "providerId": "id-provider-inexistente",
+  "userId": "{{userId}}"
+}
+
+### 5.4 Favoritar o mesmo prestador duas vezes (409 - Conflict)
+POST {{baseUrl}}/favorites
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "providerId": "{{providerId}}",
+  "userId": "{{userId}}"
+}
+
+### 5.5 Buscar favorito inexistente (404)
+GET {{baseUrl}}/favorites/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - FAVORITES
+### =============================================================================
+

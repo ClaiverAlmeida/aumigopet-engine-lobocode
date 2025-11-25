@@ -23,7 +23,7 @@ echo "🔐 Criando certificado SSL de teste..."
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout nginx/ssl/key.pem \
     -out nginx/ssl/cert.pem \
-    -subj "/C=BR/ST=SP/L=SP/O=INFRASEG/CN=localhost"
+    -subj "/C=BR/ST=SP/L=SP/O=AUMIGOPET/CN=localhost"
 
 # Construir e iniciar containers
 echo "🔨 Construindo e iniciando containers..."

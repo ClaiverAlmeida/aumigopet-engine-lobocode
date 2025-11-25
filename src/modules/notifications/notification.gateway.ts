@@ -26,7 +26,7 @@ import { AuthGuard } from '../../shared/auth/guards/auth.guard';
   path: '/socket.io',
   cors: {
     origin: [
-      'https://appinfraseg.com.br',
+      'https://appaumigopet.com.br',
       'http://31.97.166.94',           // Nginx proxy
       'http://localhost:4200',          // Para desenvolvimento local
     ], credentials: true,

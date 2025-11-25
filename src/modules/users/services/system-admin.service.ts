@@ -5,7 +5,7 @@ import { UserFactory } from '../factories/user.factory';
 import { UserRepository } from '../repositories/user.repository';
 import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service'; 
-import { Roles } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { UserPermissionService } from './user-permission.service';
 
 @Injectable()
@@ -22,26 +22,26 @@ export class SystemAdminService extends BaseUserService {
       userValidator,
       userQueryService,
       userPermissionService,
-      Roles.SYSTEM_ADMIN,
+      UserRole.ADMIN,
     );
   }
 
   //  Funcionalidades específicas de administradores da plataforma
     async criarNovoSystemAdmin(dto: CreateSystemAdminDto) {
-    // ✅ Validação de role hierárquico RESTAURADA
-    this.userPermissionService.validarCriacaoDeUserComRole(Roles.SYSTEM_ADMIN);
+    // ✅ Validação de role hierárquico
+    this.userPermissionService.validarCriacaoDeUserComRole(UserRole.ADMIN);
  
     // Valida se email é único
     await this.validarSeEmailEhUnico(dto.email); 
     // Criação do usuário
-    const userData = this.userFactory.criarSystemAdmin(dto);
+    const userData = this.userFactory.criarAdmin(dto);
     const user = await this.userRepository.criar(userData);
 
     return user;
   }
 
   async buscarTodosOsPlatformAdmins() {
-    return this.userRepository.buscarMuitos({ role: 'SYSTEM_ADMIN' });
+    return this.userRepository.buscarMuitos({ role: UserRole.ADMIN });
   }
 
   async obterEstatisticasDoSistema() {
@@ -49,8 +49,8 @@ export class SystemAdminService extends BaseUserService {
     return {
       totalUsers: 0,
       totalCompanies: 0,
-      totalPosts: 0,
-      activePatrols: 0,
+      totalServiceProviders: 0,
+      totalPets: 0,
     };
   }
 

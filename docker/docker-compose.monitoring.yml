@@ -2,7 +2,7 @@ services:
   # Prometheus Monitoring
   prometheus:
     image: prom/prometheus:latest
-    container_name: infraseg-prometheus
+    container_name: aumigopet-prometheus
     network_mode: 'host'
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
@@ -29,7 +29,7 @@ services:
   # Grafana Dashboard
   grafana:
     image: grafana/grafana:latest
-    container_name: infraseg-grafana
+    container_name: aumigopet-grafana
     ports:
       - '3001:3000'
     environment:

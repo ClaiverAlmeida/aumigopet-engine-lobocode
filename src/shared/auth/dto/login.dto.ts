@@ -9,4 +9,6 @@ export class LoginDto {
   @IsString({ message: VALIDATION_MESSAGES.REQUIRED.PASSWORD })
   @MinLength(6, { message: VALIDATION_MESSAGES.LENGTH.PASSWORD_MIN })
   password: string;
+
+  
 }

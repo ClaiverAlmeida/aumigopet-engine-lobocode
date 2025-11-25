@@ -3,13 +3,21 @@ import { JwtService } from '@nestjs/jwt';
 import { CaslAbilityService } from '../../casl/casl-ability/casl-ability.service';
 import { packRules } from '@casl/ability/extra';
 import { LoginDto } from '../dto/login.dto';
-import { IAuthResponse, ITokenPayload } from '../interfaces';
+import { RegisterDto } from '../dto/register.dto';
+import { IAuthResponse, IRegisterResponse, ITokenPayload } from '../interfaces';
 import { RefreshTokenService } from './refresh-token.service';
 import { AuditService } from './audit.service';
 import { SecurityService } from './security.service';
 import { AuthValidator } from '../validators/auth.validator';
 import { MessagesService } from '../../common/messages/messages.service';
 import { Request } from 'express';
+import { UserRepository } from '../../../modules/users/repositories/user.repository';
+import { UserValidator } from '../../../modules/users/validators/user.validator';
+import { UserQueryService } from '../../../modules/users/services/user-query.service';
+import { UserPermissionService } from '../../../modules/users/services/user-permission.service';
+import { UserFactory } from '../../../modules/users/factories/user.factory';
+import { UserRole } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class LoginService {
@@ -19,7 +27,12 @@ export class LoginService {
     private readonly refreshTokenService: RefreshTokenService,
     private readonly auditService: AuditService,
     private readonly securityService: SecurityService,
-    private readonly authValidator: AuthValidator
+    private readonly authValidator: AuthValidator,
+    private readonly userRepository: UserRepository,
+    private readonly userValidator: UserValidator,
+    private readonly userQueryService: UserQueryService,
+    private readonly userPermissionService: UserPermissionService,
+    private readonly userFactory: UserFactory,
   ) {}
 
   /**
@@ -53,10 +66,8 @@ export class LoginService {
       const payload: ITokenPayload = {
         name: user.name,
         email: user.email,
-        rg: user.rg || '', // TODO: temporariamente, para o frontend
         role: user.role,
         sub: user.id,
-        userPermissions: user.permissions.map((permission) => permission.permissionType),
         permissions: packRules(ability.rules),
       };
 
@@ -71,8 +82,7 @@ export class LoginService {
       if (request) {
         await this.auditService.logLoginSuccess(user.id, request, {
           role: user.role,
-          companyId: user.companyId,
-          userPermissions: user.permissions.map((permission) => permission.permissionType),
+          companyId: user.companyId || null,
         });
       }
 
@@ -100,4 +110,76 @@ export class LoginService {
       throw error;
     }
   }
-} 
+
+  /**
+   * Registra um novo usuário
+   */
+  async register(
+    registerDto: RegisterDto,
+    request?: Request,
+  ): Promise<IRegisterResponse> {
+    try {
+      // Validar se email já existe
+      await this.userValidator.validarSeEmailEhUnico(registerDto.email);
+
+      // Hash da senha
+      const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
+      // Criar dados do usuário
+      const userData = {
+        name: this.normalizeName(registerDto.name),
+        email: registerDto.email.trim().toLowerCase(),
+        password: hashedPassword,
+        role: UserRole.USER, // Usuário comum do app
+        phone: registerDto.phone || null,
+        status: 'ACTIVE' as const,
+      };
+
+      // Criar usuário no banco
+      const user = await this.userRepository.criar(userData);
+
+      // Log de sucesso do registro
+      if (request) {
+        await this.auditService.logLoginSuccess(user.id, request, {
+          role: user.role,
+          companyId: user.companyId || null,
+        });
+      }
+
+      // Retornar apenas confirmação de sucesso
+      return {
+        success: true,
+        message: 'Usuário registrado com sucesso',
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      };
+    } catch (error) {
+      // Log de falha se request estiver disponível
+      if (request) {
+        await this.auditService.logLoginFailed(
+          registerDto.email,
+          request,
+          error.message,
+        );
+      }
+      throw error;
+    }
+  }
+
+  private normalizeName(name: string): string {
+    if (!name) {
+      return '';
+    }
+
+    return name
+      .trim()
+      .toLowerCase()
+      .split(/\s+/)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+}

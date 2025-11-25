@@ -42,7 +42,7 @@ export class UniversalMetricsService {
     try {
       // Counter para operações por entidade
       this.entityOperationsCounter = new Counter({
-        name: 'infraseg_entity_operations_total',
+        name: 'aumigopet_entity_operations_total',
         help: 'Total de operações realizadas por entidade',
         labelNames: ['entity', 'action', 'status', 'user_role', 'company_id'],
         registers: [register],
@@ -50,7 +50,7 @@ export class UniversalMetricsService {
 
       // Histogram para duração das operações
       this.operationDurationHistogram = new Histogram({
-        name: 'infraseg_operation_duration_seconds',
+        name: 'aumigopet_operation_duration_seconds',
         help: 'Duração das operações em segundos',
         labelNames: ['entity', 'action'],
         buckets: [0.1, 0.5, 1, 2, 5, 10, 30],

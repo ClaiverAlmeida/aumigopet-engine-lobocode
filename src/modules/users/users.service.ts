@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CreateSystemAdminDto } from './dto/create-system-admin.dto';
 import { CreateAdminDto } from './dto/create-admin.dto';
-import { CreateGuardDto } from './dto/create-guard.dto';
-import { CreateHRDto } from './dto/create-hr.dto';
-import { CreatePostResidentDto } from './dto/create-post-resident.dto';
-import { CreateSupervisorDto } from './dto/create-supervisor.dto';
-import { CreatePostSupervisorDto } from './dto/create-post-supervisor.dto';
 import { BaseUserService } from './services/base-user.service';
 import { UserRepository } from './repositories/user.repository';
 import { UserValidator } from './validators/user.validator';
@@ -13,15 +8,9 @@ import { UserQueryService } from './services/user-query.service';
 import {
   SystemAdminService,
   AdminService,
-  SupervisorService,
-  GuardService,
-  HRService,
-  PostSupervisorService,
-  PostResidentService,
   UserPermissionService,
 } from './services';
-import { CreateOthersDto } from './dto/create-others.dto';
-import { Prisma, ShiftStatus, UserStatus } from '@prisma/client';
+import { Prisma, UserRole, UserStatus } from '@prisma/client';
 import { UserFactory } from './factories/user.factory';
 
 @Injectable()
@@ -33,11 +22,6 @@ export class UsersService extends BaseUserService {
     userPermissionService: UserPermissionService,
     private systemAdminService: SystemAdminService,
     private adminService: AdminService,
-    private supervisorService: SupervisorService,
-    private guardService: GuardService,
-    private hrService: HRService,
-    private postSupervisorService: PostSupervisorService,
-    private postResidentService: PostResidentService,
     private userFactory: UserFactory,
   ) {
     super(
@@ -58,18 +42,16 @@ export class UsersService extends BaseUserService {
   }
 
   /**
-   * Cria usuário
+   * Cria usuário comum
    */
-  //  Funcionalidades específicas de RH
-  async criarNovoOthers(dto: CreateOthersDto) {
-    // ✅ Validação de role hierárquico RESTAURADA
-    this.userPermissionService.validarCriacaoDeUserComRole(dto.role);
-
+  async criarNovoUser(dto: any) {
     // Validações comuns
     await this.validarSeEmailEhUnico(dto.email);
+    if (dto.cpf) await this.validarSeCPFEhUnico(dto.cpf);
+    if (dto.phone) await this.validarSePhoneEhUnico(dto.phone);
 
     // Criação do usuário
-    const userData = this.userFactory.criarOthers(dto);
+    const userData = this.userFactory.criarUser(dto);
     const user = await this.userRepository.criar(
       userData as Prisma.UserCreateInput,
     );
@@ -77,52 +59,16 @@ export class UsersService extends BaseUserService {
     return user;
   }
 
-  async criarNovoHR(dto: CreateHRDto) {
-    return this.hrService.criarNovoHR(dto);
-  }
-
-  async criarNovoSupervisor(dto: CreateSupervisorDto) {
-    return this.supervisorService.criarNovoSupervisor(dto);
-  }
-
-  async criarNovoGuard(dto: CreateGuardDto) {
-    return this.guardService.criarNovoGuard(dto);
-  }
-
-  async criarNovoPostSupervisor(dto: CreatePostSupervisorDto) {
-    return this.postSupervisorService.criarNovoPostSupervisor(dto);
-  }
-
-  async criarNovoPostResident(dto: CreatePostResidentDto) {
-    return this.postResidentService.criarNovoPostResident(dto);
-  }
-
   /**
-   * Busca vigilantes ativos em turno no posto específico
+   * Busca usuários por role
    */
-  async buscarVigilantesAtivosEmTurnoNoPosto(postId: string) {
-    // Busca usuários com turno ativo no posto específico
+  async buscarUsersPorRole(role: UserRole) {
     const whereClause = this.userQueryService.construirWhereClauseParaRead({
-      role: { in: ['GUARD', 'SUPERVISOR', 'DOORMAN'] },
+      role,
       status: UserStatus.ACTIVE,
-      shifts: {
-        some: {
-          postId: postId,
-          status: {
-            in: [ShiftStatus.IN_PROGRESS, ShiftStatus.BREAK], // Turnos ativos (em andamento ou em intervalo)
-          },
-        },
-      },
     });
 
     const users = await this.userRepository.buscarMuitos(whereClause);
-
-    // Transforma os dados dos usuários para o formato esperado pelo frontend
-    return users.map((user) => ({
-      ...user,
-      permissions:
-        user.permissions?.map((permission: any) => permission.permissionType) ||
-        [],
-    }));
+    return this.transformData(users);
   }
 }

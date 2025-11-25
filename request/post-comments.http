@@ -1,0 +1,182 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE POST COMMENTS (COMENTÁRIOS)
+### Sistema: AUMIGOPET Engine
+### Módulo: Post Comments
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@commentId = 
+@postId = 
+@authorId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR COMENTÁRIOS (CREATE)
+### =============================================================================
+
+### 2.1 Criar comentário simples
+# @name createSimpleComment
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Que lindo! Parabéns pelo pet! 🐶❤️",
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.2 Criar comentário com emoji
+# @name createEmojiComment
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "😍😍😍 Adorei!",
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.3 Criar comentário de interesse em adoção
+# @name createAdoptionInterest
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Tenho interesse! Podemos conversar por mensagem privada?",
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 2.4 Criar comentário com informação útil
+# @name createHelpfulComment
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Vi um cachorro parecido na Rua das Flores hoje pela manhã!",
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR COMENTÁRIOS (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os comentários
+GET {{baseUrl}}/post-comments
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar comentário por ID
+GET {{baseUrl}}/post-comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar comentários com paginação
+GET {{baseUrl}}/post-comments?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar comentários por post
+GET {{baseUrl}}/post-comments?postId={{postId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar comentários por autor
+GET {{baseUrl}}/post-comments?authorId={{authorId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar comentários ordenados por data (mais recentes primeiro)
+GET {{baseUrl}}/post-comments?postId={{postId}}&sortBy=createdAt&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR COMENTÁRIOS (UPDATE)
+### =============================================================================
+
+### 4.1 Editar conteúdo do comentário
+PATCH {{baseUrl}}/post-comments/{{commentId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Comentário editado: Que lindo! Parabéns! ❤️"
+}
+
+### 4.2 Corrigir erro de digitação
+PATCH {{baseUrl}}/post-comments/{{commentId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Correção: Adorei seu pet!"
+}
+
+### =============================================================================
+### 5. DELETAR COMENTÁRIOS (DELETE)
+### =============================================================================
+
+### 5.1 Deletar comentário
+DELETE {{baseUrl}}/post-comments/{{commentId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar comentário sem autenticação (401)
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+
+{
+  "content": "Comentário sem auth",
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.2 Criar comentário sem conteúdo (400)
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "postId": "{{postId}}",
+  "authorId": "{{authorId}}"
+}
+
+### 6.3 Criar comentário sem postId (400)
+POST {{baseUrl}}/post-comments
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "content": "Comentário sem post",
+  "authorId": "{{authorId}}"
+}
+
+### 6.4 Buscar comentário inexistente (404)
+GET {{baseUrl}}/post-comments/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - POST COMMENTS
+### =============================================================================
+

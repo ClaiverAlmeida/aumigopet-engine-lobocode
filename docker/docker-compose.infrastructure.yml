@@ -2,7 +2,7 @@ services:
   # Nginx Reverse Proxy
   nginx:
     image: nginx:alpine
-    container_name: infraseg-nginx
+    container_name: aumigopet-nginx
     ports:
       - '80:80'
       - '443:443'

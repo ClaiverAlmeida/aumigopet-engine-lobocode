@@ -143,7 +143,7 @@ Use `request/files.http` para testes completos.
 
 ### MinIO
 ```
-infraseg-files/
+aumigopet-files/
 ├── public/                    # Arquivos públicos
 └── companies/
     └── {companyId}/           # Arquivos por empresa

@@ -1,0 +1,405 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE PETS
+### Sistema: AUMIGOPET Engine
+### Módulo: Pets
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste (preencher após os testes)
+@token = 
+@petId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO - OBTER TOKEN
+### =============================================================================
+
+@token = {{ loginProvider.response.body.access_token }}
+ 
+### =============================================================================
+### 1. TESTE DE RESPONSES PADRONIZADOS - LOGIN
+### =============================================================================
+
+### 1.1 Login com sucesso (Response 200)
+  # @name loginProvider
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+#   "login": "admin@aumigopet.com",
+#   "password": "Admin123@"
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+ 
+
+### =============================================================================
+### 2. CRIAR PETS (CREATE)
+### =============================================================================
+
+### 2.1 Criar um cachorro
+# @name createDog
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Rex",
+  "species": "DOG",
+  "breed": "Labrador",
+  "birthDate": "2020-05-15",
+  "gender": "MALE",
+  "color": "Amarelo",
+  "weight": 30.5,
+  "microchipNumber": "123456789012345",
+  "medicalNotes": "Vacinação em dia",
+  "allergies": "Nenhuma"
+}
+
+### 2.2 Criar um gato
+# @name createCat
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Mia",
+  "species": "CAT",
+  "breed": "Persa",
+  "birthDate": "2021-03-20",
+  "gender": "FEMALE",
+  "color": "Branco",
+  "weight": 4.2,
+  "medicalNotes": "Castrada"
+}
+
+### 2.3 Criar um pássaro
+# @name createBird
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Piu",
+  "species": "BIRD",
+  "breed": "Calopsita",
+  "birthDate": "2022-01-10",
+  "gender": "MALE",
+  "color": "Cinza e amarelo"
+}
+
+### 2.4 Criar pet com dados mínimos
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Totó",
+  "species": "DOG"
+}
+
+### =============================================================================
+### 3. LISTAR PETS (READ)
+### =============================================================================
+
+### 3.1 Listar todos os meus pets (paginação padrão)
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### 3.2 Listar com paginação customizada
+GET {{baseUrl}}/pets?page=1&limit=5
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar pet específico por ID
+# @name getPetById
+GET {{baseUrl}}/pets/{{createDog.response.body.data.id}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR PETS (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar informações do pet
+PATCH {{baseUrl}}/pets/{{createDog.response.body.data.id}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 32.0,
+  "medicalNotes": "Vacinação em dia. Última consulta: 2025-01-15"
+}
+
+### 4.2 Atualizar foto do pet
+PATCH {{baseUrl}}/pets/{{createCat.response.body.data.id}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "profileImage": "https://example.com/pets/mia-profile.jpg"
+}
+
+### 4.3 Atualizar restrições alimentares
+PATCH {{baseUrl}}/pets/{{createDog.response.body.data.id}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "dietaryRestrictions": "Ração para cães adultos de porte grande. Evitar chocolate e uvas.",
+  "allergies": "Frango"
+}
+
+### =============================================================================
+### 5. DELETAR PETS (DELETE)
+### =============================================================================
+
+### 5.1 Deletar pet (soft delete)
+DELETE {{baseUrl}}/pets/{{createBird.response.body.data.id}}
+Authorization: Bearer {{token}}
+
+### 5.2 Restaurar pet deletado
+POST {{baseUrl}}/pets/{{createBird.response.body.data.id}}/restore
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. ESTATÍSTICAS E BUSCAS ESPECIAIS
+### =============================================================================
+
+### 6.1 Obter estatísticas dos meus pets
+GET {{baseUrl}}/pets/stats
+Authorization: Bearer {{token}}
+
+### 6.2 Buscar pet por microchip
+GET {{baseUrl}}/pets/microchip/123456789012345
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 7. TESTES DE VALIDAÇÃO E ERROS
+### =============================================================================
+
+### 7.1 Criar pet sem autenticação (deve retornar 401)
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste",
+  "species": "DOG"
+}
+
+### 7.2 Criar pet sem nome (deve retornar 400)
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "species": "CAT"
+}
+
+### 7.3 Criar pet com espécie inválida (deve retornar 400)
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste",
+  "species": "DINOSSAURO"
+}
+
+### 7.4 Buscar pet inexistente (deve retornar 404)
+GET {{baseUrl}}/pets/id-inexistente-123
+Authorization: Bearer {{token}}
+
+### 7.5 Atualizar pet de outro usuário (deve retornar 403)
+PATCH {{baseUrl}}/pets/id-de-outro-usuario
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Tentando atualizar pet de outro usuário"
+}
+
+### 7.6 Criar pet com microchip duplicado (deve retornar 400)
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Outro Rex",
+  "species": "DOG",
+  "microchipNumber": "123456789012345"
+}
+
+### =============================================================================
+### 8. TESTES COM DIFERENTES ESPÉCIES
+### =============================================================================
+
+### 8.1 Criar coelho
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Tambor",
+  "species": "RABBIT",
+  "breed": "Mini Lop",
+  "birthDate": "2023-06-10",
+  "gender": "MALE",
+  "color": "Branco com manchas pretas",
+  "weight": 1.5
+}
+
+### 8.2 Criar hamster
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Pipoca",
+  "species": "HAMSTER",
+  "gender": "FEMALE",
+  "color": "Marrom dourado",
+  "weight": 0.15
+}
+
+### 8.3 Criar peixe
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Nemo",
+  "species": "FISH",
+  "breed": "Betta",
+  "color": "Azul e vermelho"
+}
+
+### 8.4 Criar réptil
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Donatello",
+  "species": "REPTILE",
+  "breed": "Tartaruga Tigre d'água",
+  "birthDate": "2022-08-05",
+  "gender": "MALE",
+  "color": "Verde com listras amarelas"
+}
+
+### 8.5 Criar outro tipo
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Porquinho",
+  "species": "OTHER",
+  "breed": "Porquinho da Índia",
+  "gender": "MALE",
+  "color": "Caramelo e branco",
+  "weight": 0.8
+}
+
+### =============================================================================
+### 9. FLUXO COMPLETO DE TESTE
+### =============================================================================
+
+### 9.1 Passo 1: Fazer login
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "email": "user@aumigopet.com",
+  "password": "User123!"
+}
+
+### 9.2 Passo 2: Criar um pet
+# @name flowCreatePet
+POST {{baseUrl}}/pets
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Buddy",
+  "species": "DOG",
+  "breed": "Golden Retriever",
+  "birthDate": "2019-11-20",
+  "gender": "MALE",
+  "color": "Dourado",
+  "weight": 35.0
+}
+
+### 9.3 Passo 3: Listar meus pets
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### 9.4 Passo 4: Ver detalhes do pet criado
+GET {{baseUrl}}/pets/{{flowCreatePet.response.body.data.id}}
+Authorization: Bearer {{token}}
+
+### 9.5 Passo 5: Atualizar o pet
+PATCH {{baseUrl}}/pets/{{flowCreatePet.response.body.data.id}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 36.5,
+  "medicalNotes": "Check-up realizado em 2025-01-15. Pet saudável!"
+}
+
+### 9.6 Passo 6: Ver estatísticas
+GET {{baseUrl}}/pets/stats
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 10. NOTAS E DOCUMENTAÇÃO
+### =============================================================================
+
+### Espécies disponíveis:
+# - DOG (Cachorro)
+# - CAT (Gato)
+# - BIRD (Pássaro)
+# - FISH (Peixe)
+# - RABBIT (Coelho)
+# - HAMSTER (Hamster)
+# - REPTILE (Réptil)
+# - OTHER (Outro)
+
+### Gêneros disponíveis:
+# - MALE (Macho)
+# - FEMALE (Fêmea)
+# - UNKNOWN (Desconhecido)
+
+### Campos obrigatórios:
+# - name: Nome do pet (string)
+# - species: Espécie do pet (enum)
+
+### Campos opcionais:
+# - breed: Raça
+# - birthDate: Data de nascimento (ISO 8601)
+# - age: Idade (calculada automaticamente se birthDate for fornecido)
+# - gender: Gênero
+# - color: Cor
+# - weight: Peso em kg
+# - microchipNumber: Número do microchip (único)
+# - profileImage: URL da imagem de perfil
+# - medicalNotes: Notas médicas
+# - dietaryRestrictions: Restrições alimentares
+# - allergies: Alergias
+
+### Endpoints disponíveis:
+# POST /pets                          - Criar novo pet
+# GET /pets                           - Listar meus pets (paginado)
+# GET /pets/stats                     - Estatísticas dos meus pets
+# GET /pets/microchip/:number         - Buscar pet por microchip
+# GET /pets/:id                       - Buscar pet por ID
+# PATCH /pets/:id                     - Atualizar pet
+# DELETE /pets/:id                    - Deletar pet (soft delete)
+# POST /pets/:id/restore              - Restaurar pet deletado
+
+### =============================================================================
+### FIM DO ARQUIVO
+### =============================================================================
+

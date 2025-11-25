@@ -4,7 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: infraseg-backend
+    container_name: aumigopet-backend
     env_file:
       - .env
     ports:
@@ -34,7 +34,7 @@ services:
   # Database PostgreSQL
   db:
     image: postgres:16.8-alpine3.20
-    container_name: infraseg-db
+    container_name: aumigopet-db
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -42,7 +42,7 @@ services:
     ports:
       - '5432:5432'
     volumes:
-      - infraseg-engine-lobocode_postgres_data:/var/lib/postgresql/data
+      - aumigopet-engine-lobocode_postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
       interval: 10s
@@ -64,7 +64,7 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: infraseg-redis
+    container_name: aumigopet-redis
     ports:
       - '6379:6379'
     volumes:
@@ -84,7 +84,7 @@ services:
   # MinIO - Armazenamento de Arquivos
   minio:
     image: minio/minio:latest
-    container_name: infraseg-minio
+    container_name: aumigopet-minio
     env_file:
       - .env
     ports:
@@ -114,7 +114,7 @@ services:
       - app-net
 
 volumes:
-  infraseg-engine-lobocode_postgres_data:
+  aumigopet-engine-lobocode_postgres_data:
     external: true
   redis_data:
   minio_data:

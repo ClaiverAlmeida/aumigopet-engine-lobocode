@@ -46,7 +46,7 @@ export const CaslFields = (subject: string, fields: string[]) => {
  * Decorator para validação de role específico
  * @param action - Ação CRUD
  * @param subject - Entidade
- * @param allowedRoles - Roles permitidos
+ * @param allowedRoles - UserRole permitidos
  */
 export const CaslRole = (
   action: CrudAction,

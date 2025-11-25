@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CaslService } from '../../../shared/casl/casl.service';
 import { PermissionContextService } from '../../../shared/casl/services/permission-context.service';
 import { PermissionAuditService } from '../../../shared/casl/services/permission-audit.service';
-import { Roles, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 
 @Injectable()
@@ -32,34 +32,34 @@ export class UserPermissionService {
   }
 
   // ============================================================================
-  // 🎯 MÉTODOS PÚBLICOS - VALIDAÇÃO DE ROLE HIERÁRQUICO (RESTAURADO)
+  // 🎯 MÉTODOS PÚBLICOS - VALIDAÇÃO DE ROLE HIERÁRQUICO
   // ============================================================================
 
   /**
    * Verifica se pode criar usuário com role específico
    */
-  validarCriacaoDeUserComRole(targetRole: Roles): boolean {
+  validarCriacaoDeUserComRole(targetRole: UserRole): boolean {
     return this.validarPermissaoDeRole('create', targetRole);
   }
 
   /**
    * Verifica se pode atualizar usuário com role específico
    */
-  validarAtualizacaoDeUserComRole(targetRole: Roles): boolean {
+  validarAtualizacaoDeUserComRole(targetRole: UserRole): boolean {
     return this.validarPermissaoDeRole('update', targetRole);
   }
 
   /**
    * Verifica se pode deletar usuário com role específico
    */
-  validarDelecaoDeUserComRole(targetRole: Roles): boolean {
+  validarDelecaoDeUserComRole(targetRole: UserRole): boolean {
     return this.validarPermissaoDeRole('delete', targetRole);
   }
 
   /**
    * Validação centralizada para qualquer ação CRUD com role específico
    */
-  validarAcaoDeUserComRole(action: CrudAction, targetRole: Roles): boolean {
+  validarAcaoDeUserComRole(action: CrudAction, targetRole: UserRole): boolean {
     return this.validarPermissaoDeRole(action, targetRole);
   }
 
@@ -190,7 +190,7 @@ export class UserPermissionService {
    */
   private validarPermissaoDeRole(
     action: CrudAction,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     return this.caslService.validarPermissaoDeRole(action, 'User', targetRole);
   }

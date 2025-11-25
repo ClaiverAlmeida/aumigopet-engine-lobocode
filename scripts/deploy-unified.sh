@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Deploy Unificado - INFRASEG"
+echo "🚀 Deploy Unificado - AUMIGOPET"
 
 # Verificar se está no diretório correto
 if [ ! -f "docker/docker-compose.unified.yml" ]; then

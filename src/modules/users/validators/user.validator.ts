@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repositories/user.repository';
 import { CompaniesService } from '../../companies/companies.service';
-import { PostsService } from '../../posts/posts.service';
 import {
   ConflictError,
   NotFoundError,
@@ -13,7 +12,6 @@ export class UserValidator {
   constructor(
     private userRepository: UserRepository,
     private companiesService: CompaniesService,
-    private postsService: PostsService,
   ) {}
 
   async validarSeEmailEhUnico(email: string, excludeUserId?: string) {
@@ -56,23 +54,11 @@ export class UserValidator {
   }
 
   async validarSeUserPodeSerDeletado(id: string) {
-    const userWithRelations =
-      await this.userRepository.buscarUserComRelations(id);
-
-    if (
-      userWithRelations &&
-      userWithRelations.patrols &&
-      userWithRelations.patrols.length > 0
-    ) {
-      throw new ValidationError('Cannot delete user with active patrols');
-    }
-
-    if (
-      userWithRelations &&
-      userWithRelations.shifts &&
-      userWithRelations.shifts.length > 0
-    ) {
-      throw new ValidationError('Cannot delete user with active shifts');
+    // Validação simplificada - pode ser expandida futuramente
+    // para verificar pets, posts, etc se necessário
+    const user = await this.userRepository.buscarUnico({ id });
+    if (!user) {
+      throw new NotFoundError('User', id, 'id');
     }
   }
 }

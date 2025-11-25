@@ -20,6 +20,7 @@ import { AuthGuard } from './guards/auth.guard';
 import { RefreshGuard } from './guards/refresh.guard';
 import { RateLimitGuard } from './guards/rate-limit.guard';
 import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { UsersModule } from '../../modules/users/users.module';
 
 @Global()
 @Module({
@@ -36,6 +37,7 @@ import { AuthInterceptor } from './interceptors/auth.interceptor';
       inject: [ConfigService],
     }),
     PrismaModule,
+    UsersModule,
   ],
   controllers: [AuthController],
   providers: [

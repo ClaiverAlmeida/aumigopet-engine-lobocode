@@ -18,16 +18,10 @@ export class AuthValidator {
   async validateCredentials(loginDto: LoginDto) {
     const { login, password } = loginDto;
 
-    // Busca usuário por email ou login
+    // Busca usuário por email (login é o email)
     const user = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email: login.trim().toLowerCase() },
-          { login: login.trim().toLowerCase() },
-        ],
-      },
-      include: {
-        permissions: true,
+        email: login.trim().toLowerCase(),
       },
     });
 
@@ -67,7 +61,6 @@ export class AuthValidator {
         name: true,
         status: true,
         role: true,
-        permissions: true,
       },
     });
 

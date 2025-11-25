@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🛑 Parando ambiente de desenvolvimento Infraseg..."
+echo "🛑 Parando ambiente de desenvolvimento AuMigoPet..."
 
 # Parar serviços
 echo "📦 Parando serviços..."

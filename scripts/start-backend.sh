@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Iniciando Backend INFRASEG..."
+echo "🚀 Iniciando Backend AUMIGOPET..."
 
 # Parar containers existentes
 echo "🛑 Parando containers existentes..."

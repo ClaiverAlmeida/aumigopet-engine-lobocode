@@ -7,7 +7,7 @@ export const loggerConfig = {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.errors({ stack: true }),
-        nestWinstonModuleUtilities.format.nestLike('Infraseg', {
+        nestWinstonModuleUtilities.format.nestLike('AuMigoPet', {
           prettyPrint: true,
           colors: true,
         }),

@@ -1,4 +1,4 @@
-# Arquitetura do Sistema de Gestão de Segurança (Infraseg)
+# Arquitetura do Sistema de Gestão de Segurança (AuMigoPet)
 
 ## Visão Geral
 

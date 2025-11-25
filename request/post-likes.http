@@ -1,0 +1,135 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE POST LIKES (CURTIDAS)
+### Sistema: AUMIGOPET Engine
+### Módulo: Post Likes
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@likeId = 
+@postId = 
+@userId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR CURTIDAS (CREATE)
+### =============================================================================
+
+### 2.1 Curtir um post
+# @name likePost
+POST {{baseUrl}}/post-likes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "postId": "{{postId}}",
+  "userId": "{{userId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR CURTIDAS (READ)
+### =============================================================================
+
+### 3.1 Buscar todas as curtidas
+GET {{baseUrl}}/post-likes
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar curtida por ID
+GET {{baseUrl}}/post-likes/{{likeId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar curtidas com paginação
+GET {{baseUrl}}/post-likes?page=1&limit=100
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar curtidas de um post
+GET {{baseUrl}}/post-likes?postId={{postId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar curtidas de um usuário
+GET {{baseUrl}}/post-likes?userId={{userId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Verificar se usuário curtiu um post específico
+GET {{baseUrl}}/post-likes?postId={{postId}}&userId={{userId}}
+Authorization: Bearer {{token}}
+
+### 3.7 Contar curtidas de um post
+GET {{baseUrl}}/post-likes?postId={{postId}}&count=true
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. DELETAR CURTIDAS (DELETE / DESCURTIR)
+### =============================================================================
+
+### 4.1 Descurtir um post
+DELETE {{baseUrl}}/post-likes/{{likeId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 5. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 5.1 Curtir sem autenticação (401)
+POST {{baseUrl}}/post-likes
+Content-Type: {{contentType}}
+
+{
+  "postId": "{{postId}}",
+  "userId": "{{userId}}"
+}
+
+### 5.2 Curtir sem postId (400)
+POST {{baseUrl}}/post-likes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "userId": "{{userId}}"
+}
+
+### 5.3 Curtir post inexistente (404)
+POST {{baseUrl}}/post-likes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "postId": "id-post-inexistente",
+  "userId": "{{userId}}"
+}
+
+### 5.4 Curtir o mesmo post duas vezes (409 - Conflict)
+POST {{baseUrl}}/post-likes
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "postId": "{{postId}}",
+  "userId": "{{userId}}"
+}
+
+### 5.5 Buscar curtida inexistente (404)
+GET {{baseUrl}}/post-likes/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - POST LIKES
+### =============================================================================
+

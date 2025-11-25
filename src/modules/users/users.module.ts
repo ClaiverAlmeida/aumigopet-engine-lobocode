@@ -5,19 +5,12 @@ import { UserRepository } from './repositories/user.repository';
 import { UserValidator } from './validators/user.validator';
 import { UserFactory } from './factories/user.factory';
 import { CompaniesModule } from 'src/modules/companies/companies.module';
-import { PostsModule } from '../posts/posts.module';
 
-//  Novos services específicos
-
+//  Services específicos
 import {
   UserPermissionService,
   SystemAdminService,
   AdminService,
-  HRService,
-  SupervisorService,
-  GuardService,
-  PostSupervisorService,
-  PostResidentService,
   UserQueryService,
 } from './services';
 
@@ -30,16 +23,17 @@ import {
     UserQueryService,
     UserPermissionService,
     UserFactory,
-
-    //  Novos services específicos
     SystemAdminService,
     AdminService,
-    HRService,
-    SupervisorService,
-    GuardService,
-    PostSupervisorService,
-    PostResidentService,
   ],
-  imports: [CompaniesModule, PostsModule],
+  imports: [CompaniesModule],
+  exports: [
+    UsersService,
+    UserRepository,
+    UserValidator,
+    UserQueryService,
+    UserPermissionService,
+    UserFactory,
+  ],
 })
 export class UsersModule {}

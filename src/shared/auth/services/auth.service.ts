@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from '../dto';
-import { IAuthResponse } from '../interfaces';
+import { LoginDto, RegisterDto } from '../dto';
+import { IAuthResponse, IRegisterResponse } from '../interfaces';
 import { RefreshTokenService } from './refresh-token.service';
 import { AuditService } from './audit.service';
 import { LoginService } from './login.service';
@@ -20,6 +20,10 @@ export class AuthService {
 
   async login(loginDto: LoginDto, request?: Request): Promise<IAuthResponse> {
     return this.loginService.login(loginDto, request);
+  }
+
+  async register(registerDto: RegisterDto, request?: Request): Promise<IRegisterResponse> {
+    return this.loginService.register(registerDto, request);
   }
 
   /**

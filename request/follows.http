@@ -1,0 +1,149 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE FOLLOWS (SEGUIR USUÁRIOS)
+### Sistema: AUMIGOPET Engine
+### Módulo: Follows
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@followId = 
+@followerId = 
+@followingId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. SEGUIR USUÁRIOS (CREATE)
+### =============================================================================
+
+### 2.1 Seguir um usuário
+# @name followUser
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "followerId": "{{followerId}}",
+  "followingId": "{{followingId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR SEGUIDORES/SEGUINDO (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os follows
+GET {{baseUrl}}/follows
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar follow por ID
+GET {{baseUrl}}/follows/{{followId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar quem um usuário está seguindo
+GET {{baseUrl}}/follows?followerId={{followerId}}
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar seguidores de um usuário
+GET {{baseUrl}}/follows?followingId={{followingId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Verificar se usuário A segue usuário B
+GET {{baseUrl}}/follows?followerId={{followerId}}&followingId={{followingId}}
+Authorization: Bearer {{token}}
+
+### 3.6 Contar quantos um usuário segue
+GET {{baseUrl}}/follows?followerId={{followerId}}&count=true
+Authorization: Bearer {{token}}
+
+### 3.7 Contar quantos seguidores um usuário tem
+GET {{baseUrl}}/follows?followingId={{followingId}}&count=true
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar follows com paginação
+GET {{baseUrl}}/follows?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. DEIXAR DE SEGUIR (DELETE / UNFOLLOW)
+### =============================================================================
+
+### 4.1 Deixar de seguir um usuário
+DELETE {{baseUrl}}/follows/{{followId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 5. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 5.1 Seguir sem autenticação (401)
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+
+{
+  "followerId": "{{followerId}}",
+  "followingId": "{{followingId}}"
+}
+
+### 5.2 Seguir sem followingId (400)
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "followerId": "{{followerId}}"
+}
+
+### 5.3 Seguir usuário inexistente (404)
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "followerId": "{{followerId}}",
+  "followingId": "id-usuario-inexistente"
+}
+
+### 5.4 Tentar seguir a si mesmo (400)
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "followerId": "{{followerId}}",
+  "followingId": "{{followerId}}"
+}
+
+### 5.5 Seguir o mesmo usuário duas vezes (409 - Conflict)
+POST {{baseUrl}}/follows
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "followerId": "{{followerId}}",
+  "followingId": "{{followingId}}"
+}
+
+### 5.6 Buscar follow inexistente (404)
+GET {{baseUrl}}/follows/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - FOLLOWS
+### =============================================================================
+

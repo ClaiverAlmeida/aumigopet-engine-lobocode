@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Deploy Backend Apenas - INFRASEG"
+echo "🚀 Deploy Backend Apenas - AUMIGOPET"
 
 # Verificar se está no diretório correto
 if [ ! -f "docker/docker-compose.prod.yml" ]; then
@@ -21,7 +21,7 @@ fi
 # Verificar se infraestrutura está rodando
 echo "🔍 Verificando infraestrutura..."
 
-if ! docker ps | grep -q "infraseg-db"; then
+if ! docker ps | grep -q "aumigopet-db"; then
     echo "⚠️ Database não está rodando. Execute: ./scripts/start-database.sh"
     exit 1
 fi
@@ -45,11 +45,11 @@ docker compose -f docker/docker-compose.prod.yml ps backend
 # Testar health check
 echo "🏥 Testando health check..."
 sleep 5
-curl -k -f https://appinfraseg.com.br/api/health && echo "✅ Backend OK" || echo "❌ Backend falhou"
+curl -k -f https://appaumigopet.com.br/api/health && echo "✅ Backend OK" || echo "❌ Backend falhou"
 
 echo ""
 echo "✅ Deploy do backend concluído!"
-echo "🌐 API disponível em: https://appinfraseg.com.br/api/"
+echo "🌐 API disponível em: https://appaumigopet.com.br/api/"
 echo ""
 echo "📋 Comandos úteis:"
 echo "  - Logs: docker compose -f docker/docker-compose.prod.yml logs -f backend"

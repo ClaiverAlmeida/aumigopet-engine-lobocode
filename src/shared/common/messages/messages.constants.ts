@@ -1,5 +1,5 @@
 // ============================================================================
-// MENSAGENS CENTRALIZADAS - SISTEMA INFRASEG
+// MENSAGENS CENTRALIZADAS - SISTEMA AUMIGOPET
 // ============================================================================
 
 // ============================================================================
@@ -100,10 +100,13 @@ export const ERROR_MESSAGES = {
     ALREADY_EXISTS: 'Recurso já existe',
     DELETED: 'Recurso foi deletado',
     INACTIVE: 'Recurso está inativo',
-    USER_NOT_FOUND: 'Usuário não encontrado',
-    COMPANY_NOT_FOUND: 'Empresa não encontrada',
-    POST_NOT_FOUND: 'Posto não encontrado',
     REQUIRED_FIELD: 'Campo obrigatório',
+  },
+
+  NOT_FOUND: {
+    USER: 'Usuário não encontrado',
+    COMPANY: 'Empresa não encontrada',
+    PET: 'Pet não encontrado',
   },
 
   // Erros de validação
@@ -144,6 +147,25 @@ export const SUCCESS_MESSAGES = {
     RESTORED: 'Recurso restaurado com sucesso',
     LISTED: 'Recursos listados com sucesso',
     FOUND: 'Recurso encontrado com sucesso',
+  },
+
+  // Operações por entidade
+  CREATE: {
+    USER: 'Usuário criado com sucesso',
+    COMPANY: 'Empresa criada com sucesso',
+    PET: 'Pet cadastrado com sucesso',
+  },
+
+  UPDATE: {
+    USER: 'Usuário atualizado com sucesso',
+    COMPANY: 'Empresa atualizada com sucesso',
+    PET: 'Pet atualizado com sucesso',
+  },
+
+  DELETE: {
+    USER: 'Usuário deletado com sucesso',
+    COMPANY: 'Empresa deletada com sucesso',
+    PET: 'Pet deletado com sucesso',
   },
 
   // Operações específicas
@@ -214,7 +236,7 @@ export const LOG_MESSAGES = {
 export const NOTIFICATION_MESSAGES = {
   // Notificações de usuário
   USER: {
-    WELCOME: 'Bem-vindo ao Infraseg!',
+    WELCOME: 'Bem-vindo ao AuMigoPet!',
     ACCOUNT_CREATED: 'Conta criada com sucesso',
     PROFILE_UPDATED: 'Perfil atualizado',
     PASSWORD_RESET: 'Redefinição de senha solicitada',

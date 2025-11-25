@@ -1,4 +1,4 @@
-# 🛠️ Guia de Desenvolvimento - INFRASEG
+# 🛠️ Guia de Desenvolvimento - AUMIGOPET
 
 Este documento contém todas as informações para desenvolvimento local com ferramentas extras.
 
@@ -141,7 +141,7 @@ ports:
 ## 🗂️ Estrutura de Arquivos
 
 ```
-infraseg-engine/
+aumigopet-engine/
 ├── prisma/
 │   ├── schema.prisma          # Schema atual (alterna entre dev/prod)
 │   ├── schema.dev.prisma      # Schema de desenvolvimento (com ERD)

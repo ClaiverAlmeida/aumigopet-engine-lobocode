@@ -3,7 +3,7 @@ import { CaslAbilityService } from './casl-ability/casl-ability.service';
 import { AppAbility } from './casl-ability/casl-ability.service';
 import { ForbiddenError } from '../common/errors';
 import { ERROR_MESSAGES } from '../common/messages';
-import { Roles } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import { EntityNameCasl } from '../universal/types';
 
 export type CrudAction = 'create' | 'read' | 'update' | 'delete';
@@ -86,7 +86,7 @@ export class CaslService {
   validarPermissaoDeRole(
     action: CrudAction,
     entity: EntityNameCasl,
-    targetRole: Roles,
+    targetRole: UserRole,
   ): boolean {
     const ability = this.abilityService.ability;
 

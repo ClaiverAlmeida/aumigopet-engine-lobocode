@@ -1,0 +1,254 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE SERVICES
+### Sistema: AUMIGOPET Engine
+### Módulo: Services (Serviços Oferecidos)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@serviceId = 
+@providerId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginProvider.response.body.access_token}}
+# @name loginProvider
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "provider@aumigopet.com",
+  "password": "Provider123@"
+}
+
+
+### =============================================================================
+### 2. CRIAR SERVIÇOS (CREATE)
+### =============================================================================
+
+### 2.1 Criar consulta veterinária
+# @name createVetConsult
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Consulta Veterinária",
+  "description": "Consulta clínica geral com veterinário",
+  "price": 150.00,
+  "duration": 30,
+  "isActive": true,
+  "providerId": "{{providerId}}"
+}
+
+### 2.2 Criar banho e tosa
+# @name createGrooming
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Banho e Tosa Completa",
+  "description": "Inclui banho, tosa higiênica, corte de unhas e limpeza de ouvidos",
+  "price": 80.00,
+  "duration": 90,
+  "isActive": true,
+  "providerId": "{{providerId}}"
+}
+
+### 2.3 Criar vacinação
+# @name createVaccination
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Vacinação V10",
+  "description": "Vacina polivalente V10 para cães",
+  "price": 120.00,
+  "duration": 15,
+  "isActive": true,
+  "providerId": "{{providerId}}"
+}
+
+### 2.4 Criar hospedagem de pets
+# @name createBoarding
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Hospedagem Diária",
+  "description": "Diária de hospedagem com alimentação e recreação",
+  "price": 100.00,
+  "isActive": true,
+  "providerId": "{{providerId}}"
+}
+
+### 2.5 Criar adestramento
+# @name createTraining
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Aula de Adestramento",
+  "description": "Aula individual de adestramento com reforço positivo",
+  "price": 200.00,
+  "duration": 60,
+  "isActive": true,
+  "providerId": "{{providerId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR SERVIÇOS (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os serviços
+GET {{baseUrl}}/services
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar serviço por ID
+GET {{baseUrl}}/services/{{serviceId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar serviços com paginação
+GET {{baseUrl}}/services?page=1&limit=50
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar serviços de um prestador
+GET {{baseUrl}}/services?providerId={{providerId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar serviços ativos
+GET {{baseUrl}}/services?isActive=true
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar serviços por faixa de preço
+GET {{baseUrl}}/services?minPrice=50&maxPrice=150
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar serviços por nome (busca parcial)
+GET {{baseUrl}}/services?search=banho
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar serviços ordenados por preço
+GET {{baseUrl}}/services?sortBy=price&sortOrder=asc
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR SERVIÇOS (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar preço do serviço
+PATCH {{baseUrl}}/services/{{serviceId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "price": 160.00
+}
+
+### 4.2 Atualizar descrição
+PATCH {{baseUrl}}/services/{{serviceId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": "Descrição atualizada com mais detalhes sobre o serviço"
+}
+
+### 4.3 Desativar serviço
+PATCH {{baseUrl}}/services/{{serviceId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "isActive": false
+}
+
+### 4.4 Reativar serviço
+PATCH {{baseUrl}}/services/{{serviceId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "isActive": true
+}
+
+### 4.5 Atualizar duração
+PATCH {{baseUrl}}/services/{{serviceId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "duration": 45
+}
+
+### =============================================================================
+### 5. DELETAR SERVIÇOS (DELETE)
+### =============================================================================
+
+### 5.1 Deletar serviço
+DELETE {{baseUrl}}/services/{{serviceId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar serviço sem autenticação (401)
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste sem auth",
+  "price": 100.00,
+  "providerId": "{{providerId}}"
+}
+
+### 6.2 Criar serviço sem nome (400)
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "price": 100.00,
+  "providerId": "{{providerId}}"
+}
+
+### 6.3 Criar serviço sem providerId (400)
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste sem provider",
+  "price": 100.00
+}
+
+### 6.4 Criar serviço com preço inválido (400)
+POST {{baseUrl}}/services
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste preço inválido",
+  "price": "grátis",
+  "providerId": "{{providerId}}"
+}
+
+### 6.5 Buscar serviço inexistente (404)
+GET {{baseUrl}}/services/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - SERVICES
+### =============================================================================
+

@@ -20,12 +20,12 @@ echo -e "\n"
 
 # Teste de container
 echo "4. Status do container:"
-docker ps | grep infraseg-backend
+docker ps | grep aumigopet-backend
 echo -e "\n"
 
 # Teste de logs
 echo "5. Últimas linhas dos logs do backend:"
-docker logs --tail 10 infraseg-backend
+docker logs --tail 10 aumigopet-backend
 echo -e "\n"
 
 echo "✅ Testes concluídos!"

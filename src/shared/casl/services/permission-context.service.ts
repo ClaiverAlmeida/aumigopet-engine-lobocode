@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CaslService } from '../casl.service';
 import { CrudAction } from '../casl.service';
-import { Roles, User } from '@prisma/client';
+import { UserRole, User } from '@prisma/client';
 import { EntityNameCasl } from 'src/shared/universal/types';
 
 export interface PermissionContext {

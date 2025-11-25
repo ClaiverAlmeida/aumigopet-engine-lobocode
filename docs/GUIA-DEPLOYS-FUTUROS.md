@@ -1,4 +1,4 @@
-# 🚀 Guia de Deploys Futuros - Backend INFRASEG
+# 🚀 Guia de Deploys Futuros - Backend AUMIGOPET
 
 ## ✅ Configuração Atual
 
@@ -38,7 +38,7 @@ git pull origin main
 git pull origin main
 
 # 2. Parar backend atual
-docker stop infraseg-backend
+docker stop aumigopet-backend
 
 # 3. Reconstruir e iniciar
 docker compose -f docker-compose.backend.yml up -d --build backend
@@ -63,7 +63,7 @@ docker compose -f docker-compose.backend.yml up -d --build backend
 ### Comandos de Verificação
 ```bash
 # 1. Verificar se o container está rodando
-docker ps | grep infraseg-backend
+docker ps | grep aumigopet-backend
 
 # 2. Verificar se a porta está exposta
 netstat -tlnp | grep :3000
@@ -72,17 +72,17 @@ netstat -tlnp | grep :3000
 curl http://localhost:3000/health
 
 # 4. Verificar logs
-docker logs infraseg-backend
+docker logs aumigopet-backend
 
 # 5. Teste completo
 ./test-connectivity.sh
 ```
 
 ### ✅ Checklist Pós-Deploy
-- [ ] Container está rodando: `docker ps | grep infraseg-backend`
+- [ ] Container está rodando: `docker ps | grep aumigopet-backend`
 - [ ] Porta 3000 está exposta: `0.0.0.0:3000->3000/tcp`
 - [ ] Health check responde: `curl localhost:3000/health`
-- [ ] Logs sem erros: `docker logs infraseg-backend`
+- [ ] Logs sem erros: `docker logs aumigopet-backend`
 - [ ] Acesso externo funciona: `curl http://31.97.166.94:3000/health`
 
 ## 🚨 Cenários Especiais
@@ -113,14 +113,14 @@ docker compose -f docker-compose.backend.yml up -d backend
 ### 🛠️ Se Houver Problemas
 ```bash
 # 1. Verificar logs
-docker logs infraseg-backend
+docker logs aumigopet-backend
 
 # 2. Verificar status
-docker ps -a | grep infraseg-backend
+docker ps -a | grep aumigopet-backend
 
 # 3. Reiniciar forçadamente
-docker stop infraseg-backend
-docker rm infraseg-backend
+docker stop aumigopet-backend
+docker rm aumigopet-backend
 docker compose -f docker-compose.backend.yml up -d backend
 
 # 4. Testar conectividade
@@ -166,7 +166,7 @@ curl http://31.97.166.94:3000/health
 
 Se algo der errado:
 1. Execute `./test-connectivity.sh`
-2. Verifique os logs: `docker logs infraseg-backend`
+2. Verifique os logs: `docker logs aumigopet-backend`
 3. Consulte o arquivo `SOLUCAO-PROBLEMA-PORTA-3000.md`
 
 ---

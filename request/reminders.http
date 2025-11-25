@@ -1,0 +1,222 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE REMINDERS (LEMBRETES)
+### Sistema: AUMIGOPET Engine
+### Módulo: Reminders
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@reminderId = 
+@petId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. CRIAR LEMBRETES (CREATE)
+### =============================================================================
+
+### 2.1 Criar lembrete de vacina
+# @name createVaccineReminder
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "title": "Vacina V10",
+  "description": "Reforço anual da vacina V10",
+  "date": "2025-11-15T00:00:00.000Z",
+  "time": "14:00",
+  "status": "PENDING",
+  "notes": "Levar carteirinha de vacinação",
+  "petId": "{{petId}}"
+}
+
+### 2.2 Criar lembrete de medicação
+# @name createMedicationReminder
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "MEDICATION",
+  "title": "Antibiótico Amoxicilina",
+  "description": "Tratamento de infecção",
+  "date": "2025-10-29T00:00:00.000Z",
+  "time": "08:00",
+  "status": "PENDING",
+  "medicationDays": 7,
+  "currentDay": 1,
+  "dosage": "250mg",
+  "frequency": "8/8h",
+  "notes": "Administrar com comida",
+  "petId": "{{petId}}"
+}
+
+### 2.3 Criar lembrete de consulta veterinária
+# @name createVetReminder
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VETERINARY",
+  "title": "Consulta de Rotina",
+  "description": "Check-up anual",
+  "date": "2025-12-01T00:00:00.000Z",
+  "time": "10:30",
+  "status": "PENDING",
+  "notes": "Dr. João - Clínica VetCenter",
+  "petId": "{{petId}}"
+}
+
+### 2.4 Criar lembrete de banho e tosa
+# @name createGroomingReminder
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "GROOMING",
+  "title": "Banho e Tosa",
+  "description": "Banho mensal",
+  "date": "2025-11-05T00:00:00.000Z",
+  "time": "15:00",
+  "petId": "{{petId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR LEMBRETES (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os lembretes
+GET {{baseUrl}}/reminders
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar lembrete por ID
+GET {{baseUrl}}/reminders/{{reminderId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar lembretes com paginação
+GET {{baseUrl}}/reminders?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar lembretes por tipo
+GET {{baseUrl}}/reminders?type=MEDICATION
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar lembretes por status
+GET {{baseUrl}}/reminders?status=PENDING
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar lembretes por pet
+GET {{baseUrl}}/reminders?petId={{petId}}
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar lembretes pendentes de hoje
+GET {{baseUrl}}/reminders?status=PENDING&date=2025-10-29
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR LEMBRETES (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar status do lembrete para concluído
+PATCH {{baseUrl}}/reminders/{{reminderId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "COMPLETED"
+}
+
+### 4.2 Atualizar data e hora do lembrete
+PATCH {{baseUrl}}/reminders/{{reminderId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "date": "2025-11-20T00:00:00.000Z",
+  "time": "16:00"
+}
+
+### 4.3 Atualizar dia atual da medicação
+PATCH {{baseUrl}}/reminders/{{reminderId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "currentDay": 3,
+  "notes": "Paciente respondendo bem ao tratamento"
+}
+
+### =============================================================================
+### 5. DELETAR LEMBRETES (DELETE)
+### =============================================================================
+
+### 5.1 Deletar lembrete
+DELETE {{baseUrl}}/reminders/{{reminderId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar lembrete sem autenticação (401)
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+
+{
+  "type": "VACCINE",
+  "title": "Teste sem auth",
+  "date": "2025-11-15T00:00:00.000Z",
+  "time": "14:00",
+  "petId": "{{petId}}"
+}
+
+### 6.2 Criar lembrete com tipo inválido (400)
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "INVALID_TYPE",
+  "title": "Teste tipo inválido",
+  "date": "2025-11-15T00:00:00.000Z",
+  "time": "14:00",
+  "petId": "{{petId}}"
+}
+
+### 6.3 Criar lembrete sem campos obrigatórios (400)
+POST {{baseUrl}}/reminders
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE"
+}
+
+### 6.4 Buscar lembrete inexistente (404)
+GET {{baseUrl}}/reminders/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - REMINDERS
+### =============================================================================
+

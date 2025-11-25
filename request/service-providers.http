@@ -1,0 +1,268 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE SERVICE PROVIDERS
+### Sistema: AUMIGOPET Engine
+### Módulo: Service Providers (Prestadores de Serviço)
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@providerId = 
+@ownerId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginProvider.response.body.access_token}}
+# @name loginProvider
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "provider@aumigopet.com",
+  "password": "Provider123@"
+}
+
+
+### =============================================================================
+### 2. CRIAR PRESTADORES (CREATE)
+### =============================================================================
+
+### 2.1 Criar clínica veterinária
+# @name createVetClinic
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Clínica VetCenter",
+  "category": "VETERINARY",
+  "description": "Clínica veterinária completa com atendimento 24h",
+  "logo": "https://example.com/vetcenter-logo.jpg",
+  "phone": "(11) 3333-4444",
+  "email": "contato@vetcenter.com",
+  "website": "https://vetcenter.com",
+  "address": "Rua das Flores, 123",
+  "city": "São Paulo",
+  "state": "SP",
+  "zipCode": "01234-567",
+  "latitude": -23.5505,
+  "longitude": -46.6333,
+  "status": "APPROVED",
+  "openingHours": {
+    "monday": "08:00-20:00",
+    "tuesday": "08:00-20:00",
+    "wednesday": "08:00-20:00",
+    "thursday": "08:00-20:00",
+    "friday": "08:00-20:00",
+    "saturday": "08:00-14:00",
+    "sunday": "FECHADO"
+  },
+  "ownerId": "{{ownerId}}"
+}
+
+### 2.2 Criar pet shop
+# @name createPetShop
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "PetShop Premium",
+  "category": "PET_SHOP",
+  "description": "Pet shop com produtos premium e banho e tosa",
+  "phone": "(11) 4444-5555",
+  "email": "contato@petshoppremium.com",
+  "address": "Av. Principal, 456",
+  "city": "São Paulo",
+  "state": "SP",
+  "zipCode": "01234-890",
+  "latitude": -23.5615,
+  "longitude": -46.6565,
+  "status": "PENDING",
+  "ownerId": "{{ownerId}}"
+}
+
+### 2.3 Criar hotel para pets
+# @name createPetHotel
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Hotel Canino 5 Estrelas",
+  "category": "PET_HOTEL",
+  "description": "Hotel para cães com suítes e recreação",
+  "phone": "(11) 5555-6666",
+  "email": "reservas@hotelcanino.com",
+  "website": "https://hotelcanino.com",
+  "address": "Estrada Rural, KM 10",
+  "city": "Cotia",
+  "state": "SP",
+  "zipCode": "06700-000",
+  "status": "APPROVED",
+  "ownerId": "{{ownerId}}"
+}
+
+### 2.4 Criar adestrador
+# @name createTrainer
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Adestramento Positivo",
+  "category": "TRAINING",
+  "description": "Adestramento com reforço positivo e comportamentalismo canino",
+  "phone": "(11) 6666-7777",
+  "email": "contato@adestramento.com",
+  "city": "São Paulo",
+  "state": "SP",
+  "status": "APPROVED",
+  "ownerId": "{{ownerId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR PRESTADORES (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os prestadores
+GET {{baseUrl}}/service-providers
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar prestador por ID
+GET {{baseUrl}}/service-providers/{{providerId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar prestadores com paginação
+GET {{baseUrl}}/service-providers?page=1&limit=20
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar prestadores por categoria
+GET {{baseUrl}}/service-providers?category=VETERINARY
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar prestadores por status
+GET {{baseUrl}}/service-providers?status=APPROVED
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar prestadores por cidade
+GET {{baseUrl}}/service-providers?city=São Paulo
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar prestadores por estado
+GET {{baseUrl}}/service-providers?state=SP
+Authorization: Bearer {{token}}
+
+### 3.8 Buscar prestadores próximos (por coordenadas)
+GET {{baseUrl}}/service-providers?latitude=-23.5505&longitude=-46.6333&radius=5
+Authorization: Bearer {{token}}
+
+### 3.9 Buscar prestadores por owner
+GET {{baseUrl}}/service-providers?ownerId={{ownerId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR PRESTADORES (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar informações básicas
+PATCH {{baseUrl}}/service-providers/{{providerId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "description": "Descrição atualizada do prestador",
+  "phone": "(11) 9999-8888"
+}
+
+### 4.2 Aprovar prestador
+PATCH {{baseUrl}}/service-providers/{{providerId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "APPROVED"
+}
+
+### 4.3 Suspender prestador
+PATCH {{baseUrl}}/service-providers/{{providerId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "SUSPENDED"
+}
+
+### 4.4 Atualizar horário de funcionamento
+PATCH {{baseUrl}}/service-providers/{{providerId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "openingHours": {
+    "monday": "09:00-18:00",
+    "tuesday": "09:00-18:00",
+    "wednesday": "09:00-18:00",
+    "thursday": "09:00-18:00",
+    "friday": "09:00-18:00",
+    "saturday": "09:00-12:00",
+    "sunday": "FECHADO"
+  }
+}
+
+### =============================================================================
+### 5. DELETAR PRESTADORES (DELETE)
+### =============================================================================
+
+### 5.1 Deletar prestador
+DELETE {{baseUrl}}/service-providers/{{providerId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar prestador sem autenticação (401)
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+
+{
+  "name": "Teste sem auth",
+  "category": "VETERINARY",
+  "ownerId": "{{ownerId}}"
+}
+
+### 6.2 Criar prestador sem categoria (400)
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste sem categoria",
+  "ownerId": "{{ownerId}}"
+}
+
+### 6.3 Criar prestador com categoria inválida (400)
+POST {{baseUrl}}/service-providers
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "Teste categoria inválida",
+  "category": "INVALID_CATEGORY",
+  "ownerId": "{{ownerId}}"
+}
+
+### 6.4 Buscar prestador inexistente (404)
+GET {{baseUrl}}/service-providers/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - SERVICE PROVIDERS
+### =============================================================================
+

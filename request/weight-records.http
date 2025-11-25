@@ -1,0 +1,201 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE WEIGHT RECORDS (HISTÓRICO DE PESO)
+### Sistema: AUMIGOPET Engine
+### Módulo: Weight Records
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@weightRecordId = 
+@petId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+
+### =============================================================================
+### 2. CRIAR REGISTROS DE PESO (CREATE)
+### =============================================================================
+
+### 2.1 Criar primeiro registro de peso
+# @name createFirstWeight
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 8.5,
+  "date": "2025-01-15T00:00:00.000Z",
+  "status": "NORMAL",
+  "notes": "Peso inicial - adoção",
+  "petId": "{{petId}}"
+}
+
+### 2.2 Criar registro de peso abaixo do ideal
+# @name createUnderweight
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 6.2,
+  "date": "2025-03-10T00:00:00.000Z",
+  "status": "UNDERWEIGHT",
+  "notes": "Pet recusando ração. Veterinário recomendou mudança de alimentação.",
+  "petId": "{{petId}}"
+}
+
+### 2.3 Criar registro de peso acima do ideal
+# @name createOverweight
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 12.8,
+  "date": "2025-06-20T00:00:00.000Z",
+  "status": "OVERWEIGHT",
+  "notes": "Iniciando dieta e exercícios",
+  "petId": "{{petId}}"
+}
+
+### 2.4 Criar registro de peso atual
+# @name createCurrentWeight
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 9.3,
+  "notes": "Peso estável após dieta",
+  "petId": "{{petId}}"
+}
+
+### =============================================================================
+### 3. BUSCAR REGISTROS DE PESO (READ)
+### =============================================================================
+
+### 3.1 Buscar todos os registros
+GET {{baseUrl}}/weight-records
+Authorization: Bearer {{token}}
+
+### 3.2 Buscar registro por ID
+GET {{baseUrl}}/weight-records/{{weightRecordId}}
+Authorization: Bearer {{token}}
+
+### 3.3 Buscar registros com paginação
+GET {{baseUrl}}/weight-records?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### 3.4 Buscar registros por pet
+GET {{baseUrl}}/weight-records?petId={{petId}}
+Authorization: Bearer {{token}}
+
+### 3.5 Buscar registros por status
+GET {{baseUrl}}/weight-records?status=NORMAL
+Authorization: Bearer {{token}}
+
+### 3.6 Buscar registros ordenados por data (mais recentes primeiro)
+GET {{baseUrl}}/weight-records?petId={{petId}}&sortBy=date&sortOrder=desc
+Authorization: Bearer {{token}}
+
+### 3.7 Buscar registros em um período
+GET {{baseUrl}}/weight-records?petId={{petId}}&startDate=2025-01-01&endDate=2025-12-31
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 4. ATUALIZAR REGISTROS (UPDATE)
+### =============================================================================
+
+### 4.1 Atualizar notas do registro
+PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "notes": "Atualizado: Pet está respondendo bem à dieta"
+}
+
+### 4.2 Corrigir peso registrado
+PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": 9.5,
+  "notes": "Correção de peso - balança estava descalibrada"
+}
+
+### 4.3 Atualizar status
+PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "NORMAL"
+}
+
+### =============================================================================
+### 5. DELETAR REGISTROS (DELETE)
+### =============================================================================
+
+### 5.1 Deletar registro de peso
+DELETE {{baseUrl}}/weight-records/{{weightRecordId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 6.1 Criar registro sem autenticação (401)
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+
+{
+  "weight": 10.0,
+  "petId": "{{petId}}"
+}
+
+### 6.2 Criar registro com peso inválido (400)
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "weight": "dez quilos",
+  "petId": "{{petId}}"
+}
+
+### 6.3 Criar registro sem peso (400)
+POST {{baseUrl}}/weight-records
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "notes": "Sem peso",
+  "petId": "{{petId}}"
+}
+
+### 6.4 Buscar registro inexistente (404)
+GET {{baseUrl}}/weight-records/id-inexistente
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - WEIGHT RECORDS
+### =============================================================================
+

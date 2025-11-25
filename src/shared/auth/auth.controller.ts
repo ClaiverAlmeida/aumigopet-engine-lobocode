@@ -15,6 +15,7 @@ import {
   ForgotPasswordDto,
   ValidateResetTokenDto,
   ResetPasswordDto,
+  RegisterDto,
 } from './dto';
 import { AuthService } from './services';
 import { AuthGuard, RefreshGuard, RateLimitGuard } from './guards';
@@ -39,6 +40,13 @@ export class AuthController {
   @UseGuards(RateLimitGuard)
   async login(@Body() loginDto: LoginDto, @Req() request: Request) {
     return this.authService.login(loginDto, request);
+  }
+
+  @Post('register')
+  @Public()
+  @UseGuards(RateLimitGuard)
+  async register(@Body() registerDto: RegisterDto, @Req() request: Request) {
+    return this.authService.register(registerDto, request);
   }
 
   @Post('refresh')
@@ -67,7 +75,7 @@ export class AuthController {
     const userId = request.user?.id;
     if (!userId) {
       throw new UnauthorizedError(
-        this.messagesService.getErrorMessage('AUTH', 'USER_NOT_FOUND')
+        this.messagesService.getErrorMessage('AUTH', 'USER_NOT_FOUND'),
       );
     }
     return this.authService.logoutAll(userId, request);
@@ -83,7 +91,10 @@ export class AuthController {
   ): Promise<{ message: string }> {
     await this.passwordResetService.requestPasswordReset(dto);
     return {
-      message: this.messagesService.getSuccessMessage('OPERATIONS', 'EMAIL_SENT'),
+      message: this.messagesService.getSuccessMessage(
+        'OPERATIONS',
+        'EMAIL_SENT',
+      ),
     };
   }
 
@@ -108,8 +119,11 @@ export class AuthController {
     @Body() dto: ResetPasswordDto,
   ): Promise<{ message: string }> {
     await this.passwordResetService.resetPassword(dto);
-    return { 
-      message: this.messagesService.getSuccessMessage('OPERATIONS', 'PASSWORD_CHANGED')
+    return {
+      message: this.messagesService.getSuccessMessage(
+        'OPERATIONS',
+        'PASSWORD_CHANGED',
+      ),
     };
   }
 

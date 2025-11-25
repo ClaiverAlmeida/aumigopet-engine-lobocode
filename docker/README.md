@@ -57,10 +57,10 @@ docker compose -f docker/docker-compose.yml stop minio
 ### **Build de desenvolvimento**
 ```bash
 # Build da imagem de desenvolvimento
-docker build -f docker/Dockerfile.dev -t infraseg-backend:dev .
+docker build -f docker/Dockerfile.dev -t aumigopet-backend:dev .
 
 # Build da imagem de produção
-docker build -f docker/Dockerfile.prod -t infraseg-backend:prod .
+docker build -f docker/Dockerfile.prod -t aumigopet-backend:prod .
 ```
 
 ### **Build com compose**
@@ -115,10 +115,10 @@ docker system prune -a
 ### **Backup e Restore**
 ```bash
 # Backup do banco
-docker exec infraseg-postgres pg_dump -U postgres infraseg > backup.sql
+docker exec aumigopet-postgres pg_dump -U postgres aumigopet > backup.sql
 
 # Restore do banco
-docker exec -i infraseg-postgres psql -U postgres infraseg < backup.sql
+docker exec -i aumigopet-postgres psql -U postgres aumigopet < backup.sql
 ```
 
 ## 🌐 Acessos
@@ -144,7 +144,7 @@ curl http://localhost:9000/minio/health/live
 ### **Build para produção**
 ```bash
 # Build da imagem de produção
-docker build -f docker/Dockerfile.prod -t infraseg-backend:latest .
+docker build -f docker/Dockerfile.prod -t aumigopet-backend:latest .
 
 # Deploy com compose de produção
 docker-compose -f docker/docker-compose.prod.yml up -d

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CaslAbilityService } from '../../../shared/casl/casl-ability/casl-ability.service';
 import { TenantService } from '../../../shared/tenant/tenant.service';
 import { accessibleBy } from '@casl/prisma';
-import { Prisma, Roles } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { ForbiddenError } from 'src/shared/common/errors';
 import { ERROR_MESSAGES } from 'src/shared/common/messages';
 import { CrudAction } from '../../../shared/common/types';

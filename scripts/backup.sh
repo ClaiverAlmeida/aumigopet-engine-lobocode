@@ -2,7 +2,7 @@
 
 # Script de backup simples para VPS
 BACKUP_DIR="/home/claiver/projetos/ifraseg-engine/backups"
-DB_NAME="infraseg-engine"
+DB_NAME="aumigopet-engine"
 DB_USER="super_admin"
 RETENTION_DAYS=7
 

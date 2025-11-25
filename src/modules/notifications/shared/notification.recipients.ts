@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { RecipientType, RecipientRule } from './notification.types';
+import { UserRole } from '@prisma/client';
 
 /**
  * 👥 SISTEMA DE DESTINATÁRIOS DE NOTIFICAÇÃO FLEXÍVEL
@@ -108,13 +109,13 @@ export class NotificationRecipientsService {
   }
 
   /**
-   * 👨‍💼 APENAS SUPERVISORES
+   * 👨‍💼 APENAS ADMINS
    */
   private async getSupervisorsOnly(companyId: string): Promise<string[]> {
     const users = await this.prisma.user.findMany({
       where: {
         companyId,
-        role: 'SUPERVISOR',
+        role: UserRole.ADMIN,
         status: 'ACTIVE',
         deletedAt: null,
       },
@@ -124,13 +125,13 @@ export class NotificationRecipientsService {
   }
 
   /**
-   * 👑👨‍💼 ADMINISTRADORES E SUPERVISORES
+   * 👑 ADMINISTRADORES
    */
   private async getAdminsAndSupervisors(companyId: string): Promise<string[]> {
     const users = await this.prisma.user.findMany({
       where: {
         companyId,
-        role: { in: ['ADMIN', 'SUPERVISOR'] },
+        role: UserRole.ADMIN,
         status: 'ACTIVE',
         deletedAt: null,
       },
@@ -140,23 +141,11 @@ export class NotificationRecipientsService {
   }
 
   /**
-   * 🔄 SUPERVISORES EM TURNO ATIVO
+   * 🔄 ADMINS ATIVOS (substituindo supervisores em turno)
    */
   private async getActiveSupervisors(companyId: string): Promise<string[]> {
-    const activeShifts = await this.prisma.shift.findMany({
-      where: {
-        user: {
-          companyId,
-          role: 'SUPERVISOR',
-          status: 'ACTIVE',
-          deletedAt: null,
-        },
-        status: { not: 'COMPLETED' },
-        endTime: null,
-      },
-      select: { userId: true },
-    });
-    return activeShifts.map((shift) => shift.userId);
+    // Como não temos mais turnos, retornamos apenas admins ativos
+    return this.getAdminsOnly(companyId);
   }
 
   /**
@@ -187,30 +176,17 @@ export class NotificationRecipientsService {
   }
 
   /**
-   * 👔 APENAS RH
+   * 👑 APENAS ADMINS (substituindo RH)
    */
   private async getHROnly(companyId: string): Promise<string[]> {
-    const users = await this.prisma.user.findMany({
-      where: {
-        companyId,
-        role: 'HR',
-        status: 'ACTIVE',
-        deletedAt: null,
-      },
-      select: { id: true },
-    });
-    return users.map((user) => user.id);
+    return this.getAdminsOnly(companyId);
   }
 
   /**
-   * 👔👑 RH + ADMINISTRADORES
+   * 👑 ADMINISTRADORES (substituindo RH + Admins)
    */
   private async getHRAndAdmins(companyId: string): Promise<string[]> {
-    const [hr, admins] = await Promise.all([
-      this.getHROnly(companyId),
-      this.getAdminsOnly(companyId),
-    ]);
-    return Array.from(new Set([...hr, ...admins]));
+    return this.getAdminsOnly(companyId);
   }
 
   /**

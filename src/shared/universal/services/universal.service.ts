@@ -6,7 +6,7 @@ import { UniversalQueryService } from './query.service';
 import { UniversalRepository } from '../repositories/universal.repository';
 import { UniversalPermissionService } from './permission.service';
 import { UniversalMetricsService } from './metrics.service';
-import { Roles } from '@prisma/client';
+import { UserRole } from '@prisma/client';
 import {
   EntityNameCasl,
   EntityNameModel,
@@ -263,7 +263,7 @@ export abstract class UniversalService<DtoCreate, DtoUpdate> {
   /**
    * Cria nova entidade
    */
-  async criar(data: DtoCreate, include?: any, role?: Roles) {
+  async criar(data: DtoCreate, include?: any, role?: UserRole) {
     const startTime = Date.now();
     const user = this.request?.user;
 

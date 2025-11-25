@@ -4,11 +4,10 @@ import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service';
 import { UserPermissionService } from './user-permission.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { Prisma, Roles } from '@prisma/client';
+import { Prisma, UserRole } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 import { NotFoundError } from '../../../shared/common/errors';
 import { SUCCESS_MESSAGES } from '../../../shared/common/messages';
-import { CreateOthersDto } from '../dto/create-others.dto';
 import bcrypt from 'bcrypt';
 
 @Injectable()
@@ -18,7 +17,7 @@ export class BaseUserService {
     protected readonly userValidator: UserValidator,
     protected readonly userQueryService: UserQueryService,
     protected readonly userPermissionService: UserPermissionService,
-    protected targetRole?: Roles,
+    protected targetRole?: UserRole,
   ) {}
 
   // ============================================================================
@@ -104,17 +103,11 @@ export class BaseUserService {
 
     this.validarResultadoDaBusca(user, 'User', 'id', id);
 
-    // Prepara dados para atualização (sem permissões)
-    const { permissions, ...userData } = updateUserDto;
-    const updateData = this.prepararDadosParaUpdate(userData);
+    // Prepara dados para atualização
+    const updateData = this.prepararDadosParaUpdate(updateUserDto);
 
     // Atualiza o usuário
     const updatedUser = await this.userRepository.atualizar({ id }, updateData);
-
-    // Atualiza permissões se fornecidas
-    if (permissions !== undefined) {
-      await this.userRepository.atualizarPermissoesDoUsuario(id, permissions);
-    }
 
     return updatedUser;
   }
@@ -319,7 +312,7 @@ export class BaseUserService {
   /**
    * Transforma os dados dos usuários para o formato esperado pelo frontend
    */
-  private transformData(users: any[]): any[] {
+  protected transformData(users: any[]): any[] {
     return users.map((user) => ({
       ...user,
       permissions:

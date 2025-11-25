@@ -1,6 +1,6 @@
 # 📁 Módulo de Armazenamento de Arquivos (Simplificado)
 
-Sistema simples de armazenamento de arquivos integrado ao backend NestJS do Infraseg Engine, utilizando MinIO como storage.
+Sistema simples de armazenamento de arquivos integrado ao backend NestJS do AuMigoPet Engine, utilizando MinIO como storage.
 
 ## 🏗️ Arquitetura Simplificada
 
@@ -133,7 +133,7 @@ Use o arquivo `request/files.http` para testes completos.
 ## 📁 Estrutura de Pastas no MinIO
 
 ```
-infraseg-files/
+aumigopet-files/
 ├── public/                    # Arquivos públicos
 └── companies/
     └── {companyId}/           # Arquivos por empresa

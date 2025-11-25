@@ -4,17 +4,17 @@
 echo "🔄 Iniciando rebuild do frontend..."
 
 # Navegar para o diretório do frontend
-cd /home/ubuntu/projetos/infraseg-app-lobocode
+cd /home/ubuntu/projetos/aumigopet-app-lobocode
 
 # Rebuild da imagem do frontend
 echo "📦 Fazendo build da nova imagem do frontend..."
-docker build -f Dockerfile.prod -t infraseg-app-lobocode-frontend .
+docker build -f Dockerfile.prod -t aumigopet-app-lobocode-frontend .
 
 if [ $? -eq 0 ]; then
     echo "✅ Build do frontend concluído com sucesso!"
     
     # Voltar para o diretório do engine para restart do sistema
-    cd /home/ubuntu/projetos/infraseg-engine-lobocode
+    cd /home/ubuntu/projetos/aumigopet-engine-lobocode
     
     echo "🔄 Reiniciando containers..."
     

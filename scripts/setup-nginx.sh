@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🔧 Configurando Nginx para INFRASEG..."
+echo "🔧 Configurando Nginx para AUMIGOPET..."
 
 # Verificar se está no diretório correto
 if [ ! -f "docker/docker-compose.unified.yml" ]; then
@@ -19,7 +19,7 @@ if [ ! -f "nginx/ssl/cert.pem" ]; then
     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
         -keyout nginx/ssl/key.pem \
         -out nginx/ssl/cert.pem \
-        -subj "/C=BR/ST=SP/L=SP/O=INFRASEG/CN=localhost"
+        -subj "/C=BR/ST=SP/L=SP/O=AUMIGOPET/CN=localhost"
     echo "✅ Certificado SSL criado!"
 else
     echo "✅ Certificado SSL já existe"

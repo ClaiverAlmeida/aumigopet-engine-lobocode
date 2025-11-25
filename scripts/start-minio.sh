@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "📁 Iniciando MinIO INFRASEG..."
+echo "📁 Iniciando MinIO AUMIGOPET..."
 
 # Verificar se está no diretório correto
 if [ ! -f "docker/docker-compose.minio.yml" ]; then
