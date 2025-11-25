@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Put,
+  Delete,
   Param,
   Query,
   Request,
@@ -32,7 +33,7 @@ export class NotificationController {
 
     const filters: NotificationFilters = {
       page: page ? parseInt(page) : 1,
-      limit: limit ? parseInt(limit) : 200,
+      limit: limit ? parseInt(limit) : 1000,
       ...(isRead !== undefined && { isRead: isRead === 'true' }),
       ...(entityType && { entityType }),
     };
@@ -78,4 +79,20 @@ export class NotificationController {
 
     return { success: true };
   }
+
+  /**
+   * Deletar notificação
+   * DELETE /notifications/:id
+   */
+  @Delete(':id')
+  async deletarNotificacao(
+    @Param('id') notificationId: string,
+    @Request() req: any,
+  ) {
+    const userId = req.user.id;
+    await this.notificationService.deletarNotificacao(notificationId, userId);
+
+    return { success: true };
+  }
+
 }

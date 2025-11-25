@@ -25,13 +25,77 @@ export class BaseUserService {
   // ============================================================================
 
   /**
-   * Lista todos os usuários com paginação
+   * Lista todos os usuários com paginação e ordenação
    */
-  async buscarTodos(page = 1, limit = 20) {
+  async buscarTodos(page = 1, limit = 20, orderBy = 'name', orderDirection: 'asc' | 'desc' = 'asc') {
     const whereClause = this.userQueryService.construirWhereClauseParaRead();
     const skip = (page - 1) * limit;
+    
+    // Configuração de ordenação
+    const orderByConfig = {
+      [orderBy]: orderDirection
+    };
+    
     const [users, total] = await Promise.all([
-      this.userRepository.buscarMuitos(whereClause, { skip, take: limit }),
+      this.userRepository.buscarMuitos(whereClause, { 
+        skip, 
+        take: limit,
+        orderBy: orderByConfig
+      } as any),
+      this.userRepository.contar(whereClause),
+    ]);
+
+    const { totalPages, hasNextPage, hasPreviousPage } =
+      this.calcularInformacoesDePaginacao(page, limit, total);
+
+    const transformedData = this.transformData(users);
+
+    return {
+      data: transformedData,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages,
+        hasNextPage,
+        hasPreviousPage,
+      },
+    };
+  }
+
+  /**
+   * Busca usuários com filtro de pesquisa
+   */
+  async buscarUsuarios(query: string, page = 1, limit = 20, orderBy = 'name', orderDirection: 'asc' | 'desc' = 'asc') {
+    const baseWhereClause = this.userQueryService.construirWhereClauseParaRead();
+    
+    // Adicionar filtros de pesquisa se query fornecida
+    let whereClause = baseWhereClause;
+    if (query && query.trim()) {
+      const searchTerm = query.trim();
+      whereClause = {
+        ...baseWhereClause,
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { email: { contains: searchTerm, mode: 'insensitive' } },
+          { phone: { contains: searchTerm, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    const skip = (page - 1) * limit;
+    
+    // Configuração de ordenação
+    const orderByConfig = {
+      [orderBy]: orderDirection
+    };
+    
+    const [users, total] = await Promise.all([
+      this.userRepository.buscarMuitos(whereClause, { 
+        skip, 
+        take: limit,
+        orderBy: orderByConfig
+      } as any),
       this.userRepository.contar(whereClause),
     ]);
 

@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import {
   CreateNotificationData,
@@ -144,6 +144,18 @@ export class NotificationService {
    * Marcar notificação como lida
    */
   async marcarComoLida(notificationId: string, userId: string): Promise<void> {
+    // Verificar se a notificação pertence ao usuário
+    const notificationRecipient = await this.prisma.notificationRecipient.findFirst({
+      where: {
+        notificationId,
+        userId,
+      },
+    });
+
+    if (!notificationRecipient) {
+      throw new NotFoundException('Notificação não encontrada ou não pertence ao usuário');
+    }
+
     await this.prisma.notificationRecipient.updateMany({
       where: {
         notificationId,
@@ -168,6 +180,30 @@ export class NotificationService {
       data: {
         isRead: true,
         readAt: new Date(),
+      },
+    });
+  }
+
+  /**
+   * Deletar notificação (apenas para o usuário específico)
+   */
+  async deletarNotificacao(notificationId: string, userId: string): Promise<void> {
+    // Verificar se a notificação pertence ao usuário
+    const notificationRecipient = await this.prisma.notificationRecipient.findFirst({
+      where: {
+        notificationId,
+        userId,
+      },
+    });
+
+    if (!notificationRecipient) {
+      throw new NotFoundException('Notificação não encontrada ou não pertence ao usuário');
+    }
+
+    // Deletar apenas o registro do usuário específico
+    await this.prisma.notificationRecipient.delete({
+      where: {
+        id: notificationRecipient.id,
       },
     });
   }
