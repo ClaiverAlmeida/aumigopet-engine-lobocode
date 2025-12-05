@@ -22,7 +22,7 @@ datasource db {
 // 👥 USUÁRIOS
 // ===============================================
 
-enum UserRole {
+enum Roles {
   USER // Usuário comum do app
   ADMIN // Administrador do sistema
   SYSTEM_ADMIN // Super administrador do sistema
@@ -189,7 +189,7 @@ model User {
   name           String
   email          String     @unique
   password       String
-  role           UserRole   @default(USER)
+  role           Roles   @default(USER)
   status         UserStatus @default(ACTIVE)
   profilePicture String?
   phone          String?
@@ -279,7 +279,6 @@ model Pet {
   @@index([isActive])
   @@index([deletedAt])
 }
-
 // ===============================================
 // 💉 VACINAS E EXAMES
 // ===============================================
@@ -457,9 +456,9 @@ model PostComment {
   @@index([deletedAt])
 }
 
-  // ===============================================
+// ===============================================
 // ❤️ CURTIDAS EM POSTS
-  // ===============================================
+// ===============================================
 
 model PostLike {
   id String @id @default(cuid())
@@ -503,9 +502,9 @@ model Follow {
   @@index([followingId])
 }
 
-  // ===============================================
+// ===============================================
 // 🐕 AMIZADES ENTRE PETS - SOLICITAÇÕES
-  // ===============================================
+// ===============================================
 
 model PetFriendRequest {
   id     String  @id @default(cuid())

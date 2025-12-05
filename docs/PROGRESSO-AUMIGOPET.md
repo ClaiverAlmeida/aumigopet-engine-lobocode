@@ -35,7 +35,7 @@
 
 ### 2.2 Novos Models Criados ✅
 - [x] **User & Company** (adaptados)
-  - `UserRole`: `USER`, `ADMIN`, `SYSTEM_ADMIN`, `SERVICE_PROVIDER`
+  - `Roles`: `USER`, `ADMIN`, `SYSTEM_ADMIN`, `SERVICE_PROVIDER`
   - `UserStatus`: `ACTIVE`, `INACTIVE`, `SUSPENDED`
   
 - [x] **Gestão de Pets**
@@ -84,14 +84,14 @@
 ### 3.2 Services Mantidos e Adaptados ✅
 - [x] `base-user.service.ts`
   - Removido lógica de `permissions`
-  - Adaptado para `UserRole`
+  - Adaptado para `Roles`
   - Método `transformData` alterado para `protected`
 - [x] `admin.service.ts`
   - Estatísticas adaptadas: `totalServiceProviders`, `totalPets`
 - [x] `system-admin.service.ts`
   - Estatísticas globais adaptadas
 - [x] `user-permission.service.ts`
-  - Usa `UserRole` ao invés de `Roles`
+  - Usa `Roles` ao invés de `Roles`
 - [x] `user-query.service.ts`
   - Filtros adaptados para novo schema
 
@@ -99,8 +99,8 @@
 - [x] `base-user.dto.ts`
   - Removido: `login`, `rg`, `registration`, `permissions`
   - Adicionado: `city`, `state`, `zipCode`
-- [x] `create-admin.dto.ts` - usa `UserRole`
-- [x] `create-system-admin.dto.ts` - usa `UserRole`
+- [x] `create-admin.dto.ts` - usa `Roles`
+- [x] `create-system-admin.dto.ts` - usa `Roles`
 - [x] `update-user.dto.ts` - removido `permissions`
 - [x] Removidos DTOs de roles antigas:
   - `create-guard.dto.ts`
@@ -143,7 +143,7 @@
 
 ### 4.1 Auth Services ✅
 - [x] `login.service.ts`
-  - Usa `UserRole` ao invés de `Roles`
+  - Usa `Roles` ao invés de `Roles`
   - Removido `rg` do token payload
   - Removido `userPermissions` do token
 - [x] `token-payload.interface.ts`
@@ -152,28 +152,28 @@
   - Removido `login`, usa apenas `email`
 
 ### 4.2 Decorators e Guards ✅
-- [x] `required-roles.decorator.ts` - usa `UserRole[]`
-- [x] `roles.decorator.ts` - usa `UserRole[]`
-- [x] `role-by-method.decorator.ts` - usa `UserRole[]`
-- [x] `role.guard.ts` - validação com `UserRole`
-- [x] `role-by-method.guard.ts` - validação com `UserRole`
+- [x] `required-roles.decorator.ts` - usa `Roles[]`
+- [x] `roles.decorator.ts` - usa `Roles[]`
+- [x] `role-by-method.decorator.ts` - usa `Roles[]`
+- [x] `role.guard.ts` - validação com `Roles`
+- [x] `role-by-method.guard.ts` - validação com `Roles`
 
 ### 4.3 CASL (Permissões) ✅
 - [x] `casl-ability.service.ts`
   - Substituídas roles antigas por roles válidas
   - Removido tipo `Post`
   - Simplificadas permissões hierárquicas
-- [x] `casl.service.ts` - usa `UserRole`
+- [x] `casl.service.ts` - usa `Roles`
 - [x] `permission-context.service.ts` - adaptado
 
 ### 4.4 Universal Services ✅
-- [x] `universal.service.ts` - usa `UserRole`
-- [x] `universal.controller.ts` - usa `UserRole`
-- [x] `permission.service.ts` - usa `UserRole`
+- [x] `universal.service.ts` - usa `Roles`
+- [x] `universal.controller.ts` - usa `Roles`
+- [x] `permission.service.ts` - usa `Roles`
 
 ### 4.5 Validators ✅
 - [x] `unique-login.validator.ts` - desabilitado (campo removido)
-- [x] `is-expected-role.validator.ts` - usa `UserRole`
+- [x] `is-expected-role.validator.ts` - usa `Roles`
 
 ---
 
@@ -216,7 +216,7 @@
 
 ### 6.1 Correção de Erros ✅
 - [x] **De 80 erros para 0!** 🎉
-- [x] Todos os imports de `Roles` → `UserRole`
+- [x] Todos os imports de `Roles` → `Roles`
 - [x] Todos os models antigos removidos ou desabilitados
 - [x] Schema Prisma validado
 - [x] Prisma Client regenerado

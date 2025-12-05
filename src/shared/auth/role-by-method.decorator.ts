@@ -1,12 +1,12 @@
 import { SetMetadata } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 
 export interface RoleByMethodConfig {
-  GET?: UserRole[];
-  POST?: UserRole[];
-  PATCH?: UserRole[];
-  PUT?: UserRole[];
-  DELETE?: UserRole[];
+  GET?: Roles[];
+  POST?: Roles[];
+  PATCH?: Roles[];
+  PUT?: Roles[];
+  DELETE?: Roles[];
 }
 
 export const ROLE_BY_METHOD_KEY = 'roleByMethod';
@@ -16,10 +16,10 @@ export const ROLE_BY_METHOD_KEY = 'roleByMethod';
  * 
  * @example
  * @RoleByMethod({
- *   GET: [UserRole.ADMIN, UserRole.HR, UserRole.GUARD, UserRole.SUPERVISOR],
- *   POST: [UserRole.ADMIN, UserRole.SUPERVISOR],
- *   PATCH: [UserRole.ADMIN, UserRole.SUPERVISOR],
- *   DELETE: [UserRole.ADMIN]
+ *   GET: [Roles.ADMIN, Roles.HR, Roles.GUARD, Roles.SUPERVISOR],
+ *   POST: [Roles.ADMIN, Roles.SUPERVISOR],
+ *   PATCH: [Roles.ADMIN, Roles.SUPERVISOR],
+ *   DELETE: [Roles.ADMIN]
  * })
  */
 export const RoleByMethod = (config: RoleByMethodConfig) =>

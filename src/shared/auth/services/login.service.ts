@@ -16,7 +16,7 @@ import { UserValidator } from '../../../modules/users/validators/user.validator'
 import { UserQueryService } from '../../../modules/users/services/user-query.service';
 import { UserPermissionService } from '../../../modules/users/services/user-permission.service';
 import { UserFactory } from '../../../modules/users/factories/user.factory';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -130,7 +130,7 @@ export class LoginService {
         name: this.normalizeName(registerDto.name),
         email: registerDto.email.trim().toLowerCase(),
         password: hashedPassword,
-        role: UserRole.USER, // Usuário comum do app
+        role: Roles.USER, // Usuário comum do app
         phone: registerDto.phone || null,
         status: 'ACTIVE' as const,
       };

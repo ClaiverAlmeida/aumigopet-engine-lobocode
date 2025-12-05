@@ -6,7 +6,7 @@ import { EntityNameCasl } from 'src/shared/universal/types';
 
 export interface PermissionAuditLog {
   userId: string;
-  userRole: string;
+  Roles: string;
   action: CrudAction;
   subject: string;
   resourceId?: string;
@@ -69,7 +69,7 @@ export class PermissionAuditService {
   ): void {
     const auditLog: PermissionAuditLog = {
       userId: user.id,
-      userRole: user.role,
+      Roles: user.role,
       action,
       subject,
       resourceId: context?.resourceId,
@@ -90,7 +90,7 @@ export class PermissionAuditService {
         `Acesso negado: ${user.role} (${user.id}) tentou ${action} em ${subject}`,
         {
           userId: user.id,
-          userRole: user.role,
+          Roles: user.role,
           action,
           subject,
           companyId: user.companyId,
@@ -178,7 +178,7 @@ export class PermissionAuditService {
     // Requisições por role
     const requestsByRole: Record<string, number> = {};
     logs.forEach(log => {
-      requestsByRole[log.userRole] = (requestsByRole[log.userRole] || 0) + 1;
+      requestsByRole[log.Roles] = (requestsByRole[log.Roles] || 0) + 1;
     });
 
     // Requisições por empresa
@@ -207,7 +207,7 @@ export class PermissionAuditService {
   obterLogs(
     filtros?: {
       userId?: string;
-      userRole?: string;
+      Roles?: string;
       action?: CrudAction;
       subject?: string;
       success?: boolean;
@@ -224,8 +224,8 @@ export class PermissionAuditService {
       logs = logs.filter(log => log.userId === filtros.userId);
     }
 
-    if (filtros?.userRole) {
-      logs = logs.filter(log => log.userRole === filtros.userRole);
+    if (filtros?.Roles) {
+      logs = logs.filter(log => log.Roles === filtros.Roles);
     }
 
     if (filtros?.action) {
@@ -307,7 +307,7 @@ export class PermissionAuditService {
 
     const headers = [
       'userId',
-      'userRole',
+      'Roles',
       'action',
       'subject',
       'resourceId',
@@ -324,7 +324,7 @@ export class PermissionAuditService {
     this.auditLogs.forEach(log => {
       const row = [
         log.userId,
-        log.userRole,
+        log.Roles,
         log.action,
         log.subject,
         log.resourceId || '',

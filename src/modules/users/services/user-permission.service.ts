@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CaslService } from '../../../shared/casl/casl.service';
 import { PermissionContextService } from '../../../shared/casl/services/permission-context.service';
 import { PermissionAuditService } from '../../../shared/casl/services/permission-audit.service';
-import { UserRole, User } from '@prisma/client';
+import { Roles, User } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 
 @Injectable()
@@ -38,28 +38,28 @@ export class UserPermissionService {
   /**
    * Verifica se pode criar usuário com role específico
    */
-  validarCriacaoDeUserComRole(targetRole: UserRole): boolean {
+  validarCriacaoDeUserComRole(targetRole: Roles): boolean {
     return this.validarPermissaoDeRole('create', targetRole);
   }
 
   /**
    * Verifica se pode atualizar usuário com role específico
    */
-  validarAtualizacaoDeUserComRole(targetRole: UserRole): boolean {
+  validarAtualizacaoDeUserComRole(targetRole: Roles): boolean {
     return this.validarPermissaoDeRole('update', targetRole);
   }
 
   /**
    * Verifica se pode deletar usuário com role específico
    */
-  validarDelecaoDeUserComRole(targetRole: UserRole): boolean {
+  validarDelecaoDeUserComRole(targetRole: Roles): boolean {
     return this.validarPermissaoDeRole('delete', targetRole);
   }
 
   /**
    * Validação centralizada para qualquer ação CRUD com role específico
    */
-  validarAcaoDeUserComRole(action: CrudAction, targetRole: UserRole): boolean {
+  validarAcaoDeUserComRole(action: CrudAction, targetRole: Roles): boolean {
     return this.validarPermissaoDeRole(action, targetRole);
   }
 
@@ -190,7 +190,7 @@ export class UserPermissionService {
    */
   private validarPermissaoDeRole(
     action: CrudAction,
-    targetRole: UserRole,
+    targetRole: Roles,
   ): boolean {
     return this.caslService.validarPermissaoDeRole(action, 'User', targetRole);
   }

@@ -53,7 +53,6 @@ import {
   RequiredFieldErrorFilter,
   PrismaErrorFilter,
 } from './shared/common/filters';
-import { ServiceBusModule } from './modules/service-bus/service-bus.module';
 import { FilesModule } from './shared/files/files.module';
 import { NotificationModule } from './modules/notifications/notification.module';
 
@@ -63,7 +62,7 @@ import { NotificationModule } from './modules/notifications/notification.module'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', 
+      envFilePath: '.env',
     }),
     LoggerModule,
     MessagesModule,
@@ -89,7 +88,6 @@ import { NotificationModule } from './modules/notifications/notification.module'
     ServicesModule,
     ReviewsModule,
     FavoritesModule,
-    ServiceBusModule,
     FilesModule,
     NotificationModule,
   ],

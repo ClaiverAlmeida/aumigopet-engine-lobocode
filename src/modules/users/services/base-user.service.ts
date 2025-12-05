@@ -4,7 +4,7 @@ import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service';
 import { UserPermissionService } from './user-permission.service';
 import { UpdateUserDto } from '../dto/update-user.dto';
-import { Prisma, UserRole } from '@prisma/client';
+import { Prisma, Roles } from '@prisma/client';
 import { CrudAction } from '../../../shared/common/types';
 import { NotFoundError } from '../../../shared/common/errors';
 import { SUCCESS_MESSAGES } from '../../../shared/common/messages';
@@ -17,7 +17,7 @@ export class BaseUserService {
     protected readonly userValidator: UserValidator,
     protected readonly userQueryService: UserQueryService,
     protected readonly userPermissionService: UserPermissionService,
-    protected targetRole?: UserRole,
+    protected targetRole?: Roles,
   ) {}
 
   // ============================================================================

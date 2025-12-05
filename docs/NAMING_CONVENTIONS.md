@@ -121,7 +121,7 @@ updateUser(id: string, updateUserDto: UpdateUserDto)
 updateCompany(id: string, updateCompanyDto: UpdateCompanyDto)
 updatePost(id: string, updatePostDto: UpdatePostDto)
 updateUserStatus(id: string, status: boolean)
-updateUserRole(id: string, role: Roles)
+updateRoles(id: string, role: Roles)
 ```
 
 ### **Exclusão e Desativação**

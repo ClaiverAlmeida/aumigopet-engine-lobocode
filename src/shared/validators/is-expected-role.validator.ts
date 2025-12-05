@@ -1,7 +1,7 @@
 import { registerDecorator, ValidationOptions, ValidationArguments } from 'class-validator';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 
-export function IsExpectedRole(expectedRole: UserRole, validationOptions?: ValidationOptions) {
+export function IsExpectedRole(expectedRole: Roles, validationOptions?: ValidationOptions) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       name: 'isExpectedRole',

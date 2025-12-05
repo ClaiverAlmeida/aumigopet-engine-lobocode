@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import bcrypt from 'bcrypt';
-import { UserRole, UserStatus } from '@prisma/client';
+import { Roles, UserStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { CreateSystemAdminDto } from '../dto/create-system-admin.dto';
 import { CreateAdminDto } from '../dto/create-admin.dto';
@@ -11,7 +11,7 @@ export class UserFactory {
     return bcrypt.hashSync(password, 10);
   }
 
-  private criarUsuarioBase(dto: any, role: UserRole): Prisma.UserCreateInput {
+  private criarUsuarioBase(dto: any, role: Roles): Prisma.UserCreateInput {
     return {
       name: dto.name,
       email: dto.email.trim().toLowerCase(),
@@ -32,10 +32,10 @@ export class UserFactory {
   }
 
   criarAdmin(dto: CreateAdminDto): Prisma.UserCreateInput {
-    return this.criarUsuarioBase(dto, UserRole.ADMIN);
+    return this.criarUsuarioBase(dto, Roles.ADMIN);
   }
 
   criarUser(dto: any): Prisma.UserCreateInput {
-    return this.criarUsuarioBase(dto, UserRole.USER);
+    return this.criarUsuarioBase(dto, Roles.USER);
   }
 }

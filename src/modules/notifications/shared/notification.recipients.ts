@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../../shared/prisma/prisma.service';
 import { RecipientType, RecipientRule } from './notification.types';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 
 /**
  * 👥 SISTEMA DE DESTINATÁRIOS DE NOTIFICAÇÃO FLEXÍVEL
@@ -115,7 +115,7 @@ export class NotificationRecipientsService {
     const users = await this.prisma.user.findMany({
       where: {
         companyId,
-        role: UserRole.ADMIN,
+        role: Roles.ADMIN,
         status: 'ACTIVE',
         deletedAt: null,
       },
@@ -131,7 +131,7 @@ export class NotificationRecipientsService {
     const users = await this.prisma.user.findMany({
       where: {
         companyId,
-        role: UserRole.ADMIN,
+        role: Roles.ADMIN,
         status: 'ACTIVE',
         deletedAt: null,
       },

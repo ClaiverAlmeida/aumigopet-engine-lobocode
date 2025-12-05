@@ -13,7 +13,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { RequiredRoles } from 'src/shared/auth/required-roles.decorator';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 import { UniversalService } from '../services/universal.service';
 import { TenantInterceptor } from 'src/shared/tenant/tenant.interceptor';
 import { CaslInterceptor } from 'src/shared/casl/interceptors/casl.interceptor';
@@ -32,7 +32,7 @@ export abstract class UniversalController<
   // ============================================================================
 
   @Get('metrics')
-  @RequiredRoles(UserRole.SYSTEM_ADMIN, UserRole.ADMIN)
+  @RequiredRoles(Roles.SYSTEM_ADMIN, Roles.ADMIN)
   async obterMetricas(
     @Query('startDate') startDate?: string,
     @Query('endDate') endDate?: string,

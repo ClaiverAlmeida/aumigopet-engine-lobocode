@@ -10,7 +10,7 @@ import {
   AdminService,
   UserPermissionService,
 } from './services';
-import { Prisma, UserRole, UserStatus } from '@prisma/client';
+import { Prisma, Roles, UserStatus } from '@prisma/client';
 import { UserFactory } from './factories/user.factory';
 
 @Injectable()
@@ -62,7 +62,7 @@ export class UsersService extends BaseUserService {
   /**
    * Busca usuários por role
    */
-  async buscarUsersPorRole(role: UserRole) {
+  async buscarUsersPorRole(role: Roles) {
     const whereClause = this.userQueryService.construirWhereClauseParaRead({
       role,
       status: UserStatus.ACTIVE,

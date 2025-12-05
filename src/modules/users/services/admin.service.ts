@@ -6,7 +6,7 @@ import { UserRepository } from '../repositories/user.repository';
 import { UserValidator } from '../validators/user.validator';
 import { UserQueryService } from './user-query.service';
 import { UserPermissionService } from './user-permission.service';
-import { UserRole } from '@prisma/client';
+import { Roles } from '@prisma/client';
 
 @Injectable()
 export class AdminService extends BaseUserService {
@@ -22,14 +22,14 @@ export class AdminService extends BaseUserService {
       userValidator,
       userQueryService,
       userPermissionService,
-      UserRole.ADMIN,
+      Roles.ADMIN,
     );
   }
 
   //  Funcionalidades específicas de administradores
   async criarNovoAdmin(dto: CreateAdminDto) {
     // ✅ Validação de role hierárquico
-    this.userPermissionService.validarCriacaoDeUserComRole(UserRole.ADMIN);
+    this.userPermissionService.validarCriacaoDeUserComRole(Roles.ADMIN);
 
     // Validações comuns
     await this.validarSeEmailEhUnico(dto.email);
@@ -45,7 +45,7 @@ export class AdminService extends BaseUserService {
   }
 
   async buscarAdminsPorCompany(companyId: string) {
-    return this.userRepository.buscarMuitos({ role: UserRole.ADMIN });
+    return this.userRepository.buscarMuitos({ role: Roles.ADMIN });
   }
 
   async obterEstatisticasDaCompany(companyId: string) {
