@@ -92,6 +92,13 @@ enum ReminderStatus {
   CANCELLED // Cancelado
 }
 
+enum SharedTutorStatus {
+  PENDING   // Convite enviado, aguardando aceitação
+  ACCEPTED  // Convite aceito, tutor ativo
+  DECLINED  // Convite recusado
+  REMOVED   // Tutor removido pelo dono
+}
+
 // ===============================================
 // 📊 PESO
 // ===============================================
@@ -198,7 +205,7 @@ model User {
   address        String?
   city           String?
   state          String?
-  zipCode        String?
+  zipCode        String? 
 
   // Multi-tenancy (opcional para usuários comuns)
   company   Company? @relation(fields: [companyId], references: [id])
@@ -219,6 +226,8 @@ model User {
   petFriendRequests PetFriendRequest[]      @relation("UserFriendRequests")
   petFriendsFrom    PetFriendship[]         @relation("UserPetFriendsFrom")
   petFriendsTo      PetFriendship[]         @relation("UserPetFriendsTo")
+  ownedSharedTutors SharedTutor[]            @relation("OwnerSharedTutors")
+  sharedTutors      SharedTutor[]            @relation("SharedUserTutors")
 
   // Auditoria
   createdAt DateTime  @default(now())
@@ -264,6 +273,7 @@ model Pet {
   reminders       Reminder[]
   weightRecords   WeightRecord[]
   socialPosts     SocialPost[]
+  sharedTutors    SharedTutorPet[]
   friendRequests  PetFriendRequest[] @relation("PetFriendRequests")
   friendshipsFrom PetFriendship[]    @relation("PetFriendshipsFrom")
   friendshipsTo   PetFriendship[]    @relation("PetFriendshipsTo")
@@ -289,6 +299,7 @@ model VaccineExam {
   name     String
   date     DateTime
   nextDate DateTime? // Próxima aplicação/exame
+  reminderDate DateTime? // Data do lembrete configurada pelo app
   location String?
   status   VaccineExamStatus @default(SCHEDULED)
   notes    String?           @db.Text
@@ -330,6 +341,10 @@ model Reminder {
   currentDay     Int?    @default(1) // Dia atual do tratamento
   dosage         String? // Dosagem
   frequency      String? // Frequência (ex: "8/8h", "2x ao dia")
+
+  // Campos de recorrência
+  recurring     Boolean  @default(false) // Se o lembrete se repete
+  recurringType String?  // Tipo de recorrência: daily, weekly, monthly
 
   // Pet relacionado
   pet   Pet    @relation(fields: [petId], references: [id], onDelete: Cascade)
@@ -775,4 +790,55 @@ model NotificationRecipient {
   @@index([userId])
   @@index([notificationId])
   @@index([isRead])
+}
+
+// ===============================================
+// 👥 TUTORES COMPARTILHADOS
+// ===============================================
+
+model SharedTutor {
+  id          String            @id @default(cuid())
+  
+  // Relacionamentos
+  owner       User              @relation("OwnerSharedTutors", fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId     String
+  
+  sharedUser  User?             @relation("SharedUserTutors", fields: [sharedUserId], references: [id], onDelete: Cascade)
+  sharedUserId String?
+  
+  // Dados do convite (quando ainda não aceito)
+  inviteEmail String?           // Email do convite pendente
+  
+  // Status e permissões
+  status      SharedTutorStatus @default(PENDING)
+  permissions Json              // { canEdit: boolean, canViewMedical: boolean, canSchedule: boolean }
+
+  // Pets compartilhados
+  pets        SharedTutorPet[]
+  
+  // Auditoria
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+  
+  @@index([ownerId])
+  @@index([sharedUserId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+model SharedTutorPet {
+  id            String        @id @default(cuid())
+  sharedTutor   SharedTutor   @relation(fields: [sharedTutorId], references: [id], onDelete: Cascade)
+  sharedTutorId String
+  pet           Pet           @relation(fields: [petId], references: [id], onDelete: Cascade)
+  petId         String
+
+  createdAt     DateTime      @default(now())
+  deletedAt     DateTime?
+
+  @@unique([sharedTutorId, petId])
+  @@index([petId])
+  @@index([sharedTutorId])
+  @@index([deletedAt])
 }

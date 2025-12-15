@@ -382,6 +382,6 @@ updateUserData() // Deveria ser updateUser()
 
 ---
 
-**Última atualização**: Dezembro 2024  
+**Última atualização**: Dezembro 2025  
 **Versão**: 1.0  
 **Responsável**: Equipe de Desenvolvimento AUMIGOPET

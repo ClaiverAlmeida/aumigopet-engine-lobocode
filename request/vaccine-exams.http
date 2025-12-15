@@ -1,0 +1,393 @@
+### =============================================================================
+### ARQUIVO HTTP - TESTE DO MÓDULO DE VACCINE EXAMS (VACINAS E EXAMES)
+### Sistema: AUMIGOPET Engine
+### Módulo: VaccineExams
+### =============================================================================
+
+# Configuração de variáveis
+@baseUrl = http://localhost:3000
+@contentType = application/json
+
+# Variáveis de teste
+@token = 
+@vaccineExamId = 
+@petId = 
+
+### =============================================================================
+### 1. AUTENTICAÇÃO
+### =============================================================================
+
+@token = {{loginUser.response.body.access_token}}
+# @name loginUser
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "login": "user@aumigopet.com",
+  "password": "User123@"
+}
+
+### =============================================================================
+### 2. BUSCAR PETS (PARA OBTER petId)
+### =============================================================================
+
+### 2.0 Buscar pets do usuário logado
+# @name getPets
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### 2.0.1 Definir petId manualmente (use o ID retornado acima)
+# Exemplo: @petId = clx1234567890abcdef
+@petId = cmhawbehg0008ltkxfoynljnl
+
+### =============================================================================
+### 3. CRIAR VACINAS E EXAMES (CREATE)
+### =============================================================================
+
+### 3.1 Criar vacina V10
+# @name createV10Vaccine
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "V10 (Óctupla)",
+  "date": "2025-12-15T00:00:00.000Z",
+  "nextDate": "2025-12-15T00:00:00.000Z",
+  "location": "Clínica Veterinária Pet Care Centro",
+  "status": "UP_TO_DATE",
+  "notes": "Vacina múltipla contra doenças virais. Reforço anual necessário.",
+  "petId": "{{petId}}"
+}
+
+### 3.2 Criar vacina Antirrábica
+# @name createRabiesVaccine
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "Antirrábica",
+  "date": "2025-12-20T00:00:00.000Z",
+  "nextDate": "2025-12-20T00:00:00.000Z",
+  "location": "Clínica Veterinária Bem Aventurança",
+  "status": "DUE_SOON",
+  "notes": "Vacina obrigatória por lei. Vencendo em breve.",
+  "petId": "{{petId}}"
+}
+
+### 3.3 Criar vacina V8
+# @name createV8Vaccine
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "V8 (Óctupla)",
+  "date": "2025-09-10T00:00:00.000Z",
+  "nextDate": "2025-09-10T00:00:00.000Z",
+  "location": "Pet Care Centro",
+  "status": "OVERDUE",
+  "notes": "Primeira dose da vacina. Agendar reforço.",
+  "petId": "{{petId}}"
+}
+
+### 3.4 Criar exame de sangue
+# @name createBloodExam
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "EXAM",
+  "name": "Hemograma Completo",
+  "date": "2025-12-15T00:00:00.000Z",
+  "location": "Clínica Veterinária Bem Cai",
+  "status": "SCHEDULED",
+  "notes": "Exame de rotina para verificar saúde geral",
+  "petId": "{{petId}}"
+}
+
+### 3.5 Criar exame de fezes
+# @name createStoolExam
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "EXAM",
+  "name": "Exame de Fezes",
+  "date": "2025-11-20T00:00:00.000Z",
+  "location": "Laboratório VetLab",
+  "status": "UP_TO_DATE",
+  "notes": "Verificação de parasitas. Resultado negativo.",
+  "petId": "{{petId}}"
+}
+
+### 3.6 Criar vacina sem nextDate
+# @name createVaccineWithoutNextDate
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "Gripe Canina",
+  "date": "2025-12-10T00:00:00.000Z",
+  "location": "Clínica Veterinária",
+  "status": "SCHEDULED",
+  "petId": "{{petId}}"
+}
+
+### =============================================================================
+### 4. BUSCAR VACINAS E EXAMES (READ)
+### =============================================================================
+
+### 4.1 Buscar todos os registros
+GET {{baseUrl}}/vaccine-exams
+Authorization: Bearer {{token}}
+
+### 4.2 Buscar registro por ID
+GET {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Authorization: Bearer {{token}}
+
+### 4.3 Buscar com paginação
+GET {{baseUrl}}/vaccine-exams?page=1&limit=10
+Authorization: Bearer {{token}}
+
+### 4.4 Buscar por tipo (VACCINE)
+GET {{baseUrl}}/vaccine-exams?type=VACCINE
+Authorization: Bearer {{token}}
+
+### 4.5 Buscar por tipo (EXAM)
+GET {{baseUrl}}/vaccine-exams?type=EXAM
+Authorization: Bearer {{token}}
+
+### 4.6 Buscar por status
+GET {{baseUrl}}/vaccine-exams?status=OVERDUE
+Authorization: Bearer {{token}}
+
+### 4.7 Buscar por pet
+GET {{baseUrl}}/vaccine-exams?petId={{petId}}
+Authorization: Bearer {{token}}
+
+### 4.8 Buscar vacinas vencendo em breve
+GET {{baseUrl}}/vaccine-exams?status=DUE_SOON
+Authorization: Bearer {{token}}
+
+### 4.9 Buscar vacinas atrasadas
+GET {{baseUrl}}/vaccine-exams?status=OVERDUE
+Authorization: Bearer {{token}}
+
+### 4.10 Buscar por data específica
+GET {{baseUrl}}/vaccine-exams?date=2025-12-15
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 5. ATUALIZAR VACINAS E EXAMES (UPDATE)
+### =============================================================================
+
+### 5.1 Atualizar status para em dia
+PATCH {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "UP_TO_DATE"
+}
+
+### 5.2 Atualizar próxima data
+PATCH {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "nextDate": "2025-12-20T00:00:00.000Z",
+  "status": "SCHEDULED"
+}
+
+### 5.3 Atualizar localização e notas
+PATCH {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "location": "Nova Clínica Veterinária",
+  "notes": "Mudança de clínica. Atualizar registro."
+}
+
+### 5.4 Atualizar documento/resultado
+PATCH {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "document": "https://example.com/documentos/vacina-v10-2025.pdf",
+  "status": "UP_TO_DATE"
+}
+
+### 5.5 Atualizar múltiplos campos
+PATCH {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "name": "V10 (Óctupla) - Reforço",
+  "date": "2025-12-20T00:00:00.000Z",
+  "nextDate": "2025-12-20T00:00:00.000Z",
+  "location": "Clínica Veterinária Atualizada",
+  "status": "UP_TO_DATE",
+  "notes": "Reforço aplicado com sucesso. Próxima dose em 1 ano."
+}
+
+### =============================================================================
+### 6. DELETAR VACINAS E EXAMES (DELETE)
+### =============================================================================
+
+### 6.1 Deletar registro
+DELETE {{baseUrl}}/vaccine-exams/{{vaccineExamId}}
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### 7. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### =============================================================================
+
+### 7.1 Criar sem autenticação (401)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+
+{
+  "type": "VACCINE",
+  "name": "Teste sem auth",
+  "date": "2025-12-15T00:00:00.000Z",
+  "petId": "{{petId}}"
+}
+
+### 7.2 Criar com tipo inválido (400)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "INVALID_TYPE",
+  "name": "Teste tipo inválido",
+  "date": "2025-12-15T00:00:00.000Z",
+  "petId": "{{petId}}"
+}
+
+### 7.3 Criar com status inválido (400)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "Teste status inválido",
+  "date": "2025-12-15T00:00:00.000Z",
+  "status": "INVALID_STATUS",
+  "petId": "{{petId}}"
+}
+
+### 7.4 Criar sem campos obrigatórios (400)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE"
+}
+
+### 7.5 Criar sem petId (400)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "Vacina Teste",
+  "date": "2025-12-15T00:00:00.000Z"
+}
+
+### 7.6 Criar com petId inexistente (404/400)
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "Vacina Teste",
+  "date": "2025-12-15T00:00:00.000Z",
+  "petId": "id-inexistente"
+}
+
+### 7.7 Buscar registro inexistente (404)
+GET {{baseUrl}}/vaccine-exams/id-inexistente
+Authorization: Bearer {{token}}
+
+### 7.8 Atualizar registro inexistente (404)
+PATCH {{baseUrl}}/vaccine-exams/id-inexistente
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "status": "UP_TO_DATE"
+}
+
+### =============================================================================
+### 8. CASOS DE USO ESPECÍFICOS
+### =============================================================================
+
+### 8.1 Criar vacina com todas as informações
+# @name createCompleteVaccine
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "VACCINE",
+  "name": "V10 (Óctupla) - Completa",
+  "date": "2025-12-15T10:30:00.000Z",
+  "nextDate": "2025-12-15T10:30:00.000Z",
+  "location": "Clínica Veterinária Pet Care Centro - Sala 3",
+  "status": "UP_TO_DATE",
+  "notes": "Vacina aplicada pelo Dr. João Silva. Pet reagiu bem. Próxima dose em 1 ano. Lote: V10-2025-001",
+  "document": "https://example.com/documentos/vacina-v10-rex-2025.pdf",
+  "petId": "{{petId}}"
+}
+
+### 8.2 Criar exame com resultado
+# @name createExamWithResult
+POST {{baseUrl}}/vaccine-exams
+Content-Type: {{contentType}}
+Authorization: Bearer {{token}}
+
+{
+  "type": "EXAM",
+  "name": "Hemograma Completo",
+  "date": "2025-12-10T14:00:00.000Z",
+  "location": "Laboratório VetLab - Unidade Centro",
+  "status": "UP_TO_DATE",
+  "notes": "Exame realizado. Todos os parâmetros dentro da normalidade. Resultado: Normal.",
+  "document": "https://example.com/documentos/hemograma-rex-2025.pdf",
+  "petId": "{{petId}}"
+}
+
+### 8.3 Buscar vacinas agendadas
+GET {{baseUrl}}/vaccine-exams?status=SCHEDULED&type=VACCINE
+Authorization: Bearer {{token}}
+
+### 8.4 Buscar exames do pet
+GET {{baseUrl}}/vaccine-exams?petId={{petId}}&type=EXAM
+Authorization: Bearer {{token}}
+
+### 8.5 Buscar vacinas do pet
+GET {{baseUrl}}/vaccine-exams?petId={{petId}}&type=VACCINE
+Authorization: Bearer {{token}}
+
+### =============================================================================
+### FIM DOS TESTES - VACCINE EXAMS
+### =============================================================================
+

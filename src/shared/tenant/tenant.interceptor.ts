@@ -14,9 +14,9 @@ import { CaslAbilityService } from '../casl/casl-ability/casl-ability.service';
 @Injectable()
 export class TenantInterceptor implements NestInterceptor {
   constructor(
-    private tenantService: TenantService,
-    private prismaService: PrismaService,
-    private abilityService: CaslAbilityService,
+    private readonly tenantService: TenantService,
+    private readonly prismaService: PrismaService,
+    private readonly abilityService: CaslAbilityService,
   ) {}
 
   async intercept(
@@ -51,6 +51,7 @@ export class TenantInterceptor implements NestInterceptor {
   }
 
   // Validar se usuário tem empresa (exceto master)
+  // Para usuários comuns, companyId é opcional
   private validateUserHasCompany(user: any): void {
     const ability = this.abilityService.ability;
     
@@ -59,9 +60,8 @@ export class TenantInterceptor implements NestInterceptor {
       return;
     }
 
-    if (!user.companyId) {
-      throw new ForbiddenException('User does not have a company');
-    }
+    // Para usuários comuns, companyId é opcional
+    // Não precisa validar se tem company
   }
 
   // Configurar contexto do tenant baseado no request
@@ -83,16 +83,40 @@ export class TenantInterceptor implements NestInterceptor {
 
       // Busca e valida empresa especificada
       const company = await this.findAndValidateCompany(specifiedCompanyId);
-      this.tenantService.setTemporaryTenant(company.id, company.name);
-    } else {
-      // Usa tenant padrão do usuário
+      if (company && !company.isGlobal) {
+        this.tenantService.setTemporaryTenant(company.id, company.name);
+      } else {
+        this.tenantService.setTenant({
+          id: 'global',
+          name: 'Global Tenant',
+          isGlobal: true,
+        });
+      }
+    } else if (user.companyId) {
+      // Se usuário tem companyId, busca a empresa
       const company = await this.findAndValidateCompany(user);
-      this.tenantService.setTenant(company);
+      if (company) {
+        this.tenantService.setTenant(company);
+      } else {
+        // Se não encontrou a empresa, configura tenant global
+        this.tenantService.setTenant({
+          id: 'global',
+          name: 'Global Tenant',
+          isGlobal: true,
+        });
+      }
+    } else {
+      // Se não tem companyId, configura tenant global (sem filtro de company)
+      this.tenantService.setTenant({
+        id: 'global',
+        name: 'Global Tenant',
+        isGlobal: true,
+      });
     }
   }
 
   // Buscar e validar empresa no banco
-  private async findAndValidateCompany(companyIdOrUser: any) {
+  private async findAndValidateCompany(companyIdOrUser: any): Promise<{ id: string; name: string; isGlobal: boolean } | null> {
     const ability = this.abilityService.ability;
     
     // Se for SYSTEM_ADMIN sem especificar companyId, retorna tenant global
@@ -110,19 +134,25 @@ export class TenantInterceptor implements NestInterceptor {
         throw new NotFoundException('Company not found');
       }
 
-      return { ...company, isGlobal: false };
+      return { id: company.id, name: company.name, isGlobal: false };
     }
 
     // Se for user, busca empresa do usuário
+    // Se não tiver companyId, retorna null (será tratado no setupTenantContext)
+    if (!companyIdOrUser.companyId) {
+      return null;
+    }
+
     const company = await this.prismaService.company.findFirst({
       where: { id: companyIdOrUser.companyId },
     });
 
     if (!company) {
-      throw new NotFoundException('Company not found');
+      // Não lança erro, retorna null para permitir tenant global
+      return null;
     }
 
-    return { ...company, isGlobal: false };
+    return { id: company.id, name: company.name, isGlobal: false };
     }
 
   // Tratar erros de tenant de forma padronizada

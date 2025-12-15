@@ -39,7 +39,7 @@ export class CreatePetDto {
 
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   @IsOptional()
-  microchipNumber?: string;
+  microchip?: string;
 
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   @IsOptional()
@@ -47,7 +47,7 @@ export class CreatePetDto {
 
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   @IsOptional()
-  medicalNotes?: string;
+  notes?: string;
 
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   @IsOptional()

@@ -18,6 +18,10 @@ export class CreateVaccineExamDto {
   @IsOptional()
   nextDate?: string;
 
+  @IsDateString({}, { message: VALIDATION_MESSAGES.FORMAT.DATE_INVALID })
+  @IsOptional()
+  reminderDate?: string;
+
   @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
   @IsOptional()
   location?: string;

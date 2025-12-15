@@ -48,6 +48,14 @@ export class CreateReminderDto {
   @IsOptional()
   frequency?: string;
 
+  // Campos de recorrência
+  @IsOptional()
+  recurring?: boolean;
+
+  @IsString({ message: VALIDATION_MESSAGES.FORMAT.FIELD_INVALID })
+  @IsOptional()
+  recurringType?: string; // daily, weekly, monthly
+
   @IsString({ message: VALIDATION_MESSAGES.REQUIRED.FIELD })
   petId: string;
 }

@@ -28,10 +28,23 @@ Content-Type: {{contentType}}
 }
 
 ### =============================================================================
-### 2. CRIAR LEMBRETES (CREATE)
+### 2. BUSCAR PETS (PARA OBTER petId)
 ### =============================================================================
 
-### 2.1 Criar lembrete de vacina
+### 2.0 Buscar pets do usuário logado
+# @name getPets
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### 2.0.1 Definir petId manualmente (use o ID retornado acima)
+# Exemplo: @petId = clx1234567890abcdef
+@petId = cmhawbehg0008ltkxfoynljnl
+
+### =============================================================================
+### 3. CRIAR LEMBRETES (CREATE)
+### =============================================================================
+
+### 3.1 Criar lembrete de vacina
 # @name createVaccineReminder
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
@@ -48,7 +61,7 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 2.2 Criar lembrete de medicação
+### 3.2 Criar lembrete de medicação
 # @name createMedicationReminder
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
@@ -69,14 +82,14 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 2.3 Criar lembrete de consulta veterinária
+### 3.3 Criar lembrete de consulta veterinária
 # @name createVetReminder
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
 
 {
-  "type": "VETERINARY",
+  "type": "APPOINTMENT",
   "title": "Consulta de Rotina",
   "description": "Check-up anual",
   "date": "2025-12-01T00:00:00.000Z",
@@ -86,7 +99,7 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 2.4 Criar lembrete de banho e tosa
+### 3.4 Criar lembrete de banho e tosa
 # @name createGroomingReminder
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
@@ -102,42 +115,42 @@ Authorization: Bearer {{token}}
 }
 
 ### =============================================================================
-### 3. BUSCAR LEMBRETES (READ)
+### 4. BUSCAR LEMBRETES (READ)
 ### =============================================================================
 
-### 3.1 Buscar todos os lembretes
+### 4.1 Buscar todos os lembretes
 GET {{baseUrl}}/reminders
 Authorization: Bearer {{token}}
 
-### 3.2 Buscar lembrete por ID
+### 4.2 Buscar lembrete por ID
 GET {{baseUrl}}/reminders/{{reminderId}}
 Authorization: Bearer {{token}}
 
-### 3.3 Buscar lembretes com paginação
+### 4.3 Buscar lembretes com paginação
 GET {{baseUrl}}/reminders?page=1&limit=10
 Authorization: Bearer {{token}}
 
-### 3.4 Buscar lembretes por tipo
+### 4.4 Buscar lembretes por tipo
 GET {{baseUrl}}/reminders?type=MEDICATION
 Authorization: Bearer {{token}}
 
-### 3.5 Buscar lembretes por status
+### 4.5 Buscar lembretes por status
 GET {{baseUrl}}/reminders?status=PENDING
 Authorization: Bearer {{token}}
 
-### 3.6 Buscar lembretes por pet
+### 4.6 Buscar lembretes por pet
 GET {{baseUrl}}/reminders?petId={{petId}}
 Authorization: Bearer {{token}}
 
-### 3.7 Buscar lembretes pendentes de hoje
+### 4.7 Buscar lembretes pendentes de hoje
 GET {{baseUrl}}/reminders?status=PENDING&date=2025-10-29
 Authorization: Bearer {{token}}
 
 ### =============================================================================
-### 4. ATUALIZAR LEMBRETES (UPDATE)
+### 5. ATUALIZAR LEMBRETES (UPDATE)
 ### =============================================================================
 
-### 4.1 Atualizar status do lembrete para concluído
+### 5.1 Atualizar status do lembrete para concluído
 PATCH {{baseUrl}}/reminders/{{reminderId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -146,7 +159,7 @@ Authorization: Bearer {{token}}
   "status": "COMPLETED"
 }
 
-### 4.2 Atualizar data e hora do lembrete
+### 5.2 Atualizar data e hora do lembrete
 PATCH {{baseUrl}}/reminders/{{reminderId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -156,7 +169,7 @@ Authorization: Bearer {{token}}
   "time": "16:00"
 }
 
-### 4.3 Atualizar dia atual da medicação
+### 5.3 Atualizar dia atual da medicação
 PATCH {{baseUrl}}/reminders/{{reminderId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -167,18 +180,18 @@ Authorization: Bearer {{token}}
 }
 
 ### =============================================================================
-### 5. DELETAR LEMBRETES (DELETE)
+### 6. DELETAR LEMBRETES (DELETE)
 ### =============================================================================
 
-### 5.1 Deletar lembrete
+### 6.1 Deletar lembrete
 DELETE {{baseUrl}}/reminders/{{reminderId}}
 Authorization: Bearer {{token}}
 
 ### =============================================================================
-### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### 7. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
 ### =============================================================================
 
-### 6.1 Criar lembrete sem autenticação (401)
+### 7.1 Criar lembrete sem autenticação (401)
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
 
@@ -190,7 +203,7 @@ Content-Type: {{contentType}}
   "petId": "{{petId}}"
 }
 
-### 6.2 Criar lembrete com tipo inválido (400)
+### 7.2 Criar lembrete com tipo inválido (400)
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -203,7 +216,7 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 6.3 Criar lembrete sem campos obrigatórios (400)
+### 7.3 Criar lembrete sem campos obrigatórios (400)
 POST {{baseUrl}}/reminders
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -212,7 +225,7 @@ Authorization: Bearer {{token}}
   "type": "VACCINE"
 }
 
-### 6.4 Buscar lembrete inexistente (404)
+### 7.4 Buscar lembrete inexistente (404)
 GET {{baseUrl}}/reminders/id-inexistente
 Authorization: Bearer {{token}}
 

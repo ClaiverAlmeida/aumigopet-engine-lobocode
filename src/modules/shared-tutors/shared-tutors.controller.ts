@@ -1,7 +1,7 @@
- import { Controller, UseGuards } from '@nestjs/common';
-import { VaccineExamsService } from './vaccine-exams.service';
-import { CreateVaccineExamDto } from './dto/create-vaccine-exam.dto';
-import { UpdateVaccineExamDto } from './dto/update-vaccine-exam.dto';
+import { Controller, UseGuards } from '@nestjs/common';
+import { SharedTutorsService } from './shared-tutors.service';
+import { CreateSharedTutorDto } from './dto/create-shared-tutor.dto';
+import { UpdateSharedTutorDto } from './dto/update-shared-tutor.dto';
 import { AuthGuard } from 'src/shared/auth/guards/auth.guard';
 import { Roles } from '@prisma/client';
 import { RoleByMethodGuard } from 'src/shared/auth/guards/role-by-method.guard';
@@ -15,13 +15,14 @@ import { UniversalController } from 'src/shared/universal';
   PATCH: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.USER],
   DELETE: [Roles.SYSTEM_ADMIN, Roles.ADMIN, Roles.USER],
 })
-@Controller('vaccine-exams')
-export class VaccineExamsController extends UniversalController<
-  CreateVaccineExamDto,
-  UpdateVaccineExamDto,
-  VaccineExamsService
+@Controller('shared-tutors')
+export class SharedTutorsController extends UniversalController<
+  CreateSharedTutorDto,
+  UpdateSharedTutorDto,
+  SharedTutorsService
 > {
-  constructor(service: VaccineExamsService) {
+  constructor(service: SharedTutorsService) {
     super(service);
   }
 }
+

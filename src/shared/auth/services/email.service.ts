@@ -48,4 +48,27 @@ export class EmailService {
     // Por enquanto, apenas loga a ação
     // Em produção, integrar com serviço de email real
   }
+
+  /**
+   * Envia email de convite para tutor compartilhado
+   */
+  async sendSharedTutorInviteEmail(
+    inviteEmail: string,
+    ownerName: string,
+    petNames: string[],
+    inviteId: string,
+  ): Promise<void> {
+    // TODO: Implementar integração com serviço de email
+    this.logger.log(`Email de convite de tutor compartilhado enviado para ${inviteEmail}`);
+    this.logger.log(`Dono: ${ownerName}`);
+    this.logger.log(`Pets compartilhados: ${petNames.join(', ')}`);
+    this.logger.log(`ID do convite: ${inviteId}`);
+    
+    // Por enquanto, apenas loga a ação
+    // Em produção, integrar com serviço de email real
+    // O email deve conter:
+    // - Link para aceitar o convite
+    // - Informações sobre os pets compartilhados
+    // - Permissões concedidas
+  }
 } 

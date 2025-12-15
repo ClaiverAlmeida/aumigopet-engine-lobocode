@@ -53,8 +53,8 @@ Authorization: Bearer {{token}}
   "gender": "MALE",
   "color": "Amarelo",
   "weight": 30.5,
-  "microchipNumber": "123456789012345",
-  "medicalNotes": "Vacinação em dia",
+  "microchip": "123456789012345",
+  "notes": "Vacinação em dia",
   "allergies": "Nenhuma"
 }
 
@@ -72,7 +72,7 @@ Authorization: Bearer {{token}}
   "gender": "FEMALE",
   "color": "Branco",
   "weight": 4.2,
-  "medicalNotes": "Castrada"
+  "notes": "Castrada"
 }
 
 ### 2.3 Criar um pássaro
@@ -128,7 +128,7 @@ Authorization: Bearer {{token}}
 
 {
   "weight": 32.0,
-  "medicalNotes": "Vacinação em dia. Última consulta: 2025-01-15"
+  "notes": "Vacinação em dia. Última consulta: 2025-01-15"
 }
 
 ### 4.2 Atualizar foto do pet
@@ -227,7 +227,7 @@ Authorization: Bearer {{token}}
 {
   "name": "Outro Rex",
   "species": "DOG",
-  "microchipNumber": "123456789012345"
+  "microchip": "123456789012345"
 }
 
 ### =============================================================================
@@ -346,7 +346,7 @@ Authorization: Bearer {{token}}
 
 {
   "weight": 36.5,
-  "medicalNotes": "Check-up realizado em 2025-01-15. Pet saudável!"
+  "notes": "Check-up realizado em 2025-01-15. Pet saudável!"
 }
 
 ### 9.6 Passo 6: Ver estatísticas
@@ -383,9 +383,9 @@ Authorization: Bearer {{token}}
 # - gender: Gênero
 # - color: Cor
 # - weight: Peso em kg
-# - microchipNumber: Número do microchip (único)
+# - microchip: Número do microchip (único)
 # - profileImage: URL da imagem de perfil
-# - medicalNotes: Notas médicas
+# - notes: Notas médicas
 # - dietaryRestrictions: Restrições alimentares
 # - allergies: Alergias
 

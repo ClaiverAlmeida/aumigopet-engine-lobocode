@@ -11,7 +11,7 @@
 # Variáveis de teste
 @token = 
 @weightRecordId = 
-@petId = 
+@petId = cmisz6ut10000kxjhzneszuon
 
 ### =============================================================================
 ### 1. AUTENTICAÇÃO
@@ -27,12 +27,24 @@ Content-Type: {{contentType}}
   "password": "User123@"
 }
 
+### =============================================================================
+### 2. BUSCAR PETS (PARA OBTER petId)
+### =============================================================================
+
+### 2.0 Buscar pets do usuário logado
+# @name getPets
+GET {{baseUrl}}/pets
+Authorization: Bearer {{token}}
+
+### 2.0.1 Definir petId manualmente (use o ID retornado acima)
+# Exemplo: @petId = clx1234567890abcdef
+@petId = cmhawbehg0008ltkxfoynljnl
 
 ### =============================================================================
-### 2. CRIAR REGISTROS DE PESO (CREATE)
+### 3. CRIAR REGISTROS DE PESO (CREATE)
 ### =============================================================================
 
-### 2.1 Criar primeiro registro de peso
+### 3.1 Criar primeiro registro de peso
 # @name createFirstWeight
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
@@ -40,13 +52,13 @@ Authorization: Bearer {{token}}
 
 {
   "weight": 8.5,
-  "date": "2025-01-15T00:00:00.000Z",
+  "date": "2025-01-25T00:00:00.000Z",
   "status": "NORMAL",
   "notes": "Peso inicial - adoção",
   "petId": "{{petId}}"
 }
 
-### 2.2 Criar registro de peso abaixo do ideal
+### 3.2 Criar registro de peso abaixo do ideal
 # @name createUnderweight
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
@@ -60,21 +72,21 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 2.3 Criar registro de peso acima do ideal
+### 3.3 Criar registro de peso acima do ideal
 # @name createOverweight
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
 
 {
-  "weight": 12.8,
-  "date": "2025-06-20T00:00:00.000Z",
+  "weight": 10.8,
+  "date": "2021-06-24T00:00:00.000Z",
   "status": "OVERWEIGHT",
   "notes": "Iniciando dieta e exercícios",
   "petId": "{{petId}}"
 }
 
-### 2.4 Criar registro de peso atual
+### 3.4 Criar registro de peso atual
 # @name createCurrentWeight
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
@@ -87,42 +99,42 @@ Authorization: Bearer {{token}}
 }
 
 ### =============================================================================
-### 3. BUSCAR REGISTROS DE PESO (READ)
+### 4. BUSCAR REGISTROS DE PESO (READ)
 ### =============================================================================
 
-### 3.1 Buscar todos os registros
+### 4.1 Buscar todos os registros
 GET {{baseUrl}}/weight-records
 Authorization: Bearer {{token}}
 
-### 3.2 Buscar registro por ID
+### 4.2 Buscar registro por ID
 GET {{baseUrl}}/weight-records/{{weightRecordId}}
 Authorization: Bearer {{token}}
 
-### 3.3 Buscar registros com paginação
+### 4.3 Buscar registros com paginação
 GET {{baseUrl}}/weight-records?page=1&limit=10
 Authorization: Bearer {{token}}
 
-### 3.4 Buscar registros por pet
+### 4.4 Buscar registros por pet
 GET {{baseUrl}}/weight-records?petId={{petId}}
 Authorization: Bearer {{token}}
 
-### 3.5 Buscar registros por status
+### 4.5 Buscar registros por status
 GET {{baseUrl}}/weight-records?status=NORMAL
 Authorization: Bearer {{token}}
 
-### 3.6 Buscar registros ordenados por data (mais recentes primeiro)
+### 4.6 Buscar registros ordenados por data (mais recentes primeiro)
 GET {{baseUrl}}/weight-records?petId={{petId}}&sortBy=date&sortOrder=desc
 Authorization: Bearer {{token}}
 
-### 3.7 Buscar registros em um período
+### 4.7 Buscar registros em um período
 GET {{baseUrl}}/weight-records?petId={{petId}}&startDate=2025-01-01&endDate=2025-12-31
 Authorization: Bearer {{token}}
 
 ### =============================================================================
-### 4. ATUALIZAR REGISTROS (UPDATE)
+### 5. ATUALIZAR REGISTROS (UPDATE)
 ### =============================================================================
 
-### 4.1 Atualizar notas do registro
+### 5.1 Atualizar notas do registro
 PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -131,7 +143,7 @@ Authorization: Bearer {{token}}
   "notes": "Atualizado: Pet está respondendo bem à dieta"
 }
 
-### 4.2 Corrigir peso registrado
+### 5.2 Corrigir peso registrado
 PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -141,7 +153,7 @@ Authorization: Bearer {{token}}
   "notes": "Correção de peso - balança estava descalibrada"
 }
 
-### 4.3 Atualizar status
+### 5.3 Atualizar status
 PATCH {{baseUrl}}/weight-records/{{weightRecordId}}
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -151,18 +163,18 @@ Authorization: Bearer {{token}}
 }
 
 ### =============================================================================
-### 5. DELETAR REGISTROS (DELETE)
+### 6. DELETAR REGISTROS (DELETE)
 ### =============================================================================
 
-### 5.1 Deletar registro de peso
+### 6.1 Deletar registro de peso
 DELETE {{baseUrl}}/weight-records/{{weightRecordId}}
 Authorization: Bearer {{token}}
 
 ### =============================================================================
-### 6. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
+### 7. TESTES DE VALIDAÇÃO (ERROS ESPERADOS)
 ### =============================================================================
 
-### 6.1 Criar registro sem autenticação (401)
+### 7.1 Criar registro sem autenticação (401)
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
 
@@ -171,7 +183,7 @@ Content-Type: {{contentType}}
   "petId": "{{petId}}"
 }
 
-### 6.2 Criar registro com peso inválido (400)
+### 7.2 Criar registro com peso inválido (400)
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -181,7 +193,7 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 6.3 Criar registro sem peso (400)
+### 7.3 Criar registro sem peso (400)
 POST {{baseUrl}}/weight-records
 Content-Type: {{contentType}}
 Authorization: Bearer {{token}}
@@ -191,7 +203,7 @@ Authorization: Bearer {{token}}
   "petId": "{{petId}}"
 }
 
-### 6.4 Buscar registro inexistente (404)
+### 7.4 Buscar registro inexistente (404)
 GET {{baseUrl}}/weight-records/id-inexistente
 Authorization: Bearer {{token}}
 

@@ -11,6 +11,7 @@ export type EntityNameModel =
   | 'vaccineExam'
   | 'reminder'
   | 'weightRecord'
+  | 'sharedTutor'
   // Social Network
   | 'socialPost'
   | 'postComment'
@@ -36,6 +37,7 @@ export type EntityNameCasl =
   | 'VaccineExam'
   | 'Reminder'
   | 'WeightRecord'
+  | 'SharedTutor'
   // Social Network
   | 'SocialPost'
   | 'PostComment'
@@ -68,6 +70,7 @@ export const ENTITY_MAPPING = {
   vaccineExam: 'VaccineExam',
   reminder: 'Reminder',
   weightRecord: 'WeightRecord',
+  sharedTutor: 'SharedTutor',
   // Social Network
   socialPost: 'SocialPost',
   postComment: 'PostComment',
@@ -97,6 +100,7 @@ export const CASL_TO_MODEL_MAPPING = {
   VaccineExam: 'vaccineExam',
   Reminder: 'reminder',
   WeightRecord: 'weightRecord',
+  SharedTutor: 'sharedTutor',
   // Social Network
   SocialPost: 'socialPost',
   PostComment: 'postComment',

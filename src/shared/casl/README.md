@@ -320,8 +320,8 @@ if (metricas.mostDeniedActions.length > 0) {
 ```typescript
 // Relatório de compliance
 const logs = await auditService.obterLogs({
-  inicio: new Date('2024-01-01'),
-  fim: new Date('2024-12-31'),
+  inicio: new Date('2025-01-01'),
+  fim: new Date('2025-12-31'),
   companyId: 'company-123',
 });
 
@@ -329,7 +329,7 @@ const relatorio = {
   totalAcessos: logs.length,
   acessosNegados: logs.filter(l => !l.success).length,
   usuariosAtivos: new Set(logs.map(l => l.userId)).size,
-  periodo: '2024',
+  periodo: '2025',
 };
 ```
 

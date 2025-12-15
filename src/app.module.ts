@@ -18,6 +18,7 @@ import { PetsModule } from './modules/pets/pets.module';
 import { VaccineExamsModule } from './modules/vaccine-exams/vaccine-exams.module';
 import { RemindersModule } from './modules/reminders/reminders.module';
 import { WeightRecordsModule } from './modules/weight-records/weight-records.module';
+import { SharedTutorsModule } from './modules/shared-tutors/shared-tutors.module';
 import { SocialPostsModule } from './modules/social-posts/social-posts.module';
 import { PostCommentsModule } from './modules/post-comments/post-comments.module';
 import { PostLikesModule } from './modules/post-likes/post-likes.module';
@@ -78,6 +79,7 @@ import { NotificationModule } from './modules/notifications/notification.module'
     VaccineExamsModule,
     RemindersModule,
     WeightRecordsModule,
+    SharedTutorsModule,
     SocialPostsModule,
     PostCommentsModule,
     PostLikesModule,

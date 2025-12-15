@@ -230,6 +230,15 @@ export class UniversalRepository<DtoCreate, DtoUpdate> {
 
     const transformedData = { ...data };
 
+    // Verifica se há nested creates (como pets: { create: [...] })
+    const hasNestedCreates = Object.keys(transformedData).some(
+      (key) =>
+        typeof transformedData[key] === 'object' &&
+        transformedData[key] !== null &&
+        !Array.isArray(transformedData[key]) &&
+        transformedData[key].create !== undefined,
+    );
+
     // Detecta campos que terminam com "Id" e os transforma em relacionamentos
     Object.keys(data).forEach((key) => {
       if (key.endsWith('Id') && data[key] !== null && data[key] !== undefined) {
@@ -237,6 +246,12 @@ export class UniversalRepository<DtoCreate, DtoUpdate> {
 
         // Pula se já existe um relacionamento com esse nome
         if (transformedData[relationName]) {
+          return;
+        }
+
+        // Quando há nested creates, mantém o campo Id diretamente
+        // pois o Prisma precisa dele para criar os relacionamentos nested
+        if (hasNestedCreates) {
           return;
         }
 

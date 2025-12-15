@@ -188,7 +188,7 @@ O sistema faz backup automático diário às 2h da manhã:
 ls -la backups/
 
 # Restaurar backup
-gunzip -c backups/backup_20241201_020000.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U postgres aumigopet_prod
+gunzip -c backups/backup_20251201_020000.sql.gz | docker compose -f docker-compose.prod.yml exec -T db psql -U postgres aumigopet_prod
 ```
 
 ### Atualizações
